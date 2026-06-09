@@ -60,7 +60,7 @@
 <p>RegBase 使用 <code>__VEC_SCOPE__</code> 声明向量寄存器的作用域，使用 <code>__simd_vf__</code> 声明 VF（Vector Function）函数。这些关键字告诉编译器：这个函数内部的变量应该分配到向量寄存器中，而不是 UB。</p>
 <h2>2.2.6 SIMT：线程级并行（A5 新增）</h2>
 <p>SIMT 是 A5 引入的全新编程模型。在 SIMT 模式下，每个线程处理一个或少量数据元素，硬件按 Warp（32 线程一组）进行调度执行。</p>
-<p>如果说 SIMD 是"一屏刷过 10 个视频"，那么 SIMT 就是"每个玩家控制一个英雄，5 人一组开黑"。SIMD 适合规整的大块数据（一屏视频），SIMT 适合离散、不规则的数据访问模式（每个英雄各走各的路、各打各的野）。</p>
+<p>如果说 SIMD 是"一辆大巴一趟拉走 64 个乘客"，那么 SIMT 就是"每个玩家控制一个英雄，5 人一组开黑"。SIMD 适合规整的大块数据（一辆大巴拉满），SIMT 适合离散、不规则的数据访问模式（每个英雄各走各的路、各打各的野）。</p>
 <h3>SIMT 线程层次</h3>
 <table><thead><tr><th>层级</th><th>概念</th><th>说明</th><th>设置方式</th></tr></thead><tbody><tr><td>启动核数</td><td>Block 数量</td><td>启动多少个 AI Core</td><td>Tiling 侧 <code>SetBlockDim</code></td></tr><tr><td>启动线程数</td><td>单核线程数</td><td>每个 AI Core 内部启动多少线程</td><td>Kernel 侧 <code>constexpr</code> 常量</td></tr><tr><td>Warp</td><td>32 线程分组</td><td>硬件自动将 32 个线程分为一组</td><td>硬件自动分组</td></tr></tbody></table>
 <p>Warp 的概念——硬件自动将 32 个线程分为一组，组内线程同步执行同一条指令。</p>
