@@ -57,7 +57,7 @@ Kernel（NPU 上实际执行的核函数）</code></pre>
 <p>两者的核心区别在于硬件架构：GPU 的 SM 擅长大量线程并行做简单运算；昇腾 NPU 的 AI Core 则集成了专用的 Cube（矩阵乘）和 Vector（向量）计算单元，对矩阵运算有硬件级加速。</p>
 <h3>CANN 软件栈</h3>
 <p>CANN 全称 <strong>Compute Architecture for Neural Networks</strong>，是昇腾的统一计算架构。你可以把它理解为"NPU 世界的操作系统 + 开发工具包"。</p>
-<p><img src="../pic/cann_software_stack.svg" alt="CANN 软件栈层次图"></p>
+<p><img src="https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/8.0.0.alpha001/opdevg/ascendcopdevg/atlas_ascendc_10_0009_0.png" alt="CANN 软件栈层次图"></p>
 <p>从用户代码到硬件，整个软件栈的分层如下：</p>
 <pre class="ascii-art"><code>┌─────────────────────────────────────┐
 │  应用框架 (PyTorch / MindSpore)      │

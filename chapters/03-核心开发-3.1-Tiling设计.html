@@ -22,7 +22,7 @@
 <li><strong>充分利用 UB 空间</strong>：A5 芯片每核有 248KB 的 Unified Buffer，这是计算的主战场。Tiling 要让每次搬运进来的数据尽量填满 UB，减少搬运次数。</li>
 <li><strong>减少搬运开销</strong>：每次 GM↔UB 的数据搬运都有延迟，好的 Tiling 应该让"搬运时间"和"计算时间"尽量重叠，把搬运开销藏起来。</li>
 </ol>
-<p><img src="../pic/tiling-overview.svg" alt="Tiling 示意图"></p>
+<p><img src="https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/8.0.0.alpha001/opdevg/ascendcopdevg/atlas_ascendc_10_0011_0.png" alt="Tiling 示意图"></p>
 <h3>Tiling 的三个核心问题</h3>
 <p>设计 Tiling 时，你需要回答三个问题：</p>
 <ol>

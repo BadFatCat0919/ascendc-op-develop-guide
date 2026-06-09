@@ -24,7 +24,7 @@
 </ul>
 <p>数据在不同层级之间搬运，就像雪王奶茶的备料流程：原料从总仓（GM）拉到门店冷库（L1），再摆到吧台（UB），调饮师在操作台上加工（Vector/Cube 计算），做好的成品再打包送出。每次搬运都有时间成本，好的算子设计要尽量减少不必要的搬运，并让搬运和加工重叠执行——调饮师做上一杯的时候，下一杯的原料已经在路上了。</p>
 <p>对于 sswap 这种纯搬运算子，数据路径非常简单：从 GM 搬到 UB，在 UB 里交换两个 Buffer 的内容，再从 UB 搬回 GM。整个过程不涉及 Vector 计算和 Cube 计算，只用到 MTE2（搬入）和 MTE3（搬出）两个搬运引擎。</p>
-<p><img src="../pic/memory-hierarchy.svg" alt="存储层次图"></p>
+<p><img src="https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/8.0.0.alpha001/opdevg/ascendcopdevg/atlas_ascendc_10_0010_0.png" alt="存储层次图"></p>
 <h2>3.2.2 Global Memory (GM)</h2>
 <p>GM 是片外 HBM（高带宽内存），相当于 NPU 的"主内存"。它的容量很大（通常几十 GB），所有 AI Core 共享同一块 GM 空间。算子的输入数据和输出结果都存放在 GM 中。</p>
 <p>在 Kernel 函数中，GM 通过 <code>GM_ADDR</code> 指针传入。你可以把它理解为一个指向 HBM 的裸指针，但访问它需要特殊的语法：</p>
