@@ -42,17 +42,22 @@
 <p>写代码时以 C++ 类型名为准，别名通常出现在文档和口头讨论中。</p>
 <h2>1.2.4 A5 特有的数据类型</h2>
 <p>A5（DAV_3510 架构）相比 A2/A3 新增了多种低精度数据类型，主要服务于量化推理和高效训练。</p>
+<h3>命名规则解读</h3>
+<p>看到 FP8 E4M3、MXFP4 E2M1 这种名字，可能一头雾水。其实命名规则很直观：</p>
+<ul>
+<li><strong>E</strong> = Exponent（指数位）：决定数值的大小范围，E 越大能表示的数越大/越小</li>
+<li><strong>M</strong> = Mantissa（尾数位）：决定数值的精度，M 越大精度越高</li>
+</ul>
+<p>所以 <strong>FP8 E4M3</strong> 就是：8 位浮点数，4 位指数 + 3 位尾数（还有 1 位符号位）。<strong>MXFP4 E2M1</strong> 就是：4 位微缩浮点数，2 位指数 + 1 位尾数（还有 1 位符号位）。</p>
+<p><strong>MXFP</strong> 中的 <strong>MX</strong> = Microscaling（微缩），表示这是一种"分组共享指数"格式——多个数据元素共享同一个 Scale 因子，进一步压缩数据体积。</p>
 <h3>A5 Cube MMAD 支持的数据类型</h3>
 <table><thead><tr><th>格式</th><th>A2/A3 支持</th><th>A5 支持</th><th>备注</th></tr></thead><tbody><tr><td>FP16 / BF16 / HF32 / FP32 / S8</td><td>✅</td><td>✅</td><td>通用类型，两代都支持</td></tr><tr><td>FP8 E5M2 / E4M3</td><td>❌</td><td>✅</td><td>支持静态/动态量化</td></tr><tr><td>MXFP8 E5M2/E4M3</td><td>❌</td><td>✅</td><td>32 个 Data 共享 1 个 Scale</td></tr><tr><td>MXFP4 E2M1/E1M2</td><td>❌</td><td>✅</td><td>4-bit 浮点，极致压缩</td></tr><tr><td>HiF8</td><td>❌</td><td>✅</td><td>华为自定义 FP8 格式</td></tr></tbody></table>
 <p><strong>MXFP（Microscaling Floating Point）</strong> 是 A5 引入的一种"分组共享指数"格式：32 个数据元素共享 1 个 Scale 因子。这样做的好处是进一步压缩数据体积——32 个数只需要额外存 1 个 Scale，而不是每个数都带完整的指数位。在 Tiling 设计时，需要把 scaleFactor 作为独立的数据来处理，不能和 Data 混在一起搬运。</p>
 <h2>1.2.5 数据排布格式</h2>
 <p>同样的一批数据，在内存中可以按不同的顺序排列。就像你刷大绿书，同样一堆帖子，按"最新"排和按"最热"排，你刷到想看内容的效率完全不同。数据排布格式决定了 NPU 访问内存时的效率——如果排布方式和硬件的计算模式匹配，就能连续读取、一次搬完；不匹配就会产生大量碎片化的随机访问，效率大打折扣。</p>
-<h3>通用格式</h3>
-<table><thead><tr><th>格式</th><th>维度顺序</th><th>说明</th></tr></thead><tbody><tr><td><strong>ND</strong></td><td>任意维度</td><td>最通用，Row-major（行优先），Ascend C 中最常用</td></tr><tr><td><strong>NCHW</strong></td><td>Batch-Channel-Height-Width</td><td>PyTorch 默认格式</td></tr><tr><td><strong>NHWC</strong></td><td>Batch-Height-Width-Channel</td><td>TensorFlow 默认格式</td></tr><tr><td><strong>NCDHW</strong></td><td>Batch-Channel-Depth-Height-Width</td><td>3D 卷积场景</td></tr></tbody></table>
+<table><thead><tr><th>格式</th><th>维度顺序 / 说明</th><th>用途</th><th>备注</th></tr></thead><tbody><tr><td><strong>ND</strong></td><td>任意维度，Row-major（行优先）</td><td>最通用的格式，Ascend C 中最常用</td><td></td></tr><tr><td><strong>NCHW</strong></td><td>Batch-Channel-Height-Width</td><td>卷积、图像处理</td><td>PyTorch 默认格式</td></tr><tr><td><strong>NHWC</strong></td><td>Batch-Height-Width-Channel</td><td>卷积、图像处理</td><td>TensorFlow 默认格式</td></tr><tr><td><strong>NCDHW</strong></td><td>Batch-Channel-Depth-Height-Width</td><td>3D 卷积场景</td><td></td></tr><tr><td><strong>NC1HWC0 (5HD)</strong></td><td>将 Channel 维拆为 C1（外层）+ C0（内层），C0=16</td><td>卷积输入特征图</td><td>昇腾专用，匹配 Cube 的 16×16 计算粒度</td></tr><tr><td><strong>FracZ</strong></td><td>按 Cube 计算分块重新排列</td><td>全连接层权重</td><td>昇腾专用</td></tr><tr><td><strong>FracNZ</strong></td><td>FracZ 的改进版，支持双维分块</td><td>Transformer QKV 权重</td><td>昇腾专用</td></tr></tbody></table>
 <p><strong>ND 格式</strong>是 Ascend C 开发中最常用的格式。它不限制维度数和维度含义，数据按行优先（Row-major）顺序连续存放——就像 C 语言中二维数组 <code>a[i][j]</code> 的存储方式：第 0 行所有元素、第 1 行所有元素……依次排列。</p>
-<h3>昇腾 NPU 专用格式</h3>
-<p>这些格式是为了匹配 Cube 单元（矩阵乘单元）的硬件计算需求而设计的。Cube 单元一次计算的是一个固定大小的矩阵块（如 16×16），如果数据按 ND 格式存放，每次取一个矩阵块就需要跨行跳跃读取，效率低。专用格式把数据预先按 Cube 的计算块重排，让硬件可以连续读取。</p>
-<table><thead><tr><th>格式</th><th>说明</th><th>用途</th></tr></thead><tbody><tr><td><strong>NC1HWC0 (5HD)</strong></td><td>将 Channel 维拆为 C1（外层）+ C0（内层），C0=16</td><td>卷积输入特征图</td></tr><tr><td><strong>FracZ</strong></td><td>按 Cube 计算分块重新排列</td><td>全连接层权重</td></tr><tr><td><strong>FracNZ</strong></td><td>FracZ 的改进版，支持双维分块</td><td>Transformer QKV 权重</td></tr></tbody></table>
+<p>表中标注"昇腾专用"的格式是为了匹配 Cube 单元（矩阵乘单元）的硬件计算需求而设计的。Cube 单元一次计算的是一个固定大小的矩阵块（如 16×16），如果数据按 ND 格式存放，每次取一个矩阵块就需要跨行跳跃读取，效率低。专用格式把数据预先按 Cube 的计算块重排，让硬件可以连续读取。</p>
 <h3>格式转换路径</h3>
 <pre class="ascii-art"><code>NCHW → NC1HWC0 (5HD)    # 卷积输入：从 PyTorch 格式转为 NPU 友好格式
 NC1HWC0 → NCHW          # 卷积输出：从 NPU 格式转回 PyTorch 格式
