@@ -115,10 +115,10 @@ EXPECT_TRUE(Verifier::verifyVector(yPtr, goldenY.data(), ...));</code></pre>
 <script>
 renderQuiz('quiz', [
   {
-    question: "精度问题的三种表现，哪种最像'大绿书搜攻略搜到全篇广告'？",
-    options: ["输出全为 0 或随机值", "输出与 golden 偏差大", "部分元素正确、部分错误", "编译报错"],
+    question: "精度问题有三种表现。'在大绿书搜三亚攻略，搜到的全是广告'最像哪种精度问题？",
+    options: ["输出全为 0 或随机值（数据根本没被正确处理）", "输出与 golden 偏差大（数据流对但数值算错了）", "部分元素正确、部分错误（DataCopy 不对齐或尾块处理有误）", "编译报错"],
     answer: 0,
-    explanation: "输出全为 0 或随机值就像搜攻略搜到广告——数据根本没被正确处理，Buffer 未初始化或流水线同步出了问题。"
+    explanation: "输出全为 0 或随机值就像搜攻略搜到广告——数据根本没被正确处理，通常是 Buffer 未初始化或流水线同步出了问题。"
   },
   {
     question: "sswap 是位精确算子（PrecisionMode::EXACT），如果它的精度不对，问题一定出在哪？",
