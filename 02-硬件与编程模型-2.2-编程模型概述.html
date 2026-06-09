@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>2.2 编程模型概述 - AscendC Guide</title>
-<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <nav class="sidebar"><div class="sidebar-header"><h2>AscendC Guide</h2><p>算子开发从入门到精通</p></div><ul class="sidebar-nav"><li class="chapter-group"><span class="chapter-title">第1章 基础概念</span><ul class="article-list"><li><a href="01-基础概念-1.1-什么是算子与AscendC.html" class=""><span class="doc-type">📘</span>1.1 什么是算子与 Ascend C</a></li><li><a href="01-基础概念-1.2-数据类型排布与量化.html" class=""><span class="doc-type">📘📕</span>1.2 数据类型、排布与量化</a></li><li><a href="01-基础概念-1.3-五分钟跑通第一个算子.html" class=""><span class="doc-type">📗</span>1.3 五分钟跑通第一个算子</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第2章 硬件与编程模型</span><ul class="article-list"><li><a href="02-硬件与编程模型-2.1-A5硬件架构.html" class=""><span class="doc-type">📘</span>2.1 A5 硬件架构</a></li><li><a href="02-硬件与编程模型-2.2-编程模型概述.html" class="active"><span class="doc-type">📘</span>2.2 编程模型概述</a></li><li><a href="02-硬件与编程模型-2.3-算子结构与直调开发.html" class=""><span class="doc-type">📘📗</span>2.3 算子结构与直调开发</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第3章 核心开发</span><ul class="article-list"><li><a href="03-核心开发-3.1-Tiling设计.html" class=""><span class="doc-type">📘</span>3.1 Tiling 设计</a></li><li><a href="03-核心开发-3.2-内存管理与数据搬运.html" class=""><span class="doc-type">📘📕</span>3.2 内存管理与数据搬运</a></li><li><a href="03-核心开发-3.3-Vector计算.html" class=""><span class="doc-type">📘📕</span>3.3 Vector 计算</a></li><li><a href="03-核心开发-3.4-Cube计算.html" class=""><span class="doc-type">📘📕</span>3.4 Cube 计算</a></li><li><a href="03-核心开发-3.5-同步与流水线.html" class=""><span class="doc-type">📘</span>3.5 同步与流水线</a></li><li><a href="03-核心开发-3.6-实战-从零实现一个完整算子.html" class=""><span class="doc-type">📗</span>3.6 实战：从零实现一个完整算子</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第4章 调试与优化</span><ul class="article-list"><li><a href="04-调试与优化-4.1-精度不对怎么办.html" class=""><span class="doc-type">📙</span>4.1 精度不对怎么办</a></li><li><a href="04-调试与优化-4.2-性能不达标怎么办.html" class=""><span class="doc-type">📙</span>4.2 性能不达标怎么办</a></li><li><a href="04-调试与优化-4.3-算子精度标准.html" class=""><span class="doc-type">📕</span>4.3 算子精度标准</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第5章 进阶</span><ul class="article-list"><li><a href="05-进阶-5.1-常见踩坑与最佳实践.html" class=""><span class="doc-type">📙</span>5.1 常见踩坑与最佳实践</a></li><li><a href="05-进阶-5.2-进阶主题.html" class=""><span class="doc-type">📘</span>5.2 进阶主题</a></li></ul></li><li class="chapter-group"><span class="chapter-title">附录</span><ul class="article-list"><li><a href="附录-A-数据类型速查表.html" class=""><span class="doc-type">📕</span>A. 数据类型速查表</a></li><li><a href="附录-B-对齐规则速查.html" class=""><span class="doc-type">📕</span>B. 对齐规则速查</a></li><li><a href="附录-C-错误码速查.html" class=""><span class="doc-type">📕</span>C. 错误码速查</a></li></ul></li></ul></nav>
@@ -12,7 +12,7 @@
 <div class="content">
 <div class="meta-bar">
 <span class="doc-badge badge-explanation">📘 Explanation</span>
-<a href="../index.html">← 返回目录</a>
+<a href="index.html">← 返回目录</a>
 </div>
 <h2>2.2.1 并行编程模型总览</h2>
 <p>编程模型是硬件能力和软件表达之间的抽象层——它决定了程序员如何描述并行计算。选对编程模型，代码写起来事半功倍；选错了，要么性能上不去，要么根本实现不了。</p>
@@ -98,8 +98,69 @@
 <li><a href="https://gitcode.com/cann/asc-devkit.git">asc-devkit RegBase 示例</a>（<code>examples/01_simd_cpp_api/00_introduction/04_vector_reg/</code>）</li>
 <li><a href="https://gitcode.com/cann/asc-devkit.git">asc-devkit RegBase 最佳实践</a>（<code>examples/01_simd_cpp_api/04_best_practices/02_reg_vector_compute_practices/</code>）</li>
 </ul>
+<div id="quiz"></div>
 <div class="page-nav"><a href="02-硬件与编程模型-2.1-A5硬件架构.html" class="nav-prev"><span class="nav-label">← 上一篇</span><span class="nav-title">2.1 A5 硬件架构</span></a><a href="02-硬件与编程模型-2.3-算子结构与直调开发.html" class="nav-next"><span class="nav-label">下一篇 →</span><span class="nav-title">2.3 算子结构与直调开发</span></a></div>
 </div>
 </main>
+<script src="js/quiz.js"></script>
+<script>
+renderQuiz('quiz', [
+  {
+    question: "SPMD 模型用公司团建来类比，20 个同事做同一套试卷但每人分到不同题号。这里的'同一套试卷'对应什么？",
+    options: [
+      "不同的数据块",
+      "同一份 Kernel 代码",
+      "不同的 AI Core 编号",
+      "Tiling 参数"
+    ],
+    answer: 1,
+    explanation: "SPMD 的核心是'代码共享，数据分工'——所有 AI Core 运行同一份 Kernel 代码（同一套试卷），但每个核处理不同的数据块（不同的题号）。"
+  },
+  {
+    question: "SIMD 被比作在音符软件上刷视频——一屏推荐 10 个视频，手指一划全部划过。这个类比强调的是 SIMD 的哪个特点？",
+    options: [
+      "每个视频独立播放",
+      "一条指令同时处理多个数据",
+      "视频之间有依赖关系",
+      "需要逐个点击下载"
+    ],
+    answer: 1,
+    explanation: "SIMD 的核心思想是'一条指令处理多个数据'。就像一划就刷过一整屏视频，Vector 单元一条 Add 指令就能同时处理 64 个 float。"
+  },
+  {
+    question: "如果说 SIMD 是'一屏刷过 10 个视频'，那 SIMT 被比作什么？",
+    options: [
+      "一个人看十部电影",
+      "每个玩家控制一个英雄，5 人一组开黑",
+      "公司年会抽奖",
+      "在蓝鹿咖啡排队点单"
+    ],
+    answer: 1,
+    explanation: "SIMT 就像王者开黑——每个线程控制一个英雄（处理一个数据元素），32 个线程组成一个 Warp（5 人一组），组内同步执行同一条指令。"
+  },
+  {
+    question: "MemBase 和 RegBase 的核心区别是什么？",
+    options: [
+      "MemBase 用 Cube 单元，RegBase 用 Vector 单元",
+      "MemBase 中间数据存在 UB，RegBase 中间数据存在寄存器",
+      "MemBase 只支持 A5，RegBase 支持所有架构",
+      "MemBase 做矩阵乘，RegBase 做逐元素运算"
+    ],
+    answer: 1,
+    explanation: "MemBase 的中间数据存储在 UB 中（每步都读写 UB），RegBase 的中间数据保存在寄存器中（仅首尾读写 UB），因此 RegBase 在多步融合计算中效率更高。"
+  },
+  {
+    question: "你的算子需要做 Gather（离散地址读写）操作，在 A5 芯片上应该优先选择哪种编程模型？",
+    options: [
+      "SIMD-MemBase",
+      "SIMD-RegBase",
+      "SIMT",
+      "SPMD"
+    ],
+    answer: 2,
+    explanation: "SIMT 擅长离散、不规则的访问模式（Gather/Scatter、Hash、排序等），因为它支持 GM 直接访问和线程级控制。SIMD 更适合规整的大块数据。"
+  }
+]);
+</script>
 </body>
 </html>

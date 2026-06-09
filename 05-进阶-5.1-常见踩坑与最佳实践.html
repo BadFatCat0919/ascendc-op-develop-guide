@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>5.1 常见踩坑与最佳实践 - AscendC Guide</title>
-<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <nav class="sidebar"><div class="sidebar-header"><h2>AscendC Guide</h2><p>算子开发从入门到精通</p></div><ul class="sidebar-nav"><li class="chapter-group"><span class="chapter-title">第1章 基础概念</span><ul class="article-list"><li><a href="01-基础概念-1.1-什么是算子与AscendC.html" class=""><span class="doc-type">📘</span>1.1 什么是算子与 Ascend C</a></li><li><a href="01-基础概念-1.2-数据类型排布与量化.html" class=""><span class="doc-type">📘📕</span>1.2 数据类型、排布与量化</a></li><li><a href="01-基础概念-1.3-五分钟跑通第一个算子.html" class=""><span class="doc-type">📗</span>1.3 五分钟跑通第一个算子</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第2章 硬件与编程模型</span><ul class="article-list"><li><a href="02-硬件与编程模型-2.1-A5硬件架构.html" class=""><span class="doc-type">📘</span>2.1 A5 硬件架构</a></li><li><a href="02-硬件与编程模型-2.2-编程模型概述.html" class=""><span class="doc-type">📘</span>2.2 编程模型概述</a></li><li><a href="02-硬件与编程模型-2.3-算子结构与直调开发.html" class=""><span class="doc-type">📘📗</span>2.3 算子结构与直调开发</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第3章 核心开发</span><ul class="article-list"><li><a href="03-核心开发-3.1-Tiling设计.html" class=""><span class="doc-type">📘</span>3.1 Tiling 设计</a></li><li><a href="03-核心开发-3.2-内存管理与数据搬运.html" class=""><span class="doc-type">📘📕</span>3.2 内存管理与数据搬运</a></li><li><a href="03-核心开发-3.3-Vector计算.html" class=""><span class="doc-type">📘📕</span>3.3 Vector 计算</a></li><li><a href="03-核心开发-3.4-Cube计算.html" class=""><span class="doc-type">📘📕</span>3.4 Cube 计算</a></li><li><a href="03-核心开发-3.5-同步与流水线.html" class=""><span class="doc-type">📘</span>3.5 同步与流水线</a></li><li><a href="03-核心开发-3.6-实战-从零实现一个完整算子.html" class=""><span class="doc-type">📗</span>3.6 实战：从零实现一个完整算子</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第4章 调试与优化</span><ul class="article-list"><li><a href="04-调试与优化-4.1-精度不对怎么办.html" class=""><span class="doc-type">📙</span>4.1 精度不对怎么办</a></li><li><a href="04-调试与优化-4.2-性能不达标怎么办.html" class=""><span class="doc-type">📙</span>4.2 性能不达标怎么办</a></li><li><a href="04-调试与优化-4.3-算子精度标准.html" class=""><span class="doc-type">📕</span>4.3 算子精度标准</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第5章 进阶</span><ul class="article-list"><li><a href="05-进阶-5.1-常见踩坑与最佳实践.html" class="active"><span class="doc-type">📙</span>5.1 常见踩坑与最佳实践</a></li><li><a href="05-进阶-5.2-进阶主题.html" class=""><span class="doc-type">📘</span>5.2 进阶主题</a></li></ul></li><li class="chapter-group"><span class="chapter-title">附录</span><ul class="article-list"><li><a href="附录-A-数据类型速查表.html" class=""><span class="doc-type">📕</span>A. 数据类型速查表</a></li><li><a href="附录-B-对齐规则速查.html" class=""><span class="doc-type">📕</span>B. 对齐规则速查</a></li><li><a href="附录-C-错误码速查.html" class=""><span class="doc-type">📕</span>C. 错误码速查</a></li></ul></li></ul></nav>
@@ -12,7 +12,7 @@
 <div class="content">
 <div class="meta-bar">
 <span class="doc-badge badge-howto">📙 How-to Guide</span>
-<a href="../index.html">← 返回目录</a>
+<a href="index.html">← 返回目录</a>
 </div>
 <p>本文以 sswap 算子（arch35）为贯穿示例。sswap 是 BLAS Level-1 算子，功能是交换两个向量的对应元素——纯数据搬运，不涉及 Vector 计算，使用 Single Buffer 和 TQueBind 流水线。</p>
 <h2>5.1.1 对齐问题</h2>
@@ -144,8 +144,44 @@ WAIT_FLAG(MTE2, MTE3, event_id);  // MTE3 等待 MTE2 搬完</code></pre>
 <li><a href="https://gitcode.com/cann/cann-samples">cann-samples 最佳实践</a>（<code>Samples/1_Features/</code>）</li>
 <li><a href="https://gitcode.com/cann/asc-devkit.git">asc-devkit 最佳实践</a>（<code>examples/04_best_practices/</code>）</li>
 </ul>
+<div id="quiz"></div>
 <div class="page-nav"><a href="04-调试与优化-4.3-算子精度标准.html" class="nav-prev"><span class="nav-label">← 上一篇</span><span class="nav-title">4.3 算子精度标准</span></a><a href="05-进阶-5.2-进阶主题.html" class="nav-next"><span class="nav-label">下一篇 →</span><span class="nav-title">5.2 进阶主题</span></a></div>
 </div>
 </main>
+<script src="js/quiz.js"></script>
+<script>
+renderQuiz('quiz', [
+  {
+    question: "Ascend C 中 DataCopy 的对齐要求是什么？",
+    options: ["每次搬运长度必须是 16B 的倍数", "每次搬运长度必须是 32B 的倍数", "每次搬运长度必须是 64B 的倍数", "没有对齐要求"],
+    answer: 1,
+    explanation: "MTE 搬运数据时硬件总线宽度是 256 bit = 32 字节，每次 DMA 固定搬运 32B，所以长度必须是 32B 的整数倍。就像集装箱装车，散货必须凑齐一整箱。"
+  },
+  {
+    question: "对于 FP32 数据，每次搬运的元素个数必须是几的倍数？",
+    options: ["4", "8", "16", "32"],
+    answer: 1,
+    explanation: "FP32 每个元素 4 字节，32 / 4 = 8，所以每次搬运的元素个数必须是 8 的倍数。这就是 sswap 中 ELEMENTS_PER_BLOCK = 8 的由来。"
+  },
+  {
+    question: "Vector 指令的 repeatTimes 参数上限通常是多少？",
+    options: ["127", "255", "512", "1024"],
+    answer: 1,
+    explanation: "repeatTimes 上限通常是 255。如果数据量很大一条指令处理不完，需要把数据切成多个 chunk 循环调用。"
+  },
+  {
+    question: "sswap 用什么方式避免 Buffer 冲突？",
+    options: ["使用双 Buffer 交替", "使用两个独立的 TQueBind 分别管理 x 和 y", "使用 Single Buffer 共享", "使用全局变量"],
+    answer: 1,
+    explanation: "sswap 用两个独立的 TQueBind 分别管理 x 和 y 的 Buffer，各走各的通道，永远不会踩到对方。"
+  },
+  {
+    question: "为什么不能硬编码硬件参数（如 CORE_NUM = 32）？",
+    options: ["因为代码会太长", "因为不同芯片型号的 Vector 核数、UB 大小等参数不同", "因为编译器会报错", "因为会影响精度"],
+    answer: 1,
+    explanation: "不同昇腾芯片型号的硬件参数完全不同，写死 CORE_NUM = 32 换一块芯片就可能出问题。正确做法是通过 aclrtGetDeviceInfo 或 PlatformAscendC 动态获取。"
+  }
+]);
+</script>
 </body>
 </html>

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>3.3 Vector 计算 - AscendC Guide</title>
-<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <nav class="sidebar"><div class="sidebar-header"><h2>AscendC Guide</h2><p>算子开发从入门到精通</p></div><ul class="sidebar-nav"><li class="chapter-group"><span class="chapter-title">第1章 基础概念</span><ul class="article-list"><li><a href="01-基础概念-1.1-什么是算子与AscendC.html" class=""><span class="doc-type">📘</span>1.1 什么是算子与 Ascend C</a></li><li><a href="01-基础概念-1.2-数据类型排布与量化.html" class=""><span class="doc-type">📘📕</span>1.2 数据类型、排布与量化</a></li><li><a href="01-基础概念-1.3-五分钟跑通第一个算子.html" class=""><span class="doc-type">📗</span>1.3 五分钟跑通第一个算子</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第2章 硬件与编程模型</span><ul class="article-list"><li><a href="02-硬件与编程模型-2.1-A5硬件架构.html" class=""><span class="doc-type">📘</span>2.1 A5 硬件架构</a></li><li><a href="02-硬件与编程模型-2.2-编程模型概述.html" class=""><span class="doc-type">📘</span>2.2 编程模型概述</a></li><li><a href="02-硬件与编程模型-2.3-算子结构与直调开发.html" class=""><span class="doc-type">📘📗</span>2.3 算子结构与直调开发</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第3章 核心开发</span><ul class="article-list"><li><a href="03-核心开发-3.1-Tiling设计.html" class=""><span class="doc-type">📘</span>3.1 Tiling 设计</a></li><li><a href="03-核心开发-3.2-内存管理与数据搬运.html" class=""><span class="doc-type">📘📕</span>3.2 内存管理与数据搬运</a></li><li><a href="03-核心开发-3.3-Vector计算.html" class="active"><span class="doc-type">📘📕</span>3.3 Vector 计算</a></li><li><a href="03-核心开发-3.4-Cube计算.html" class=""><span class="doc-type">📘📕</span>3.4 Cube 计算</a></li><li><a href="03-核心开发-3.5-同步与流水线.html" class=""><span class="doc-type">📘</span>3.5 同步与流水线</a></li><li><a href="03-核心开发-3.6-实战-从零实现一个完整算子.html" class=""><span class="doc-type">📗</span>3.6 实战：从零实现一个完整算子</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第4章 调试与优化</span><ul class="article-list"><li><a href="04-调试与优化-4.1-精度不对怎么办.html" class=""><span class="doc-type">📙</span>4.1 精度不对怎么办</a></li><li><a href="04-调试与优化-4.2-性能不达标怎么办.html" class=""><span class="doc-type">📙</span>4.2 性能不达标怎么办</a></li><li><a href="04-调试与优化-4.3-算子精度标准.html" class=""><span class="doc-type">📕</span>4.3 算子精度标准</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第5章 进阶</span><ul class="article-list"><li><a href="05-进阶-5.1-常见踩坑与最佳实践.html" class=""><span class="doc-type">📙</span>5.1 常见踩坑与最佳实践</a></li><li><a href="05-进阶-5.2-进阶主题.html" class=""><span class="doc-type">📘</span>5.2 进阶主题</a></li></ul></li><li class="chapter-group"><span class="chapter-title">附录</span><ul class="article-list"><li><a href="附录-A-数据类型速查表.html" class=""><span class="doc-type">📕</span>A. 数据类型速查表</a></li><li><a href="附录-B-对齐规则速查.html" class=""><span class="doc-type">📕</span>B. 对齐规则速查</a></li><li><a href="附录-C-错误码速查.html" class=""><span class="doc-type">📕</span>C. 错误码速查</a></li></ul></li></ul></nav>
@@ -12,7 +12,7 @@
 <div class="content">
 <div class="meta-bar">
 <span class="doc-badge badge-explanation">📘📕 Explanation + Reference</span>
-<a href="../index.html">← 返回目录</a>
+<a href="index.html">← 返回目录</a>
 </div>
 <h2>3.3.1 Vector 计算单元</h2>
 <p>Vector 单元是昇腾 NPU 上的向量计算引擎，每个时钟周期可以处理一条 256 字节宽的向量指令。你可以把它想象成一条"超宽的流水线"：普通 CPU 一次处理 1 个或几个浮点数，Vector 单元一次处理一整排——256 字节可以装下 128 个 FP16 或 64 个 FP32 元素。</p>
@@ -84,8 +84,44 @@ Muls(dst, src, scalar, length, repeatTimes, repeatParams);</code></pre>
 <li><a href="https://gitcode.com/cann/asc-devkit.git">asc-devkit Vector 示例</a>（<code>examples/00_introduction/11_vectoradd/</code>）</li>
 <li><a href="https://gitcode.com/cann/asc-devkit.git">asc-devkit RegBase GELU 示例</a>（<code>examples/01_simd_cpp_api/00_introduction/04_vector_reg/gelu/</code>）</li>
 </ul>
+<div id="quiz"></div>
 <div class="page-nav"><a href="03-核心开发-3.2-内存管理与数据搬运.html" class="nav-prev"><span class="nav-label">← 上一篇</span><span class="nav-title">3.2 内存管理与数据搬运</span></a><a href="03-核心开发-3.4-Cube计算.html" class="nav-next"><span class="nav-label">下一篇 →</span><span class="nav-title">3.4 Cube 计算</span></a></div>
 </div>
 </main>
+<script src="js/quiz.js"></script>
+<script>
+renderQuiz('quiz', [
+  {
+    question: "Vector 单元每个时钟周期可以处理多宽的向量指令？",
+    options: ["128 字节", "64 字节", "256 字节", "512 字节"],
+    answer: 2,
+    explanation: "Vector 单元每个时钟周期处理一条 256 字节宽的向量指令。256B 可以装下 128 个 FP16 或 64 个 FP32 元素，就像一条超宽的流水线。"
+  },
+  {
+    question: "处理 1024 个 FP16 元素（2048 字节），需要多少次 repeat？",
+    options: ["4 次", "8 次", "16 次", "2 次"],
+    answer: 1,
+    explanation: "每次 repeat 处理 256B，1024 个 FP16 = 2048 字节，需要 ceil(2048 / 256) = 8 次 repeat。"
+  },
+  {
+    question: "mask 机制的作用是什么？",
+    options: ["加密数据", "告诉硬件哪些元素需要计算、哪些跳过，用于处理不足 256B 的尾部", "标记 Buffer 是否可用", "控制 MTE 引擎的开关"],
+    answer: 1,
+    explanation: "当数据量不是 256B 的整数倍时，最后一次 repeat 会有空位。mask 用位掩码告诉硬件哪些元素需要计算、哪些跳过。"
+  },
+  {
+    question: "归约运算（如 ReduceSum）为什么不能像逐元素运算那样随意切分数据？",
+    options: ["因为归约运算太简单了", "因为输出元素依赖多个输入元素，需要累加到一起", "因为归约运算不支持 FP32", "因为归约运算只能用 Cube 单元"],
+    answer: 1,
+    explanation: "归约运算把多个元素"压缩"成一个结果（如求和），轴内数据必须累加到一起，不能随意切分。通常用两阶段归约：核内局部归约 + 跨核全局归约。"
+  },
+  {
+    question: "sswap 算子需不需要 Vector 计算单元？",
+    options: ["需要，用于交换两个元素", "需要，用于比较大小", "不需要，sswap 是纯数据搬运型算子，只涉及 DataCopy", "需要，用于类型转换"],
+    answer: 2,
+    explanation: "sswap 的功能是交换两个向量的对应元素，整个过程只涉及数据搬运（GM↔UB），完全不需要 Vector 单元参与。选择计算单元要看算子的实际需求。"
+  }
+]);
+</script>
 </body>
 </html>

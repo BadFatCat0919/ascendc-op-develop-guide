@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>3.1 Tiling 设计 - AscendC Guide</title>
-<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <nav class="sidebar"><div class="sidebar-header"><h2>AscendC Guide</h2><p>算子开发从入门到精通</p></div><ul class="sidebar-nav"><li class="chapter-group"><span class="chapter-title">第1章 基础概念</span><ul class="article-list"><li><a href="01-基础概念-1.1-什么是算子与AscendC.html" class=""><span class="doc-type">📘</span>1.1 什么是算子与 Ascend C</a></li><li><a href="01-基础概念-1.2-数据类型排布与量化.html" class=""><span class="doc-type">📘📕</span>1.2 数据类型、排布与量化</a></li><li><a href="01-基础概念-1.3-五分钟跑通第一个算子.html" class=""><span class="doc-type">📗</span>1.3 五分钟跑通第一个算子</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第2章 硬件与编程模型</span><ul class="article-list"><li><a href="02-硬件与编程模型-2.1-A5硬件架构.html" class=""><span class="doc-type">📘</span>2.1 A5 硬件架构</a></li><li><a href="02-硬件与编程模型-2.2-编程模型概述.html" class=""><span class="doc-type">📘</span>2.2 编程模型概述</a></li><li><a href="02-硬件与编程模型-2.3-算子结构与直调开发.html" class=""><span class="doc-type">📘📗</span>2.3 算子结构与直调开发</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第3章 核心开发</span><ul class="article-list"><li><a href="03-核心开发-3.1-Tiling设计.html" class="active"><span class="doc-type">📘</span>3.1 Tiling 设计</a></li><li><a href="03-核心开发-3.2-内存管理与数据搬运.html" class=""><span class="doc-type">📘📕</span>3.2 内存管理与数据搬运</a></li><li><a href="03-核心开发-3.3-Vector计算.html" class=""><span class="doc-type">📘📕</span>3.3 Vector 计算</a></li><li><a href="03-核心开发-3.4-Cube计算.html" class=""><span class="doc-type">📘📕</span>3.4 Cube 计算</a></li><li><a href="03-核心开发-3.5-同步与流水线.html" class=""><span class="doc-type">📘</span>3.5 同步与流水线</a></li><li><a href="03-核心开发-3.6-实战-从零实现一个完整算子.html" class=""><span class="doc-type">📗</span>3.6 实战：从零实现一个完整算子</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第4章 调试与优化</span><ul class="article-list"><li><a href="04-调试与优化-4.1-精度不对怎么办.html" class=""><span class="doc-type">📙</span>4.1 精度不对怎么办</a></li><li><a href="04-调试与优化-4.2-性能不达标怎么办.html" class=""><span class="doc-type">📙</span>4.2 性能不达标怎么办</a></li><li><a href="04-调试与优化-4.3-算子精度标准.html" class=""><span class="doc-type">📕</span>4.3 算子精度标准</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第5章 进阶</span><ul class="article-list"><li><a href="05-进阶-5.1-常见踩坑与最佳实践.html" class=""><span class="doc-type">📙</span>5.1 常见踩坑与最佳实践</a></li><li><a href="05-进阶-5.2-进阶主题.html" class=""><span class="doc-type">📘</span>5.2 进阶主题</a></li></ul></li><li class="chapter-group"><span class="chapter-title">附录</span><ul class="article-list"><li><a href="附录-A-数据类型速查表.html" class=""><span class="doc-type">📕</span>A. 数据类型速查表</a></li><li><a href="附录-B-对齐规则速查.html" class=""><span class="doc-type">📕</span>B. 对齐规则速查</a></li><li><a href="附录-C-错误码速查.html" class=""><span class="doc-type">📕</span>C. 错误码速查</a></li></ul></li></ul></nav>
@@ -12,7 +12,7 @@
 <div class="content">
 <div class="meta-bar">
 <span class="doc-badge badge-explanation">📘 Explanation</span>
-<a href="../index.html">← 返回目录</a>
+<a href="index.html">← 返回目录</a>
 </div>
 <h2>3.1.1 什么是 Tiling</h2>
 <p>Tiling 的本质是"分而治之"。想象公司团建点了 1000 杯雪王奶茶，一家门店做不完，于是你把订单分给 20 家门店同时做——每家分 50 杯。但问题来了：1000 除 20 刚好整除，那如果是 1003 杯呢？最后 3 杯给谁做？而且每家门店的吧台（UB）就那么大，一次放不下 50 杯的原料，得分批从总仓库（GM）进货。Tiling 就是解决这些问题的"分单策略"——怎么分、每家分多少、分几批做。</p>
@@ -137,8 +137,44 @@ ascendcPlatform.GetCoreMemSize(platform_ascendc::CoreMemType::UB, ubSize);</code
 <li><a href="https://gitcode.com/cann/cann-samples">cann-samples 入门样例</a>（<code>Samples/0_Introduction/</code>）</li>
 <li><a href="https://gitcode.com/cann/asc-devkit.git">asc-devkit Tiling 实现</a>（<code>impl/adv_api/tiling/</code>）</li>
 </ul>
+<div id="quiz"></div>
 <div class="page-nav"><a href="02-硬件与编程模型-2.3-算子结构与直调开发.html" class="nav-prev"><span class="nav-label">← 上一篇</span><span class="nav-title">2.3 算子结构与直调开发</span></a><a href="03-核心开发-3.2-内存管理与数据搬运.html" class="nav-next"><span class="nav-label">下一篇 →</span><span class="nav-title">3.2 内存管理与数据搬运</span></a></div>
 </div>
 </main>
+<script src="js/quiz.js"></script>
+<script>
+renderQuiz('quiz', [
+  {
+    question: "Tiling 的本质是什么？用雪王奶茶的比喻来说，Tiling 就像——",
+    options: ["给每杯奶茶贴标签", "把 1000 杯奶茶的订单分给 20 家门店同时做", "把奶茶从总仓运到门店", "给奶茶加冰加糖"],
+    answer: 1,
+    explanation: "Tiling 的本质是"分而治之"，就像把大订单分给多家门店并行处理。分单策略要考虑负载均衡、UB 空间利用和搬运开销。"
+  },
+  {
+    question: "多核切分时，为什么 perCoreN 要向下对齐到 ELEMENTS_PER_BLOCK 的倍数？",
+    options: ["为了让代码更好看", "因为 DataCopy 要求搬运长度按 32 字节对齐", "因为 AI Core 只认识偶数", "因为核数必须是 2 的幂"],
+    answer: 1,
+    explanation: "DataCopy 的搬运长度必须是 32B 的倍数。FP32 下 32B = 8 个元素，所以 ELEMENTS_PER_BLOCK = 8，perCoreN 必须对齐到 8 的倍数。"
+  },
+  {
+    question: "A5 芯片每核 UB 有多大？",
+    options: ["128 KB", "256 KB", "248 KB", "512 KB"],
+    answer: 2,
+    explanation: "A5 芯片每核 UB 为 248KB，这是 Vector 计算的主战场。sswap 需要两个 Buffer（x 和 y），所以每个 Buffer 约 124KB。"
+  },
+  {
+    question: "多核切分后剩余的数据（remainder）怎么处理？",
+    options: ["丢掉不要了", "平均分给所有核", "全部交给最后一个核处理", "交给第一个核处理"],
+    answer: 2,
+    explanation: "sswap 的策略是把所有剩余数据都交给最后一个核处理。remainder 通常不大，对整体负载均衡影响很小。"
+  },
+  {
+    question: "ELEMENTS_PER_BLOCK = 32 / sizeof(float) 的值是多少？它代表什么含义？",
+    options: ["4，表示每个 block 有 4 个字节", "8，表示每次搬运最少要搬 8 个 FP32 元素", "16，表示 16 字节对齐", "32，表示 32 个元素"],
+    answer: 1,
+    explanation: "32 / sizeof(float) = 32 / 4 = 8。它代表 DataCopy 的最小搬运粒度（32B）在 FP32 下对应的元素个数，所有切分粒度都要对齐到这个值。"
+  }
+]);
+</script>
 </body>
 </html>

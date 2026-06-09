@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>4.3 算子精度标准 - AscendC Guide</title>
-<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <nav class="sidebar"><div class="sidebar-header"><h2>AscendC Guide</h2><p>算子开发从入门到精通</p></div><ul class="sidebar-nav"><li class="chapter-group"><span class="chapter-title">第1章 基础概念</span><ul class="article-list"><li><a href="01-基础概念-1.1-什么是算子与AscendC.html" class=""><span class="doc-type">📘</span>1.1 什么是算子与 Ascend C</a></li><li><a href="01-基础概念-1.2-数据类型排布与量化.html" class=""><span class="doc-type">📘📕</span>1.2 数据类型、排布与量化</a></li><li><a href="01-基础概念-1.3-五分钟跑通第一个算子.html" class=""><span class="doc-type">📗</span>1.3 五分钟跑通第一个算子</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第2章 硬件与编程模型</span><ul class="article-list"><li><a href="02-硬件与编程模型-2.1-A5硬件架构.html" class=""><span class="doc-type">📘</span>2.1 A5 硬件架构</a></li><li><a href="02-硬件与编程模型-2.2-编程模型概述.html" class=""><span class="doc-type">📘</span>2.2 编程模型概述</a></li><li><a href="02-硬件与编程模型-2.3-算子结构与直调开发.html" class=""><span class="doc-type">📘📗</span>2.3 算子结构与直调开发</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第3章 核心开发</span><ul class="article-list"><li><a href="03-核心开发-3.1-Tiling设计.html" class=""><span class="doc-type">📘</span>3.1 Tiling 设计</a></li><li><a href="03-核心开发-3.2-内存管理与数据搬运.html" class=""><span class="doc-type">📘📕</span>3.2 内存管理与数据搬运</a></li><li><a href="03-核心开发-3.3-Vector计算.html" class=""><span class="doc-type">📘📕</span>3.3 Vector 计算</a></li><li><a href="03-核心开发-3.4-Cube计算.html" class=""><span class="doc-type">📘📕</span>3.4 Cube 计算</a></li><li><a href="03-核心开发-3.5-同步与流水线.html" class=""><span class="doc-type">📘</span>3.5 同步与流水线</a></li><li><a href="03-核心开发-3.6-实战-从零实现一个完整算子.html" class=""><span class="doc-type">📗</span>3.6 实战：从零实现一个完整算子</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第4章 调试与优化</span><ul class="article-list"><li><a href="04-调试与优化-4.1-精度不对怎么办.html" class=""><span class="doc-type">📙</span>4.1 精度不对怎么办</a></li><li><a href="04-调试与优化-4.2-性能不达标怎么办.html" class=""><span class="doc-type">📙</span>4.2 性能不达标怎么办</a></li><li><a href="04-调试与优化-4.3-算子精度标准.html" class="active"><span class="doc-type">📕</span>4.3 算子精度标准</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第5章 进阶</span><ul class="article-list"><li><a href="05-进阶-5.1-常见踩坑与最佳实践.html" class=""><span class="doc-type">📙</span>5.1 常见踩坑与最佳实践</a></li><li><a href="05-进阶-5.2-进阶主题.html" class=""><span class="doc-type">📘</span>5.2 进阶主题</a></li></ul></li><li class="chapter-group"><span class="chapter-title">附录</span><ul class="article-list"><li><a href="附录-A-数据类型速查表.html" class=""><span class="doc-type">📕</span>A. 数据类型速查表</a></li><li><a href="附录-B-对齐规则速查.html" class=""><span class="doc-type">📕</span>B. 对齐规则速查</a></li><li><a href="附录-C-错误码速查.html" class=""><span class="doc-type">📕</span>C. 错误码速查</a></li></ul></li></ul></nav>
@@ -12,7 +12,7 @@
 <div class="content">
 <div class="meta-bar">
 <span class="doc-badge badge-reference">📕 Reference</span>
-<a href="../index.html">← 返回目录</a>
+<a href="index.html">← 返回目录</a>
 </div>
 <h2>4.3.1 精度标准概述</h2>
 <p>算子精度标准不是"一刀切"的，而是根据算子类型和使用场景分为两套体系：</p>
@@ -115,8 +115,44 @@
 <li><a href="https://www.hiascend.com/zh/developer/techArticles/20240106-1">Ascend C 算子开发常见问题案例</a></li>
 <li><a href="https://www.hiascend.com/zh/developer/techArticles/20250107-1">含有Matmul高阶API的算子精度问题定位</a></li>
 </ul>
+<div id="quiz"></div>
 <div class="page-nav"><a href="04-调试与优化-4.2-性能不达标怎么办.html" class="nav-prev"><span class="nav-label">← 上一篇</span><span class="nav-title">4.2 性能不达标怎么办</span></a><a href="05-进阶-5.1-常见踩坑与最佳实践.html" class="nav-next"><span class="nav-label">下一篇 →</span><span class="nav-title">5.1 常见踩坑与最佳实践</span></a></div>
 </div>
 </main>
+<script src="js/quiz.js"></script>
+<script>
+renderQuiz('quiz', [
+  {
+    question: "商用标准和社区标准的主要区别是什么？",
+    options: ["商用标准更宽松，社区标准更严格", "商用标准用双标杆比对（NPU+三方芯片），社区标准用单标杆（仅 CPU golden）", "商用标准只支持 FP32，社区标准支持所有类型", "没有区别，只是名字不同"],
+    answer: 1,
+    explanation: "商用标准更严格，采用双标杆比对（NPU 结果同时与 CPU golden 和三方芯片结果比较）；社区标准相对宽松，只与 CPU golden 比较。"
+  },
+  {
+    question: "MERE 和 MARE 分别是什么的缩写？",
+    options: ["最小误差和最大误差", "平均相对误差和最大相对误差", "平均绝对误差和最大绝对误差", "中位误差和平均误差"],
+    answer: 1,
+    explanation: "MERE = Mean Error of Relative Error（平均相对误差），MARE = Maximum Absolute Relative Error（最大相对误差）。两者都要小于阈值才算通过。"
+  },
+  {
+    question: "sswap 使用 PrecisionMode::EXACT 模式，这意味着什么？",
+    options: ["允许 FP16 级别的误差", "允许 atol=0.001 的偏差", "NPU 输出必须和 CPU golden 每个 bit 完全相同", "只检查前 100 个元素"],
+    answer: 2,
+    explanation: "sswap 只做数据交换不涉及数值计算，所以要求二进制一致（Bitwise Match），只要有一个 bit 不对就算失败。"
+  },
+  {
+    question: "构造 Golden 时，最重要的原则是什么？",
+    options: ["使用和被测算子相同的库", "使用更高精度来计算 Golden", "只用 FP16 计算", "不需要 Golden，直接上板测试"],
+    answer: 1,
+    explanation: "Golden 的计算精度应该高于被测算子（比如 FP16 算子用 FP32 做 Golden），还要避免同源错误，否则两者可能犯同样的错。"
+  },
+  {
+    question: "当 golden 值接近 0 时，需要启用什么特殊标准？",
+    options: ["大值域标准", "小值域标准，因为相对误差的分母太小会不稳定", "不需要特殊处理", "直接跳过这些元素"],
+    answer: 1,
+    explanation: "当 golden 值接近 0 时，相对误差计算不稳定（分母太小，一点偏差就被放大），此时启用小值域标准，用 ErrorCount 来评估。"
+  }
+]);
+</script>
 </body>
 </html>

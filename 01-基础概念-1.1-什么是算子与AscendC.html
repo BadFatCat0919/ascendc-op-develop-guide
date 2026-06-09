@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>1.1 什么是算子与 Ascend C - AscendC Guide</title>
-<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <nav class="sidebar"><div class="sidebar-header"><h2>AscendC Guide</h2><p>算子开发从入门到精通</p></div><ul class="sidebar-nav"><li class="chapter-group"><span class="chapter-title">第1章 基础概念</span><ul class="article-list"><li><a href="01-基础概念-1.1-什么是算子与AscendC.html" class="active"><span class="doc-type">📘</span>1.1 什么是算子与 Ascend C</a></li><li><a href="01-基础概念-1.2-数据类型排布与量化.html" class=""><span class="doc-type">📘📕</span>1.2 数据类型、排布与量化</a></li><li><a href="01-基础概念-1.3-五分钟跑通第一个算子.html" class=""><span class="doc-type">📗</span>1.3 五分钟跑通第一个算子</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第2章 硬件与编程模型</span><ul class="article-list"><li><a href="02-硬件与编程模型-2.1-A5硬件架构.html" class=""><span class="doc-type">📘</span>2.1 A5 硬件架构</a></li><li><a href="02-硬件与编程模型-2.2-编程模型概述.html" class=""><span class="doc-type">📘</span>2.2 编程模型概述</a></li><li><a href="02-硬件与编程模型-2.3-算子结构与直调开发.html" class=""><span class="doc-type">📘📗</span>2.3 算子结构与直调开发</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第3章 核心开发</span><ul class="article-list"><li><a href="03-核心开发-3.1-Tiling设计.html" class=""><span class="doc-type">📘</span>3.1 Tiling 设计</a></li><li><a href="03-核心开发-3.2-内存管理与数据搬运.html" class=""><span class="doc-type">📘📕</span>3.2 内存管理与数据搬运</a></li><li><a href="03-核心开发-3.3-Vector计算.html" class=""><span class="doc-type">📘📕</span>3.3 Vector 计算</a></li><li><a href="03-核心开发-3.4-Cube计算.html" class=""><span class="doc-type">📘📕</span>3.4 Cube 计算</a></li><li><a href="03-核心开发-3.5-同步与流水线.html" class=""><span class="doc-type">📘</span>3.5 同步与流水线</a></li><li><a href="03-核心开发-3.6-实战-从零实现一个完整算子.html" class=""><span class="doc-type">📗</span>3.6 实战：从零实现一个完整算子</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第4章 调试与优化</span><ul class="article-list"><li><a href="04-调试与优化-4.1-精度不对怎么办.html" class=""><span class="doc-type">📙</span>4.1 精度不对怎么办</a></li><li><a href="04-调试与优化-4.2-性能不达标怎么办.html" class=""><span class="doc-type">📙</span>4.2 性能不达标怎么办</a></li><li><a href="04-调试与优化-4.3-算子精度标准.html" class=""><span class="doc-type">📕</span>4.3 算子精度标准</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第5章 进阶</span><ul class="article-list"><li><a href="05-进阶-5.1-常见踩坑与最佳实践.html" class=""><span class="doc-type">📙</span>5.1 常见踩坑与最佳实践</a></li><li><a href="05-进阶-5.2-进阶主题.html" class=""><span class="doc-type">📘</span>5.2 进阶主题</a></li></ul></li><li class="chapter-group"><span class="chapter-title">附录</span><ul class="article-list"><li><a href="附录-A-数据类型速查表.html" class=""><span class="doc-type">📕</span>A. 数据类型速查表</a></li><li><a href="附录-B-对齐规则速查.html" class=""><span class="doc-type">📕</span>B. 对齐规则速查</a></li><li><a href="附录-C-错误码速查.html" class=""><span class="doc-type">📕</span>C. 错误码速查</a></li></ul></li></ul></nav>
@@ -12,7 +12,7 @@
 <div class="content">
 <div class="meta-bar">
 <span class="doc-badge badge-explanation">📘 Explanation</span>
-<a href="../index.html">← 返回目录</a>
+<a href="index.html">← 返回目录</a>
 </div>
 <h2>1.1.1 算子是什么</h2>
 <p>想象你在雪王奶茶打工。一杯"满杯百香果"从点单到出餐，要经过好几道工序：煮茶底、加果酱、加冰、封口。每道工序就是一个<strong>算子（Operator）</strong>——它接收上一步的半成品（数据），加工一下，传给下一步。你写的 PyTorch 模型就是那张菜单，框架就是店里的 POS 系统，而算子就是每一道实际动手的工序。<code>torch.add(a, b)</code> 就是"加两勺糖"，<code>torch.matmul(A, B)</code> 就是"把茶底和果酱摇匀"。</p>
@@ -108,8 +108,44 @@ Kernel（NPU 上实际执行的核函数）</code></pre>
 <li><a href="https://gitcode.com/cann/opbase">opbase 基础框架</a></li>
 <li><a href="https://gitcode.com/cann/cann-samples">cann-samples 入门样例</a>（<code>Samples/0_Introduction/</code>）</li>
 </ul>
+<div id="quiz"></div>
 <div class="page-nav"><a href="01-基础概念-1.2-数据类型排布与量化.html" class="nav-next"><span class="nav-label">下一篇 →</span><span class="nav-title">1.2 数据类型、排布与量化</span></a></div>
 </div>
 </main>
+<script src="js/quiz.js"></script>
+<script>
+renderQuiz('quiz', [
+  {
+    question: "在雪王奶茶的类比中，算子（Operator）对应的是什么角色？",
+    options: ["菜单上的菜品名", "POS 收银系统", "每一道实际动手的工序（如煮茶底、加果酱）", "顾客点的订单"],
+    answer: 2,
+    explanation: "算子就像奶茶店里的一道道工序——煮茶底、加果酱、加冰、封口。每道工序接收上一步的半成品，加工后传给下一步。框架是 POS 系统，菜单是 PyTorch 模型，而算子是实际动手的那道工序。"
+  },
+  {
+    question: "「算子」「函数」「层」三个概念经常混用，但视角不同。以下哪个描述是正确的？",
+    options: ["「层」是硬件执行概念，代表 NPU 上运行的一段 Kernel", "「算子」是硬件执行概念，代表 NPU 上实际运行的一段 Kernel 代码", "「函数」是网络结构概念，代表网络架构图里的一个方框", "「层」是编程概念，代表 C++ 中的一个函数调用"],
+    answer: 1,
+    explanation: "算子（Operator）是硬件执行概念——它是 NPU 上实际运行的一段 Kernel 代码。函数是编程概念（C++ 函数），层是网络结构概念（网络架构图里的一个方框）。一个层往往包含多个算子，比如卷积层 = Conv2D + BiasAdd + ReLU。"
+  },
+  {
+    question: "在 CUDA 与 Ascend C 的对比中，CUDA 的 Shared Memory 对应 Ascend C 中的什么？",
+    options: ["Global Memory (GM)", "Unified Buffer (UB)", "AI Core", "TPipe"],
+    answer: 1,
+    explanation: "CUDA 的 Shared Memory 对应 Ascend C 的 Unified Buffer (UB)——都是片上高速缓存，用于在计算单元附近暂存数据。GM 对应的是 Global Memory（全局显存），AI Core 对应的是 GPU SM（流多处理器）。"
+  },
+  {
+    question: "在 CANN 软件栈的分层中，opbase 基础框架的角色是什么？",
+    options: ["最顶层的应用框架，如 PyTorch / MindSpore", "算子接口层，提供 aclnn 前缀的统一 C 接口", "所有算子仓库共同依赖的底层库，提供公共头文件、调度框架、内存管理等基础设施", "最底层的 NPU 硬件驱动"],
+    answer: 2,
+    explanation: "opbase 是所有算子仓库的「标准库」——它提供公共头文件、调度框架、内存管理等基础设施。所有算子仓库（ops-blas、ops-nn、ops-math 等）都依赖它。它位于 Ascend C 算子库和 CANN Toolkit 之间。"
+  },
+  {
+    question: "sswap 算子属于哪个仓库？它属于 BLAS 标准的哪个 Level？",
+    options: ["ops-nn，BLAS Level-2", "ops-math，BLAS Level-3", "ops-blas，BLAS Level-1", "ops-transformer，BLAS Level-1"],
+    answer: 2,
+    explanation: "sswap 属于 ops-blas 仓，因为它是 BLAS（Basic Linear Algebra Subprograms）标准中 Level-1 的一个 routine。BLAS Level-1 处理的都是向量与向量之间的操作，sswap 的功能就是交换两个向量的对应元素。"
+  }
+]);
+</script>
 </body>
 </html>

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>5.2 进阶主题 - AscendC Guide</title>
-<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <nav class="sidebar"><div class="sidebar-header"><h2>AscendC Guide</h2><p>算子开发从入门到精通</p></div><ul class="sidebar-nav"><li class="chapter-group"><span class="chapter-title">第1章 基础概念</span><ul class="article-list"><li><a href="01-基础概念-1.1-什么是算子与AscendC.html" class=""><span class="doc-type">📘</span>1.1 什么是算子与 Ascend C</a></li><li><a href="01-基础概念-1.2-数据类型排布与量化.html" class=""><span class="doc-type">📘📕</span>1.2 数据类型、排布与量化</a></li><li><a href="01-基础概念-1.3-五分钟跑通第一个算子.html" class=""><span class="doc-type">📗</span>1.3 五分钟跑通第一个算子</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第2章 硬件与编程模型</span><ul class="article-list"><li><a href="02-硬件与编程模型-2.1-A5硬件架构.html" class=""><span class="doc-type">📘</span>2.1 A5 硬件架构</a></li><li><a href="02-硬件与编程模型-2.2-编程模型概述.html" class=""><span class="doc-type">📘</span>2.2 编程模型概述</a></li><li><a href="02-硬件与编程模型-2.3-算子结构与直调开发.html" class=""><span class="doc-type">📘📗</span>2.3 算子结构与直调开发</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第3章 核心开发</span><ul class="article-list"><li><a href="03-核心开发-3.1-Tiling设计.html" class=""><span class="doc-type">📘</span>3.1 Tiling 设计</a></li><li><a href="03-核心开发-3.2-内存管理与数据搬运.html" class=""><span class="doc-type">📘📕</span>3.2 内存管理与数据搬运</a></li><li><a href="03-核心开发-3.3-Vector计算.html" class=""><span class="doc-type">📘📕</span>3.3 Vector 计算</a></li><li><a href="03-核心开发-3.4-Cube计算.html" class=""><span class="doc-type">📘📕</span>3.4 Cube 计算</a></li><li><a href="03-核心开发-3.5-同步与流水线.html" class=""><span class="doc-type">📘</span>3.5 同步与流水线</a></li><li><a href="03-核心开发-3.6-实战-从零实现一个完整算子.html" class=""><span class="doc-type">📗</span>3.6 实战：从零实现一个完整算子</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第4章 调试与优化</span><ul class="article-list"><li><a href="04-调试与优化-4.1-精度不对怎么办.html" class=""><span class="doc-type">📙</span>4.1 精度不对怎么办</a></li><li><a href="04-调试与优化-4.2-性能不达标怎么办.html" class=""><span class="doc-type">📙</span>4.2 性能不达标怎么办</a></li><li><a href="04-调试与优化-4.3-算子精度标准.html" class=""><span class="doc-type">📕</span>4.3 算子精度标准</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第5章 进阶</span><ul class="article-list"><li><a href="05-进阶-5.1-常见踩坑与最佳实践.html" class=""><span class="doc-type">📙</span>5.1 常见踩坑与最佳实践</a></li><li><a href="05-进阶-5.2-进阶主题.html" class="active"><span class="doc-type">📘</span>5.2 进阶主题</a></li></ul></li><li class="chapter-group"><span class="chapter-title">附录</span><ul class="article-list"><li><a href="附录-A-数据类型速查表.html" class=""><span class="doc-type">📕</span>A. 数据类型速查表</a></li><li><a href="附录-B-对齐规则速查.html" class=""><span class="doc-type">📕</span>B. 对齐规则速查</a></li><li><a href="附录-C-错误码速查.html" class=""><span class="doc-type">📕</span>C. 错误码速查</a></li></ul></li></ul></nav>
@@ -12,7 +12,7 @@
 <div class="content">
 <div class="meta-bar">
 <span class="doc-badge badge-explanation">📘 Explanation</span>
-<a href="../index.html">← 返回目录</a>
+<a href="index.html">← 返回目录</a>
 </div>
 <p>本文介绍 Ascend C 在 A5（Ascend 950 / DAV_3510）上引入的一系列高级特性。这些特性面向有经验的开发者，能够进一步释放硬件性能。文中会以 sswap 算子为例，重点说明跨架构兼容的设计思路。</p>
 <h2>5.2.1 SIMD-RegBase 深入</h2>
@@ -119,8 +119,44 @@ if (npuArch == NpuArch::DAV_3510) {
 <li><a href="https://gitcode.com/cann/asc-devkit.git">asc-devkit RegBase 示例</a>（<code>examples/01_simd_cpp_api/04_best_practices/02_reg_vector_compute_practices/</code>）</li>
 <li><a href="https://www.hiascend.com/zh/developer/courses/detail/1696690858236694530">Ascend C 系列教程（高级）</a></li>
 </ul>
+<div id="quiz"></div>
 <div class="page-nav"><a href="05-进阶-5.1-常见踩坑与最佳实践.html" class="nav-prev"><span class="nav-label">← 上一篇</span><span class="nav-title">5.1 常见踩坑与最佳实践</span></a><a href="附录-A-数据类型速查表.html" class="nav-next"><span class="nav-label">下一篇 →</span><span class="nav-title">A. 数据类型速查表</span></a></div>
 </div>
 </main>
+<script src="js/quiz.js"></script>
+<script>
+renderQuiz('quiz', [
+  {
+    question: "RegBase 编程模型相比 MemBase 的核心优势是什么？",
+    options: ["代码更短", "直接操作向量寄存器，编译器可以做更深的优化", "不需要 UB 内存", "只支持 FP32"],
+    answer: 1,
+    explanation: "RegBase 让你直接操作向量寄存器（类似 GPU 的 PTX），数据从 UB 加载到寄存器组中，所有计算在寄存器上完成，减少了中间 UB 读写的开销。"
+  },
+  {
+    question: "SIMT 混合编程中，SIMT 部分最适合处理什么场景？",
+    options: ["密集的向量计算", "离散内存访问（如 Gather/Scatter）和分支密集的逻辑", "规整的数据搬运", "矩阵乘法"],
+    answer: 1,
+    explanation: "SIMT 适合处理离散内存访问和分支密集的逻辑（如稀疏矩阵遍历），而 SIMD 适合密集的向量计算和规整的数据搬运。两者可以混合使用。"
+  },
+  {
+    question: "NDDMA（高维 DMA）特别适合什么场景？",
+    options: ["一维向量搬运", "last-axis 长度较短的多维张量", "标量运算", "整数加法"],
+    answer: 1,
+    explanation: "NDDMA 适合 last-axis 较短的场景，比如 [N, D] 中 D=16 时，传统 DataCopy 并行度低，NDDMA 可以先做转置把 last axis 变长再计算。"
+  },
+  {
+    question: "CCU（Collective Communication Unit）的最大优势是什么？",
+    options: ["提高计算速度", "通信操作由 CCU 独立完成，不占用 AI Core 计算资源", "减少内存占用", "提高精度"],
+    answer: 1,
+    explanation: "CCU 让通信操作（如 AllReduce）由专用单元完成，AI Core 可以同时做 MatMul，两者完全并行，特别适合大模型训练中的'计算+通信'重叠。"
+  },
+  {
+    question: "跨架构兼容时，Kernel 侧用什么方式做条件编译？",
+    options: ["运行时 if/else 分支", "__NPU_ARCH__ 编译宏", "不同的文件名", "不同的编译器"],
+    answer: 1,
+    explanation: "Kernel 侧用 __NPU_ARCH__ 编译宏做条件编译（如 #if __NPU_ARCH__ == 3510），Host 侧则可以用 ascendcPlatform.GetCurNpuArch() 做运行时分支。"
+  }
+]);
+</script>
 </body>
 </html>

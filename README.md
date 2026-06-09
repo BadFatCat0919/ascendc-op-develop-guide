@@ -1,5 +1,7 @@
 # AscendC Guide
 
+> 📖 **在线阅读**：[https://badfatcat0919.github.io/ascendc-op-develop-guide/](https://badfatcat0919.github.io/ascendc-op-develop-guide/)
+
 用 Agent 总结的 AscendC 算子开发手册，摈弃高高在上的刻板技术语气，用更接地气的方式介绍算子开发，并配上了更适合中国宝宝体质的习题系统，帮助你更快理解算子开发！
 
 ## 📖 这是什么？
@@ -46,7 +48,7 @@
 
 ```bash
 # 克隆仓库
-git clone https://gitcode.com/xutianze/AscendC-Guide.git
+git clone https://github.com/BadFatCat0919/ascendc-op-develop-guide.git
 
 # 用浏览器打开
 open index.html  # macOS
@@ -54,22 +56,13 @@ xdg-open index.html  # Linux
 start index.html  # Windows
 ```
 
-或者直接在 GitCode 上浏览：点击仓库根目录下的 `index.html` 文件。
-
 ## 🛠️ 技术栈
 
-- 纯静态 HTML + CSS，无需构建工具
+- 纯静态 HTML + CSS + JavaScript，无需构建工具
 - 响应式设计，支持桌面和移动端
 - 代码高亮，ASCII 图表特殊样式
 - 侧边栏导航，方便跳转
-
-## 📝 更新内容
-
-如果你想重新生成 HTML 文件（比如修改了源 markdown 文件），运行：
-
-```bash
-python3 convert.py
-```
+- 交互式习题系统，边学边练
 
 ## 🤝 贡献
 
@@ -77,7 +70,7 @@ python3 convert.py
 
 ## 📄 许可证
 
-本项目采用 [CANN Open Software License Agreement Version 2.0](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/8.0.0.alpha001/developmenttools/0000001862665073) 许可证。
+本项目采用 [MIT License](LICENSE) 开源。
 
 ## 🔗 相关资源
 

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>4.2 性能不达标怎么办 - AscendC Guide</title>
-<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <nav class="sidebar"><div class="sidebar-header"><h2>AscendC Guide</h2><p>算子开发从入门到精通</p></div><ul class="sidebar-nav"><li class="chapter-group"><span class="chapter-title">第1章 基础概念</span><ul class="article-list"><li><a href="01-基础概念-1.1-什么是算子与AscendC.html" class=""><span class="doc-type">📘</span>1.1 什么是算子与 Ascend C</a></li><li><a href="01-基础概念-1.2-数据类型排布与量化.html" class=""><span class="doc-type">📘📕</span>1.2 数据类型、排布与量化</a></li><li><a href="01-基础概念-1.3-五分钟跑通第一个算子.html" class=""><span class="doc-type">📗</span>1.3 五分钟跑通第一个算子</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第2章 硬件与编程模型</span><ul class="article-list"><li><a href="02-硬件与编程模型-2.1-A5硬件架构.html" class=""><span class="doc-type">📘</span>2.1 A5 硬件架构</a></li><li><a href="02-硬件与编程模型-2.2-编程模型概述.html" class=""><span class="doc-type">📘</span>2.2 编程模型概述</a></li><li><a href="02-硬件与编程模型-2.3-算子结构与直调开发.html" class=""><span class="doc-type">📘📗</span>2.3 算子结构与直调开发</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第3章 核心开发</span><ul class="article-list"><li><a href="03-核心开发-3.1-Tiling设计.html" class=""><span class="doc-type">📘</span>3.1 Tiling 设计</a></li><li><a href="03-核心开发-3.2-内存管理与数据搬运.html" class=""><span class="doc-type">📘📕</span>3.2 内存管理与数据搬运</a></li><li><a href="03-核心开发-3.3-Vector计算.html" class=""><span class="doc-type">📘📕</span>3.3 Vector 计算</a></li><li><a href="03-核心开发-3.4-Cube计算.html" class=""><span class="doc-type">📘📕</span>3.4 Cube 计算</a></li><li><a href="03-核心开发-3.5-同步与流水线.html" class=""><span class="doc-type">📘</span>3.5 同步与流水线</a></li><li><a href="03-核心开发-3.6-实战-从零实现一个完整算子.html" class=""><span class="doc-type">📗</span>3.6 实战：从零实现一个完整算子</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第4章 调试与优化</span><ul class="article-list"><li><a href="04-调试与优化-4.1-精度不对怎么办.html" class=""><span class="doc-type">📙</span>4.1 精度不对怎么办</a></li><li><a href="04-调试与优化-4.2-性能不达标怎么办.html" class="active"><span class="doc-type">📙</span>4.2 性能不达标怎么办</a></li><li><a href="04-调试与优化-4.3-算子精度标准.html" class=""><span class="doc-type">📕</span>4.3 算子精度标准</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第5章 进阶</span><ul class="article-list"><li><a href="05-进阶-5.1-常见踩坑与最佳实践.html" class=""><span class="doc-type">📙</span>5.1 常见踩坑与最佳实践</a></li><li><a href="05-进阶-5.2-进阶主题.html" class=""><span class="doc-type">📘</span>5.2 进阶主题</a></li></ul></li><li class="chapter-group"><span class="chapter-title">附录</span><ul class="article-list"><li><a href="附录-A-数据类型速查表.html" class=""><span class="doc-type">📕</span>A. 数据类型速查表</a></li><li><a href="附录-B-对齐规则速查.html" class=""><span class="doc-type">📕</span>B. 对齐规则速查</a></li><li><a href="附录-C-错误码速查.html" class=""><span class="doc-type">📕</span>C. 错误码速查</a></li></ul></li></ul></nav>
@@ -12,7 +12,7 @@
 <div class="content">
 <div class="meta-bar">
 <span class="doc-badge badge-howto">📙 How-to Guide</span>
-<a href="../index.html">← 返回目录</a>
+<a href="index.html">← 返回目录</a>
 </div>
 <h2>4.2.1 先搞清楚你的算子是什么类型</h2>
 <p>优化之前，先想清楚一个根本问题：你的算子是 <strong>计算密集型</strong> 还是 <strong>访存密集型</strong>？</p>
@@ -85,8 +85,44 @@
 <li><a href="https://www.hiascend.com/zh/developer/techArticles/20240607-1">基于Ascend C的FlashAttention算子性能优化最佳实践</a></li>
 <li><a href="https://gitcode.com/cann/cann-samples">cann-samples 性能实战</a>（<code>Samples/2_Performance/</code>）</li>
 </ul>
+<div id="quiz"></div>
 <div class="page-nav"><a href="04-调试与优化-4.1-精度不对怎么办.html" class="nav-prev"><span class="nav-label">← 上一篇</span><span class="nav-title">4.1 精度不对怎么办</span></a><a href="04-调试与优化-4.3-算子精度标准.html" class="nav-next"><span class="nav-label">下一篇 →</span><span class="nav-title">4.3 算子精度标准</span></a></div>
 </div>
 </main>
+<script src="js/quiz.js"></script>
+<script>
+renderQuiz('quiz', [
+  {
+    question: "文中把计算密集型算子比作王者里的什么角色？",
+    options: ["辅助", "法师", "射手", "坦克"],
+    answer: 1,
+    explanation: "计算密集型就像王者里的法师，团战时疯狂放技能（计算多，搬运少），优化方向是堆法强（算力）。访存密集型则像辅助，全图跑做视野插眼。"
+  },
+  {
+    question: "sswap 属于哪种类型的算子？",
+    options: ["计算密集型（compute-bound）", "访存密集型（memory-bound）", "调度密集型", "IO 密集型"],
+    answer: 1,
+    explanation: "sswap 是典型的 memory-bound 算子，每次交换需要 4 次 GM 访问（读 x、读 y、写回 x、写回 y），性能瓶颈 100% 在数据搬运上。"
+  },
+  {
+    question: "msprof 在昇腾平台上的地位类似于 NVIDIA 的什么工具？",
+    options: ["CUDA Debugger", "Nsight", "cuDNN", "TensorRT"],
+    answer: 1,
+    explanation: "msprof 是昇腾平台的性能分析工具，地位类似于 NVIDIA 的 Nsight，可以采集执行时间、各 Pipe 利用率、搬运延迟等关键指标。"
+  },
+  {
+    question: "双 Buffer 优化的核心原理是什么？",
+    options: ["增加计算单元数量", "搬运和计算重叠执行", "减少数据类型", "增大 UB 容量"],
+    answer: 1,
+    explanation: "双 Buffer 的核心是搬运和计算重叠——当计算单元处理 Buffer A 时，MTE 同时把下一批数据搬到 Buffer B，就像流水线作业不用等。"
+  },
+  {
+    question: "如果你对着 sswap 去优化 Vector 利用率，相当于什么？",
+    options: ["给辅助堆法强", "给法师堆移速", "方向搞反了", "正确的优化方向"],
+    answer: 2,
+    explanation: "sswap 根本不涉及计算，性能瓶颈在数据搬运上。对着它优化 Vector 利用率就是方向搞反了——应该优化搬运效率才对。"
+  }
+]);
+</script>
 </body>
 </html>

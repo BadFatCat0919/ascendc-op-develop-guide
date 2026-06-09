@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>1.3 五分钟跑通第一个算子 - AscendC Guide</title>
-<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <nav class="sidebar"><div class="sidebar-header"><h2>AscendC Guide</h2><p>算子开发从入门到精通</p></div><ul class="sidebar-nav"><li class="chapter-group"><span class="chapter-title">第1章 基础概念</span><ul class="article-list"><li><a href="01-基础概念-1.1-什么是算子与AscendC.html" class=""><span class="doc-type">📘</span>1.1 什么是算子与 Ascend C</a></li><li><a href="01-基础概念-1.2-数据类型排布与量化.html" class=""><span class="doc-type">📘📕</span>1.2 数据类型、排布与量化</a></li><li><a href="01-基础概念-1.3-五分钟跑通第一个算子.html" class="active"><span class="doc-type">📗</span>1.3 五分钟跑通第一个算子</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第2章 硬件与编程模型</span><ul class="article-list"><li><a href="02-硬件与编程模型-2.1-A5硬件架构.html" class=""><span class="doc-type">📘</span>2.1 A5 硬件架构</a></li><li><a href="02-硬件与编程模型-2.2-编程模型概述.html" class=""><span class="doc-type">📘</span>2.2 编程模型概述</a></li><li><a href="02-硬件与编程模型-2.3-算子结构与直调开发.html" class=""><span class="doc-type">📘📗</span>2.3 算子结构与直调开发</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第3章 核心开发</span><ul class="article-list"><li><a href="03-核心开发-3.1-Tiling设计.html" class=""><span class="doc-type">📘</span>3.1 Tiling 设计</a></li><li><a href="03-核心开发-3.2-内存管理与数据搬运.html" class=""><span class="doc-type">📘📕</span>3.2 内存管理与数据搬运</a></li><li><a href="03-核心开发-3.3-Vector计算.html" class=""><span class="doc-type">📘📕</span>3.3 Vector 计算</a></li><li><a href="03-核心开发-3.4-Cube计算.html" class=""><span class="doc-type">📘📕</span>3.4 Cube 计算</a></li><li><a href="03-核心开发-3.5-同步与流水线.html" class=""><span class="doc-type">📘</span>3.5 同步与流水线</a></li><li><a href="03-核心开发-3.6-实战-从零实现一个完整算子.html" class=""><span class="doc-type">📗</span>3.6 实战：从零实现一个完整算子</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第4章 调试与优化</span><ul class="article-list"><li><a href="04-调试与优化-4.1-精度不对怎么办.html" class=""><span class="doc-type">📙</span>4.1 精度不对怎么办</a></li><li><a href="04-调试与优化-4.2-性能不达标怎么办.html" class=""><span class="doc-type">📙</span>4.2 性能不达标怎么办</a></li><li><a href="04-调试与优化-4.3-算子精度标准.html" class=""><span class="doc-type">📕</span>4.3 算子精度标准</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第5章 进阶</span><ul class="article-list"><li><a href="05-进阶-5.1-常见踩坑与最佳实践.html" class=""><span class="doc-type">📙</span>5.1 常见踩坑与最佳实践</a></li><li><a href="05-进阶-5.2-进阶主题.html" class=""><span class="doc-type">📘</span>5.2 进阶主题</a></li></ul></li><li class="chapter-group"><span class="chapter-title">附录</span><ul class="article-list"><li><a href="附录-A-数据类型速查表.html" class=""><span class="doc-type">📕</span>A. 数据类型速查表</a></li><li><a href="附录-B-对齐规则速查.html" class=""><span class="doc-type">📕</span>B. 对齐规则速查</a></li><li><a href="附录-C-错误码速查.html" class=""><span class="doc-type">📕</span>C. 错误码速查</a></li></ul></li></ul></nav>
@@ -12,7 +12,7 @@
 <div class="content">
 <div class="meta-bar">
 <span class="doc-badge badge-tutorial">📗 Tutorial</span>
-<a href="../index.html">← 返回目录</a>
+<a href="index.html">← 返回目录</a>
 </div>
 <h2>1.3.1 环境准备</h2>
 <p>在开始之前，确保你已经安装了 CANN Toolkit。运行以下命令检查环境：</p>
@@ -123,8 +123,44 @@ constexpr uint32_t ELEMENTS_PER_BLOCK = 32 / sizeof(float);</code></pre>
 <li><a href="https://www.hiascend.com/document/redirect/CannCommunityInstWizard">CANN 安装指南</a></li>
 <li><a href="https://www.hiascend.com/developer/courses/detail/1691696509765107713">Ascend C 系列教程（入门）</a></li>
 </ul>
+<div id="quiz"></div>
 <div class="page-nav"><a href="01-基础概念-1.2-数据类型排布与量化.html" class="nav-prev"><span class="nav-label">← 上一篇</span><span class="nav-title">1.2 数据类型、排布与量化</span></a><a href="02-硬件与编程模型-2.1-A5硬件架构.html" class="nav-next"><span class="nav-label">下一篇 →</span><span class="nav-title">2.1 A5 硬件架构</span></a></div>
 </div>
 </main>
+<script src="js/quiz.js"></script>
+<script>
+renderQuiz('quiz', [
+  {
+    question: "sswap 是 BLAS Level-1 中的一个 routine，它的功能是什么？",
+    options: ["计算两个向量的点积", "对向量中的每个元素取绝对值", "交换两个向量的对应元素（x 变成原来的 y，y 变成原来的 x）", "将两个向量相加"],
+    answer: 2,
+    explanation: "sswap 的功能是交换两个向量的对应元素——调用 swap(x, y) 后，x 变成原来的 y，y 变成原来的 x。它不做任何加减乘除，纯粹是把数据从 A 搬到 B、从 B 搬到 A，属于数据搬运算子。"
+  },
+  {
+    question: "sswap 算子的代码放在 arch35 目录下，这个目录包含三个文件。以下哪个文件负责定义「每个 NPU 核该处理多少数据」？",
+    options: ["sswap_host.cpp", "sswap_kernel.cpp", "sswap_tiling_data.h", "三个文件共同负责"],
+    answer: 2,
+    explanation: "sswap_tiling_data.h 定义 TilingData 结构体——告诉 NPU 每个核该处理多少数据。sswap_kernel.cpp 是 Kernel 代码（NPU 上运行），sswap_host.cpp 是 Host 侧代码（CPU 上运行，负责参数校验、计算 Tiling 参数、启动 Kernel）。"
+  },
+  {
+    question: "编译 sswap 算子时，使用的命令是 bash build.sh --ops=sswap --soc=ascend950。其中 --soc 参数的作用是什么？",
+    options: ["指定算子的功能域（如 BLAS、NN）", "指定目标芯片型号，不同芯片的 AI Core 架构不同，编译出的二进制也不同", "指定编译优化等级", "指定测试用例的数量"],
+    answer: 1,
+    explanation: "--soc 参数指定目标芯片型号（如 ascend950 代表 A5）。不同芯片的 AI Core 架构不同，编译器需要根据目标架构生成不同的二进制代码。如果你用的是 A2/A3 芯片，需要替换为对应的型号（如 ascend910b）。"
+  },
+  {
+    question: "在 Kernel 代码中，__global__ __aicore__ 这两个标记的作用是什么？",
+    options: ["标记这是一个 CPU 上的普通函数", "标记这是一个 NPU 核函数，类似 CUDA 的 __global__", "标记这是一个只能在仿真器上运行的函数", "标记这是一个 Host 侧的参数校验函数"],
+    answer: 1,
+    explanation: "__global__ __aicore__ 标记这是一个 NPU 核函数，类似 CUDA 的 __global__。它告诉编译器这段代码要在 NPU 的 AI Core 上执行，而不是在 CPU 上。__aicore__ 是 Ascend C 特有的标记，表示函数运行在 AI Core 计算单元上。"
+  },
+  {
+    question: "sswap 的核心逻辑是「交叉写回」——以下哪个描述最准确？",
+    options: ["把 x 和 y 的数据都搬到 UB 的同一块缓冲区，然后复制回原位", "把 x 缓冲区的数据写回 y 的 GM 位置，把 y 缓冲区的数据写回 x 的 GM 位置", "先把 x 的数据复制到临时空间，再把 y 复制给 x，最后把临时空间复制给 y", "直接在 GM 上原地交换，不需要经过 UB"],
+    answer: 1,
+    explanation: "sswap 的核心逻辑是：从 GM 把 x 和 y 的数据分别搬到 UB 的两块缓冲区，然后交叉搬回——把 x 缓冲区的数据写回 y 的 GM 位置，把 y 缓冲区的数据写回 x 的 GM 位置。这样就完成了交换，而且不需要额外的临时空间。"
+  }
+]);
+</script>
 </body>
 </html>
