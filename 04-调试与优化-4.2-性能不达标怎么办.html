@@ -55,7 +55,7 @@
 <li><strong>数据对齐</strong>：确保搬运长度和地址 32B 对齐。不对齐的搬运会触发额外的对齐操作，浪费带宽。</li>
 <li><strong>Full Load</strong>：一次性将整个 Tile 的数据搬入 UB，减少搬运次数。</li>
 </ul>
-<blockquote><p><strong>sswap 的搬运优化</strong>：sswap 有 4 次 GM 访问（2 读 + 2 写），是典型的搬运瓶颈。优化方向是让 CopyIn 和 CopyOut 尽可能重叠——当 x 的数据正在写回 GM 时，下一批 y 的数据可以同时从 GM 读入。双 Buffer 在这里非常有效。</p></blockquote>
+<blockquote><p><strong>sswap 的搬运优化</strong>：sswap 是纯搬运算子，没有计算阶段可以重叠，因此使用 Single Buffer。优化方向是最大化单次搬运效率（对齐、填满 UB）和多核负载均衡。</p></blockquote>
 <h2>4.2.6 调度瓶颈</h2>
 <p><strong>现象</strong>：各 Pipe 利用率都不高，有大量空闲时间。说明各单元之间的协调不好，互相等待。</p>
 <p><strong>优化手段</strong>：</p>

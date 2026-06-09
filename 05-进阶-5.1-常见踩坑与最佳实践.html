@@ -42,7 +42,7 @@
 <ol>
 <li><strong>在 Tiling 阶段就做好对齐。</strong> sswap 的 Host 侧 <code>CalSswapTilingData</code> 函数中，<code>perCoreN</code> 和 <code>tileSize</code> 都做了向下对齐到 <code>ELEMENTS_PER_BLOCK</code> 的处理，从源头避免不对齐的情况。</li>
 </ol>
-<p>详细计算见 <a href="../附录/B-对齐规则速查.md">附录 B：对齐规则速查</a>。</p>
+<p>详细计算见 <a href="附录-B-对齐规则速查.html">附录 B：对齐规则速查</a>。</p>
 <h2>5.1.2 repeat 限制</h2>
 <p>Ascend C 的 Vector 指令有一个 <code>repeatTimes</code> 参数，用来指定同一条指令连续执行多少次。但这个参数有上限——通常是 <strong>255</strong>。</p>
 <p>如果你的数据量很大，一条指令处理不完怎么办？答案是<strong>分多轮处理</strong>。比如你要对 10000 个元素做 Add 运算，每条指令最多处理 255 轮（每轮 128 个 FP16 元素），那就需要把数据切成多个 chunk，循环调用。</p>
@@ -76,11 +76,11 @@ TQueBind&lt;QuePosition::VECIN, QuePosition::VECOUT, 1&gt; inQueueY_;</code></pr
 <p>精度问题在浮点运算中无处不在，Ascend C 也不例外。</p>
 <p><strong>FP16 累加溢出。</strong> FP16 的最大值只有 65504，如果你用 FP16 做累加器，累加几千个中等大小的数就可能溢出。解决方案是使用 <strong>FP32 累加器</strong>——先把 FP16 数据 Cast 到 FP32，用 FP32 做累加，最后再 Cast 回 FP16。</p>
 <p><strong>BF16 精度更低。</strong> BF16 的尾数只有 7 位（FP16 有 10 位），所以 BF16 的精度实际上比 FP16 更差。它的优势在于动态范围和 FP32 一样大（指数位都是 8 位），不容易溢出，但精度损失更明显。</p>
-<p>sswap 是纯数据搬运，不涉及任何计算，所以不存在精度问题——它的测试使用的是 <code>PrecisionMode::EXACT</code>（精确比对）。但对于有计算的算子，精度标准的选择至关重要，详见 <a href="../04-调试与优化/4.3-算子精度标准.md">4.3 算子精度标准</a>。</p>
+<p>sswap 是纯数据搬运，不涉及任何计算，所以不存在精度问题——它的测试使用的是 <code>PrecisionMode::EXACT</code>（精确比对）。但对于有计算的算子，精度标准的选择至关重要，详见 <a href="04-调试与优化-4.3-算子精度标准.html">4.3 算子精度标准</a>。</p>
 <h2>5.1.5 硬编码硬件参数</h2>
 <p>这是一个看似方便、实则致命的坏习惯。</p>
 <h3>为什么不能硬编码</h3>
-<p>不同的昇腾芯片型号，Vector 核数、UB 大小等硬件参数完全不同。比如 A2 有 40 个 Vector 核，A5 的核数则因具体型号而异。如果你在代码里写死 <code>CORE_NUM = 32</code>，换一块芯片就可能出问题——要么浪费了一半的核，要么核数不够导致数据丢失。</p>
+<p>不同的昇腾芯片型号，Vector 核数、UB 大小等硬件参数完全不同。A2 不同型号核数不同（如 910B2 有 48 个 Vector 核），sswap arch22 代码中使用 DEFAULT_VECTOR_CNT = 40。这就是为什么必须动态获取核数而不是硬编码。如果你在代码里写死 <code>CORE_NUM = 32</code>，换一块芯片就可能出问题——要么浪费了一半的核，要么核数不够导致数据丢失。</p>
 <h3>sswap 的正确做法</h3>
 <p>sswap 在 Host 侧通过 <code>aclrtGetDeviceInfo</code> 动态获取核数：</p>
 <pre class=""><code>static uint32_t GetVectorCoreCount()

@@ -37,7 +37,7 @@
 </ul>
 <h2>1.2.3 C++ 类型名与别名</h2>
 <p>这是新手最容易搞混的地方。同一种数据类型在不同头文件、不同文档中可能用不同的名字。比如 FP16 在代码里可能写成 <code>half</code>，在文档里写成 <code>float16_t</code>，在口头交流中说成 <code>fp16</code>——它们指的是同一个东西。</p>
-<p>下面是一张速查表（详细版本见 <a href="../附录/A-数据类型速查表.md">附录 A：数据类型速查表</a>）：</p>
+<p>下面是一张速查表（详细版本见 <a href="附录-A-数据类型速查表.html">附录 A：数据类型速查表</a>）：</p>
 <table><thead><tr><th>格式</th><th>C++ 类型名</th><th>常见别名</th></tr></thead><tbody><tr><td>FP32</td><td><code>float</code></td><td><code>float32</code>, <code>fp32</code></td></tr><tr><td>FP16</td><td><code>half</code></td><td><code>float16_t</code>, <code>fp16</code></td></tr><tr><td>BF16</td><td><code>bfloat16_t</code></td><td><code>bf16</code>, <code>bfloat16</code></td></tr><tr><td>FP8 E4M3</td><td><code>fp8_e4m3fn_t</code></td><td><code>fp8_e4m3</code></td></tr><tr><td>FP8 E5M2</td><td><code>fp8_e5m2_t</code></td><td><code>fp8_e5m2</code></td></tr><tr><td>HiFloat8</td><td><code>hifloat8_t</code></td><td><code>hif8</code></td></tr><tr><td>INT8</td><td><code>int8_t</code></td><td><code>int8</code></td></tr><tr><td>INT4</td><td><code>int4b_t</code></td><td><code>int4</code></td></tr></tbody></table>
 <p>写代码时以 C++ 类型名为准，别名通常出现在文档和口头讨论中。</p>
 <h2>1.2.4 A5 特有的数据类型</h2>
@@ -73,7 +73,7 @@ ND → FracNZ             # Transformer 权重</code></pre>
 <p>对齐后长度的计算公式：</p>
 <pre class=""><code>对齐后长度 = ceil(原始长度 / 对齐粒度) × 对齐粒度</code></pre>
 <p><strong>以 sswap 为例</strong>：sswap 使用 FP32（float）类型，每个 float 占 4 字节，所以对齐粒度 = 32 / 4 = <strong>8 个 float</strong>。在 sswap 的 TilingData 头文件中，这个值被定义为常量 <code>ELEMENTS_PER_BLOCK = 32 / sizeof(float) = 8</code>。如果向量长度不是 8 的倍数，就需要在末尾补齐（padding）到 8 的倍数才能用 DataCopy 搬运。</p>
-<p>更多对齐规则的细节见 <a href="../附录/B-对齐规则速查.md">附录 B：对齐规则速查</a>。</p>
+<p>更多对齐规则的细节见 <a href="附录-B-对齐规则速查.html">附录 B：对齐规则速查</a>。</p>
 <h2>1.2.7 量化（Quantization）</h2>
 <p>量化是将高精度数据（如 FP32）映射到低精度数据（如 INT8）的技术。目的是<strong>减小模型体积、加速推理</strong>。</p>
 <p>类比一下：一幅 2400 万像素的照片（FP32）占 70MB，压缩成 JPEG（INT8）只占 3MB，虽然损失了一些细节，但人眼看起来差别不大。</p>

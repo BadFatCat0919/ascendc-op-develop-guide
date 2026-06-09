@@ -241,8 +241,8 @@ aclrtGetDeviceInfo(deviceId, ACL_DEV_ATTR_VECTOR_CORE_NUM, &amp;aivCoreNum, size
 ./build/sswap_test</code></pre>
 <p>ST 用例会自动生成多种规模的测试数据（小、中、大、边界），调用算子并与 golden 结果比对。全部通过才算验证成功。</p>
 <h2>3.6.9 常见问题排查</h2>
-<p><strong>精度不对</strong>：sswap 是精确算子，如果出现精度问题，大概率是 DataCopy 对齐错误或 Buffer 越界。检查 <code>ELEMENTS_PER_BLOCK</code> 的计算是否正确，DataCopyPad 的填充参数是否匹配。详见 <a href="../04-调试与优化/4.1-精度不对怎么办.md">4.1 精度不对怎么办</a>。</p>
-<p><strong>性能不好</strong>：sswap 是纯搬运算子，性能瓶颈在 GM 带宽。检查多核切分是否均匀（<code>remainder</code> 是否过大），<code>tileSize</code> 是否充分利用了 UB 空间。详见 <a href="../04-调试与优化/4.2-性能不达标怎么办.md">4.2 性能不达标怎么办</a>。</p>
+<p><strong>精度不对</strong>：sswap 是精确算子，如果出现精度问题，大概率是 DataCopy 对齐错误或 Buffer 越界。检查 <code>ELEMENTS_PER_BLOCK</code> 的计算是否正确，DataCopyPad 的填充参数是否匹配。详见 <a href="04-调试与优化-4.1-精度不对怎么办.html">4.1 精度不对怎么办</a>。</p>
+<p><strong>性能不好</strong>：sswap 是纯搬运算子，性能瓶颈在 GM 带宽。检查多核切分是否均匀（<code>remainder</code> 是否过大），<code>tileSize</code> 是否充分利用了 UB 空间。详见 <a href="04-调试与优化-4.2-性能不达标怎么办.html">4.2 性能不达标怎么办</a>。</p>
 <p><strong>编译报错</strong>：检查 CANN 环境变量、SOC_VERSION 配置、头文件路径。常见的 <code>__gm__</code> 相关报错通常是因为没有使用 CANN 提供的编译器。</p>
 <p><strong>运行时崩溃</strong>：检查 GM 指针是否为空、N 是否为 0、Tiling 数据是否正确写入 GM。可以通过 plog 日志定位具体的崩溃位置。</p>
 <h2>参考链接</h2>

@@ -24,14 +24,14 @@
 <h3>三大计算单元</h3>
 <table><thead><tr><th>计算单元</th><th>类比</th><th>擅长场景</th><th>算力 (A5 Server)</th></tr></thead><tbody><tr><td><strong>Cube</strong></td><td>吕布大招（一刀劈一片）</td><td>矩阵乘加（16×16×16 MAC 阵列）</td><td>432T (BF16)</td></tr><tr><td><strong>Vector</strong></td><td>流水线工人</td><td>逐元素运算、归约、类型转换</td><td>54T (FP16)</td></tr><tr><td><strong>Scalar</strong></td><td>管理员</td><td>控制流、地址计算</td><td>-</td></tr></tbody></table>
 <p><strong>Cube</strong> 是算力担当，专门做矩阵乘法。它内部是一个 16×16×16 的 MAC（乘累加）阵列，每个时钟周期可以完成一次 16×16 的矩阵乘运算。对于 FP8 精度，阵列扩大为 16×32×16，算力翻倍；对于 MXFP4 精度，阵列进一步扩大为 16×64×16，算力再翻倍。</p>
-<p><strong>Vector</strong> 是通用计算单元，宽度为 128 bit，每次可以处理 256 Bytes 的数据（对于 float 就是 64 个元素，对于 half 就是 128 个元素）。当数据总量超过一次处理的宽度时，Vector 通过 repeat（重复执行）和 mask（掩码选择）机制来处理任意长度的向量。</p>
+<p><strong>Vector</strong> 是通用计算单元，宽度为 256 Bytes（2048 bit），每次可以处理 256 Bytes 的数据（对于 float 就是 64 个元素，对于 half 就是 128 个元素）。当数据总量超过一次处理的宽度时，Vector 通过 repeat（重复执行）和 mask（掩码选择）机制来处理任意长度的向量。</p>
 <p><strong>Scalar</strong> 负责控制流和地址计算等标量操作，不参与大规模数据计算。</p>
 <div class="sswap-callout"><p>sswap 是纯数据搬运算子（交换两个向量的元素），只做 CopyIn 和 CopyOut，不涉及加减乘除。因此它只使用 <strong>Vector</strong> 单元来驱动数据搬运（MTE2 搬入、MTE3 搬出），完全不需要 Cube 单元。这也是为什么 sswap 的 kernel 入口使用 <code>KERNEL_TASK_TYPE_DEFAULT(KERNEL_TYPE_AIV_ONLY)</code>——只启动 AIV（AI Vector）核，不启动 AIC（AI Cube）核。</p></div>
 <h3>Cube 单元详解</h3>
 <p>Cube 的核心是一个脉动阵列（Systolic Array），在 FP16/BF16 精度下规模为 16×16×16。你可以把它理解为王者里吕布的大招：蓄力（数据从 L0A/L0B 送入）→ 一刀劈下去（16×16 的矩阵乘一步完成）→ 范围内的敌人全被打到（结果写入 L0C）。每个时钟周期，阵列中的每个乘加单元都在做一次乘法和一次累加，数据像波浪一样从一端流向另一端。</p>
 <p>FP8 精度下阵列规模变为 16×32×16（K 维度翻倍），MXFP4 下变为 16×64×16（K 维度再翻倍），精度越低、吞吐越高。</p>
 <h3>Vector 单元详解</h3>
-<p>Vector 单元的物理宽度是 128 bit，但一次指令操作的数据量由 VL（Vector Length）决定，最大为 256 Bytes。以 float（4 Bytes）为例，一次可以处理 64 个元素；以 half（2 Bytes）为例，一次可以处理 128 个元素。</p>
+<p>Vector 单元的物理宽度是 256 Bytes（2048 bit），一次指令操作的数据量由 VL（Vector Length）决定，最大为 256 Bytes。以 float（4 Bytes）为例，一次可以处理 64 个元素；以 half（2 Bytes）为例，一次可以处理 128 个元素。</p>
 <p>当向量长度超过单次处理能力时，Vector 通过 <strong>repeat</strong> 参数指定重复执行次数，通过 <strong>mask</strong> 参数指定每次执行时哪些元素有效。这套机制让 Vector 能够处理任意长度的向量，而不需要程序员手写循环。</p>
 <h2>2.1.3 存储层次</h2>
 <p>昇腾的存储层次类似 CPU 的 L1/L2/L3 cache，但有一个关键区别：<strong>缓存由程序员显式管理</strong>。CPU 的 cache 对程序员透明，由硬件自动替换；而昇腾的各级 Buffer 需要程序员通过 API 显式搬运数据。</p>
@@ -74,7 +74,7 @@
 <li><strong>SIMD-RegBase</strong>：中间计算结果保存在寄存器中而非 UB，减少 UB 读写次数，特别适合多步融合计算（如 Gelu+Cast）。</li>
 <li><strong>NDDMA</strong>：高维 DMA 指令，支持多维张量的直接搬运，不需要拆成一维循环。</li>
 </ul>
-<p>这些编程模型在 <a href="./2.2-编程模型概述.md">2.2 编程模型概述</a> 中有详细讲解。</p>
+<p>这些编程模型在 <a href="02-硬件与编程模型-2.2-编程模型概述.html">2.2 编程模型概述</a> 中有详细讲解。</p>
 <h3>新增数据类型</h3>
 <p>A5 新增了一系列低精度数据类型，以支持大模型推理中的量化需求：</p>
 <ul>
@@ -82,7 +82,7 @@
 <li><strong>MXFP8 / MXFP4</strong>：微缩浮点格式，通过共享指数位进一步压缩数据。</li>
 <li><strong>HiF8</strong>：华为自定义的 8 位浮点格式。</li>
 </ul>
-<p>详见 <a href="../01-基础概念/1.2-数据类型排布与量化.md">1.2 数据类型</a> 中的 A5 特有类型章节。</p>
+<p>详见 <a href="01-基础概念-1.2-数据类型排布与量化.html">1.2 数据类型</a> 中的 A5 特有类型章节。</p>
 <h3>同步机制变化</h3>
 <p>A2/A3 上，多流水并行时需要严格配对使用 <code>SetFlag</code> / <code>WaitFlag</code> 来做同步——一个流水段 Set 了某个 flag，另一个流水段必须 Wait 同一个 flag，配对关系不能乱。A5 引入了 <strong>BufferID 同步机制</strong>，每个 Buffer 自带独立的同步标识，硬件自动管理依赖关系，消除了手动配对的需求，大幅简化了多流水算子的同步代码。</p>
 <h3>不再支持的特性</h3>

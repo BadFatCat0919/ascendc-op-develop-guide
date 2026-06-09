@@ -99,7 +99,7 @@ inQueueX_.FreeTensor(xIn);
 inQueueY_.FreeTensor(yIn);</code></pre>
 <h3>多队列协作</h3>
 <p>sswap 有两个输入队列（<code>inQueueX_</code> 和 <code>inQueueY_</code>），分别管理 x 和 y 的数据流。对于更复杂的算子，可能还需要输出队列、中间结果队列等。不同队列之间相互独立，各自管理自己的 Buffer 生命周期。</p>
-<p>队列机制的一个关键优势是：它把同步逻辑封装在了 EnQue/DeQue 的语义中。你不需要关心"MTE2 搬完了没有"，只要 DeQue 能返回数据，就说明搬运一定已经完成了。这将在 <a href="./3.5-同步与流水线.md">3.5 同步与流水线</a> 中深入讨论。</p>
+<p>队列机制的一个关键优势是：它把同步逻辑封装在了 EnQue/DeQue 的语义中。你不需要关心"MTE2 搬完了没有"，只要 DeQue 能返回数据，就说明搬运一定已经完成了。这将在 <a href="03-核心开发-3.5-同步与流水线.html">3.5 同步与流水线</a> 中深入讨论。</p>
 <h2>3.2.6 各层存储之间的搬运路径</h2>
 <p>不同的搬运路径由不同的 MTE（Memory Transfer Engine）负责。下表列出了 A5 架构上所有可用的搬运路径：</p>
 <table><thead><tr><th>源</th><th>目标</th><th>MTE 引擎</th><th>说明</th></tr></thead><tbody><tr><td>GM</td><td>UB</td><td>MTE2</td><td>输入数据搬入（Vector 类算子）</td></tr><tr><td>GM</td><td>L1</td><td>MTE2</td><td>Cube 输入搬入</td></tr><tr><td>L1</td><td>L0A</td><td>MTE1</td><td>Cube 左矩阵搬入</td></tr><tr><td>L1</td><td>L0B</td><td>MTE1</td><td>Cube 右矩阵搬入</td></tr><tr><td>L0C</td><td>UB</td><td>MTE1</td><td>Cube 输出到 Vector（A5 新增）</td></tr><tr><td>UB</td><td>GM</td><td>MTE3</td><td>结果搬出</td></tr><tr><td>UB</td><td>L1</td><td>MTE1</td><td>Vector 到 Cube（A5 新增）</td></tr><tr><td>L1</td><td>UB</td><td>MTE1</td><td>Cube 输入到 Vector</td></tr></tbody></table>
@@ -117,7 +117,7 @@ inQueueY_.FreeTensor(yIn);</code></pre>
 <li><strong>Tiling 阶段对齐</strong>：在切分时就把每轮的数据量对齐到 32B 边界，尾块单独处理。sswap 的 <code>perCoreN</code> 和 <code>tileSize</code> 都做了对齐。</li>
 <li><strong>DataCopyPad 填充</strong>：对于尾块，用 DataCopyPad 自动补齐不足的部分。sswap 在 <code>tailCount > 0</code> 时使用了这种方式。</li>
 </ul>
-<p>详细的对齐规则速查表见 <a href="../附录/B-对齐规则速查.md">附录 B：对齐规则速查</a>。</p>
+<p>详细的对齐规则速查表见 <a href="附录-B-对齐规则速查.html">附录 B：对齐规则速查</a>。</p>
 <h2>参考链接</h2>
 <ul>
 <li><a href="https://hiascend.com/document/redirect/CannCommunityOpdevAscendC">Ascend C 编程指南 — 内存管理</a></li>

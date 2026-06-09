@@ -92,8 +92,8 @@ EXPECT_TRUE(Verifier::verifyVector(yPtr, goldenY.data(), ...));</code></pre>
 <pre class=""><code>对于每个元素：
 |actual - expected| &lt;= atol + rtol * |expected|</code></pre>
 <p>这个公式的含义是：允许的误差由两部分组成——一个固定的绝对误差 atol，加上一个与期望值成正比的相对误差 rtol。当期望值很大时，允许的绝对误差也相应放大。</p>
-<blockquote><p>这里用 atol/rtol 做简化说明，便于快速理解。实际 opbase 标准使用 MERE/MARE 聚合指标，详见 <a href="./4.3-算子精度标准.md">4.3 算子精度标准</a>。</p></blockquote>
-<p>对于 sswap 这类位精确算子，atol 和 rtol 都是 0——不允许任何偏差。详细的精度标准见 <a href="./4.3-算子精度标准.md">4.3 算子精度标准</a>。</p>
+<blockquote><p>这里用 atol/rtol 做简化说明，便于快速理解。实际 opbase 标准使用 MERE/MARE 聚合指标，详见 <a href="04-调试与优化-4.3-算子精度标准.html">4.3 算子精度标准</a>。</p></blockquote>
+<p>对于 sswap 这类位精确算子，atol 和 rtol 都是 0——不允许任何偏差。详细的精度标准见 <a href="04-调试与优化-4.3-算子精度标准.html">4.3 算子精度标准</a>。</p>
 <h2>4.1.8 调试工具</h2>
 <p>排查精度问题时，有几个趁手的工具：</p>
 <p><strong>printf</strong> — 最简单粗暴的方式。直接在 Device 侧的 Kernel 代码里加 <code>PRINTF</code>，打印 UB 中的数据。优点是所见即所得，缺点是会严重影响性能，而且大量打印会刷屏。适合在开发初期快速验证数据流。</p>

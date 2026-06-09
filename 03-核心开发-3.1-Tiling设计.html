@@ -75,7 +75,7 @@ tiling.tileSize = (maxElements / alignUnit) * alignUnit;</code></pre>
 <pre class=""><code>时间线：
 Buffer[0]: [搬运] [计算]        [搬运] [计算]
 Buffer[1]:        [搬运] [计算]        [搬运] [计算]</code></pre>
-<p>不过 sswap 是纯搬运算子，没有 Vector 计算阶段，所以双 Buffer 对它没有额外收益。sswap 使用单 Buffer（<code>BUFFER_NUM = 1</code>），每轮搬入→交换→搬出，逻辑更简单。这将在 <a href="./3.5-同步与流水线.md">3.5 同步与流水线</a> 中详细讨论。</p>
+<p>不过 sswap 是纯搬运算子，没有 Vector 计算阶段，所以双 Buffer 对它没有额外收益。sswap 使用单 Buffer（<code>BUFFER_NUM = 1</code>），每轮搬入→交换→搬出，逻辑更简单。这将在 <a href="03-核心开发-3.5-同步与流水线.html">3.5 同步与流水线</a> 中详细讨论。</p>
 <h2>3.1.4 Tiling 数据结构设计</h2>
 <p>Tiling 数据是 Host 侧和 Device 侧之间的"合同"。Host 侧根据输入规模和硬件参数计算出切分方案，打包成一个结构体写入 GM；Kernel 侧从 GM 读出这个结构体，就知道自己该处理哪段数据、每轮搬多少。</p>
 <p>这个结构体需要包含 Kernel 运行所需的全部切分信息，不多不少。字段太少，Kernel 无法正确工作；字段太多，增加 GM 读写开销和代码复杂度。</p>
@@ -95,13 +95,13 @@ Buffer[1]:        [搬运] [计算]        [搬运] [计算]</code></pre>
 </ul>
 <p>Kernel 侧的主循环（<code>Process</code>）用这四个字段就能完整描述：</p>
 <pre class=""><code>uint32_t tileLoop = myCount_ / tiling_.tileSize;  // 完整轮数
-uint32_t tileHead = myCount_ % tiling_.tileSize;  // 最后一轮的元素数
+uint32_t tileTail = myCount_ % tiling_.tileSize;  // 最后一轮的元素数
 for (uint32_t i = 0; i &lt; tileLoop; i++) {
     SingleIteration(curOffset, tiling_.tileSize);
     curOffset += tiling_.tileSize;
 }
-if (tileHead &gt; 0) {
-    SingleIteration(curOffset, tileHead);
+if (tileTail &gt; 0) {
+    SingleIteration(curOffset, tileTail);
 }</code></pre>
 <h2>3.1.5 获取硬件参数</h2>
 <p>Tiling 函数运行在 Host 侧（CPU），但它需要知道 Device 侧（NPU）的硬件参数，比如一共有多少个 AI Core、每核 UB 有多大。这些参数<strong>必须通过运行时接口获取，禁止硬编码</strong>。</p>
@@ -119,7 +119,7 @@ constexpr uint32_t UB_SIZE = 248 * 1024;
 uint32_t coreNum = ascendcPlatform.GetCoreNumAiv();
 uint64_t ubSize;
 ascendcPlatform.GetCoreMemSize(platform_ascendc::CoreMemType::UB, ubSize);</code></pre>
-<p>sswap 的 Tiling 函数中，<code>coreNum</code> 和 UB 大小（248KB）虽然看起来是固定值，但仍然通过接口获取，保证代码的可移植性。在实际的 ops-blas 工程中，<code>GetVectorCoreCount</code> 等封装函数会统一处理这些查询。</p>
+<p>sswap 的 UB 大小目前使用了常量值 248KB（A5 架构固定值），核数通过 <code>aclrtGetDeviceInfo</code> 动态获取。理想情况下应通过接口获取 UB 大小，但 sswap 作为简单算子使用了 A5 的固定值。在实际的 ops-blas 工程中，<code>GetVectorCoreCount</code> 等封装函数会统一处理这些查询。</p>
 <h2>3.1.6 不同算子类型的 Tiling 策略</h2>
 <p>不同类型的算子，Tiling 的侧重点不同。</p>
 <h3>逐元素算子</h3>
@@ -128,7 +128,7 @@ ascendcPlatform.GetCoreMemSize(platform_ascendc::CoreMemType::UB, ubSize);</code
 <h3>归约算子</h3>
 <p>归约算子（如 Sum、Max）需要沿某个维度聚合数据。Tiling 时需要区分"归约轴内"和"归约轴外"：轴内的数据必须累加到一起，不能随意切分；轴外的数据可以独立分配给不同核。通常的做法是：每个核先做局部归约，把中间结果写入 workspace，最后由一个核做全局归约。</p>
 <h3>矩阵乘算子</h3>
-<p>矩阵乘 <code>C[M,N] = A[M,K] × B[K,N]</code> 需要在 M、N、K 三个维度上同时切分。M 和 N 维度的切分类似逐元素算子（分给不同核），但 K 维度是累加维度，切分后需要累加中间结果。此外，分块大小受 L0A/L0B/L0C 容量限制，Tiling 设计更加复杂。这部分将在 <a href="./3.4-Cube计算.md">3.4 Cube 计算</a> 中详细讨论。</p>
+<p>矩阵乘 <code>C[M,N] = A[M,K] × B[K,N]</code> 需要在 M、N、K 三个维度上同时切分。M 和 N 维度的切分类似逐元素算子（分给不同核），但 K 维度是累加维度，切分后需要累加中间结果。此外，分块大小受 L0A/L0B/L0C 容量限制，Tiling 设计更加复杂。这部分将在 <a href="03-核心开发-3.4-Cube计算.html">3.4 Cube 计算</a> 中详细讨论。</p>
 <h2>参考链接</h2>
 <ul>
 <li><a href="https://hiascend.com/document/redirect/CannCommunityOpdevAscendC">Ascend C 编程指南 — Tiling</a></li>

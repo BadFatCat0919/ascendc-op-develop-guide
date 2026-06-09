@@ -30,7 +30,7 @@
 <h2>对齐粒度速算</h2>
 <p>32 字节对齐下，各数据类型每次搬运的最少元素个数：</p>
 <table><thead><tr><th>数据类型</th><th>字节数</th><th>对齐粒度（元素数）</th><th>计算方式</th></tr></thead><tbody><tr><td>FP32</td><td>4</td><td><strong>8</strong></td><td>32 / 4 = 8</td></tr><tr><td>FP16 / BF16</td><td>2</td><td><strong>16</strong></td><td>32 / 2 = 16</td></tr><tr><td>FP8</td><td>1</td><td><strong>32</strong></td><td>32 / 1 = 32</td></tr><tr><td>INT64</td><td>8</td><td><strong>4</strong></td><td>32 / 8 = 4</td></tr><tr><td>INT32</td><td>4</td><td><strong>8</strong></td><td>32 / 4 = 8</td></tr><tr><td>INT16</td><td>2</td><td><strong>16</strong></td><td>32 / 2 = 16</td></tr><tr><td>INT8</td><td>1</td><td><strong>32</strong></td><td>32 / 1 = 32</td></tr></tbody></table>
-<blockquote><p>sswap 处理的是 FP32 数据，所以 <code>ELEMENTS_PER_BLOCK = 32 / 4 = 8</code>，每次 DataCopy 搬运的元素个数必须是 8 的倍数。详细对齐规则见 <a href="./B-对齐规则速查.md">附录 B：对齐规则速查</a>。</p></blockquote>
+<blockquote><p>sswap 处理的是 FP32 数据，所以 <code>ELEMENTS_PER_BLOCK = 32 / 4 = 8</code>，每次 DataCopy 搬运的元素个数必须是 8 的倍数。详细对齐规则见 <a href="附录-B-对齐规则速查.html">附录 B：对齐规则速查</a>。</p></blockquote>
 <h2>参考链接</h2>
 <ul>
 <li><a href="https://hiascend.com/document/redirect/CannCommunityAscendCApi">Ascend C 数据类型</a></li>
