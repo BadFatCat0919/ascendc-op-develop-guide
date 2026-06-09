@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4.2 五分钟跑通第一个算子 - AscendC Guide</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<nav class="sidebar"><div class="sidebar-header"><h2><a href="index.html" style="color:inherit;text-decoration:none">AscendC Guide</a></h2><p>算子开发从入门到精通</p></div><ul class="sidebar-nav"><li class="chapter-group"><span class="chapter-title">第1章 基础概念</span><ul class="article-list"><li><a href="01-基础概念-1.1-什么是算子与AscendC.html" class="">1.1 什么是算子与 Ascend C</a></li><li><a href="01-基础概念-1.2-数据类型排布与量化.html" class="">1.2 数据类型、排布与量化</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第2章 硬件与编程模型</span><ul class="article-list"><li><a href="02-硬件与编程模型-2.1-A5硬件架构.html" class="">2.1 A5 硬件架构</a></li><li><a href="02-硬件与编程模型-2.2-编程模型概述.html" class="">2.2 编程模型概述</a></li><li><a href="02-硬件与编程模型-2.3-算子结构与直调开发.html" class="">2.3 算子结构与直调开发</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第3章 核心开发</span><ul class="article-list"><li><a href="03-核心开发-3.1-Tiling设计.html" class="">3.1 Tiling 设计</a></li><li><a href="03-核心开发-3.2-内存管理与数据搬运.html" class="">3.2 内存管理与数据搬运</a></li><li><a href="03-核心开发-3.3-Vector计算.html" class="">3.3 Vector 计算</a></li><li><a href="03-核心开发-3.4-Cube计算.html" class="">3.4 Cube 计算</a></li><li><a href="03-核心开发-3.5-同步与流水线.html" class="">3.5 同步与流水线</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第4章 实战演练</span><ul class="article-list"><li><a href="04-实战演练-4.1-环境搭建.html" class="">4.1 环境搭建</a></li><li><a href="04-实战演练-4.2-五分钟跑通第一个算子.html" class="active">4.2 五分钟跑通第一个算子</a></li><li><a href="04-实战演练-4.3-直调开发-swap算子.html" class="">4.3 直调开发：swap 算子</a></li><li><a href="04-实战演练-4.4-框架开发-add算子.html" class="">4.4 框架开发：add 算子</a></li><li><a href="04-实战演练-4.5-ACL接口使用指南.html" class="">4.5 ACL 接口使用指南</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第5章 调试与优化</span><ul class="article-list"><li><a href="05-调试与优化-5.1-精度不对怎么办.html" class="">5.1 精度不对怎么办</a></li><li><a href="05-调试与优化-5.2-性能不达标怎么办.html" class="">5.2 性能不达标怎么办</a></li><li><a href="05-调试与优化-5.3-算子精度标准.html" class="">5.3 算子精度标准</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第6章 进阶</span><ul class="article-list"><li><a href="06-进阶-6.1-常见踩坑与最佳实践.html" class="">6.1 常见踩坑与最佳实践</a></li><li><a href="06-进阶-6.2-进阶主题.html" class="">6.2 进阶主题</a></li></ul></li><li class="chapter-group"><span class="chapter-title">附录</span><ul class="article-list"><li><a href="附录-A-数据类型速查表.html" class="">A. 数据类型速查表</a></li><li><a href="附录-B-对齐规则速查.html" class="">B. 对齐规则速查</a></li><li><a href="附录-C-错误码速查.html" class="">C. 错误码速查</a></li></ul></li></ul></nav>
+<main class="main">
+<div class="content">
+<div class="meta-bar"><a href="index.html">← 返回目录</a></div>
+
+<h2>4.2.1 获取 swap 算子代码</h2>
+<p>swap 是 BLAS（Basic Linear Algebra Subprograms）标准中最简单的算子之一：交换两个向量的对应元素。我们用它作为第一个实战项目，因为它逻辑简单但结构完整，能让你快速理解算子开发的全流程。</p>
+
+<h3>克隆 ops-blas 仓库</h3>
+<pre><code># 克隆 ops-blas 算子仓库
+git clone https://gitcode.com/cann/ops-blas.git
+cd ops-blas
+
+# 查看仓库结构
+ls -la
+# 输出：
+# blas/          # 算子源码目录
+# build.sh       # 编译脚本
+# test/          # 测试用例
+# CMakeLists.txt # CMake 配置
+# ...</code></pre>
+
+<h3>定位 swap 算子代码</h3>
+<pre><code># swap 算子位于 blas/swap/ 目录
+ls blas/swap/
+# 输出：
+# arch35/        # 针对 A5 架构的实现
+# CMakeLists.txt
+
+# 查看 arch35 目录下的文件
+ls blas/swap/arch35/
+# 输出：
+# swap_host.cpp       # Host 侧实现
+# swap_kernel.cpp     # Kernel 侧实现
+# swap_tiling_data.h  # Tiling 数据结构定义</code></pre>
+
+<h3>代码文件说明</h3>
+<table>
+<thead><tr><th>文件</th><th>作用</th><th>运行位置</th></tr></thead>
+<tbody>
+<tr><td><code>swap_host.cpp</code></td><td>参数校验、Tiling 计算、启动 Kernel</td><td>CPU（Host 侧）</td></tr>
+<tr><td><code>swap_kernel.cpp</code></td><td>Ascend C 核函数实现</td><td>NPU（Device 侧）</td></tr>
+<tr><td><code>swap_tiling_data.h</code></td><td>Host 和 Kernel 共享的 Tiling 数据结构</td><td>编译时共用</td></tr>
+</tbody>
+</table>
+
+<h2>4.2.2 编译 swap 算子</h2>
+<p>ops-blas 仓库提供了统一的编译脚本 <code>build.sh</code>，一行命令就能编译指定算子。</p>
+
+<h3>编译命令</h3>
+<pre><code># 编译 swap 算子，目标芯片为 Ascend 910B（架构代号 ascend950）
+bash build.sh --ops=swap --soc=ascend950
+
+# 编译过程输出（简化）：
+# [INFO] Building swap for ascend950...
+# [INFO] Compiling swap_kernel.cpp...
+# [INFO] Compiling swap_host.cpp...
+# [INFO] Linking...
+# [INFO] Build success!
+# [INFO] Output: out/swap/libswap.so</code></pre>
+
+<h3>编译参数说明</h3>
+<table>
+<thead><tr><th>参数</th><th>说明</th><th>示例值</th></tr></thead>
+<tbody>
+<tr><td><code>--ops</code></td><td>要编译的算子名称</td><td>swap、gemm、axpy</td></tr>
+<tr><td><code>--soc</code></td><td>目标芯片型号</td><td>ascend950（910B）、ascend910</td></tr>
+<tr><td><code>--debug</code></td><td>开启调试模式</td><td>添加此标志</td></tr>
+<tr><td><code>--clean</code></td><td>清理后重新编译</td><td>添加此标志</td></tr>
+</tbody>
+</table>
+
+<h3>编译产物</h3>
+<pre><code># 编译成功后，产物在 out/ 目录
+ls out/swap/
+# 输出：
+# libswap.so           # 动态库（算子实现）
+# swap_kernel.o        # Kernel 目标文件
+# swap_host.o          # Host 目标文件
+
+# 同时会生成编译日志
+cat out/swap/build.log</code></pre>
+
+<h2>4.2.3 运行测试</h2>
+<p>ops-blas 仓库自带 ST（System Test）测试框架，可以自动验证算子的正确性。</p>
+
+<h3>运行 ST 测试</h3>
+<pre><code># 运行 swap 算子的 ST 测试
+cd test/swap
+bash run_test.sh
+
+# 或者使用统一测试入口
+cd ../..
+bash test/run_all_tests.sh --ops=swap
+
+# 测试输出示例：
+# [==========] Running 5 tests from swap_test
+# [ RUN      ] swap_test.float32_normal
+# [       OK ] swap_test.float32_normal (12 ms)
+# [ RUN      ] swap_test.float32_empty
+# [       OK ] swap_test.float32_empty (3 ms)
+# [ RUN      ] swap_test.float16_normal
+# [       OK ] swap_test.float16_normal (15 ms)
+# [ RUN      ] swap_test.float16_edge_case
+# [       OK ] swap_test.float16_edge_case (8 ms)
+# [ RUN      ] swap_test.int8_normal
+# [       OK ] swap_test.int8_normal (10 ms)
+# [==========] 5 tests from swap_test passed
+# [  PASSED  ] All tests passed!</code></pre>
+
+<h3>测试用例说明</h3>
+<table>
+<thead><tr><th>测试用例</th><th>测试内容</th><th>数据规模</th></tr></thead>
+<tbody>
+<tr><td>float32_normal</td><td>FP32 正常规模数据</td><td>N=1024</td></tr>
+<tr><td>float32_empty</td><td>空向量边界情况</td><td>N=0</td></tr>
+<tr><td>float16_normal</td><td>FP16 正常规模数据</td><td>N=2048</td></tr>
+<tr><td>float16_edge_case</td><td>FP16 边界情况（非对齐）</td><td>N=33</td></tr>
+<tr><td>int8_normal</td><td>INT8 正常规模数据</td><td>N=4096</td></tr>
+</tbody>
+</table>
+
+<h2>4.2.4 查看执行结果</h2>
+<p>测试通过后，可以查看详细的执行结果和性能数据。</p>
+
+<h3>查看测试报告</h3>
+<pre><code># 测试报告在 test/swap/results/ 目录
+cat test/swap/results/swap_test_report.txt
+
+# 报告内容示例：
+# ============================================
+# Swap Operator Test Report
+# Date: 2024-xx-xx
+# Target: ascend950
+# ============================================
+#
+# Test Summary:
+#   Total: 5
+#   Passed: 5
+#   Failed: 0
+#   Pass Rate: 100%
+#
+# Performance:
+#   float32 (N=1024):  0.012 ms, 682 GB/s
+#   float16 (N=2048):  0.015 ms, 546 GB/s
+#   int8    (N=4096):  0.010 ms, 409 GB/s
+#
+# ============================================</code></pre>
+
+<h3>查看 NPU 执行日志</h3>
+<pre><code># NPU 运行时日志在 plog 目录
+ls plog/
+# 输出：
+# plog-xxxx-xxxxxx.log
+
+# 查看日志中的 swap 相关信息
+grep -i "swap" plog/plog-*.log | head -20
+
+# 关键日志字段：
+# [INFO] Kernel launch: swap_kernel
+# [INFO] Block count: 8
+# [INFO] Execution time: 12 us</code></pre>
+
+<h2>4.2.5 理解输出日志</h2>
+<p>编译和运行过程中会产生大量日志，学会快速定位关键信息很重要。</p>
+
+<h3>编译日志关键字段</h3>
+<pre><code># 编译成功的关键标志
+[INFO] Build success!
+
+# 如果编译失败，关注 error 信息
+[ERROR] swap_kernel.cpp:42: undefined reference to 'DataCopy'
+# 说明：API 使用错误，检查头文件包含
+
+[ERROR] swap_kernel.cpp:15: expected ';' after expression
+# 说明：语法错误，检查代码</code></pre>
+
+<h3>运行日志关键字段</h3>
+<table>
+<thead><tr><th>日志级别</th><th>含义</th><th>处理方式</th></tr></thead>
+<tbody>
+<tr><td><code>[INFO]</code></td><td>正常信息</td><td>一般无需关注</td></tr>
+<tr><td><code>[WARN]</code></td><td>警告信息</td><td>检查是否影响功能</td></tr>
+<tr><td><code>[ERROR]</code></td><td>错误信息</td><td>必须修复</td></tr>
+<tr><td><code>[FATAL]</code></td><td>致命错误</td><td>程序终止，必须修复</td></tr>
+</tbody>
+</table>
+
+<h3>常见错误码</h3>
+<pre><code># 运行时错误码示例
+[ERROR] ACL Error: 161001
+# 含义：Tiling 参数错误
+# 解决：检查 TilingData 的计算逻辑
+
+[ERROR] ACL Error: 361001
+# 含义：Kernel 执行超时
+# 解决：检查 Kernel 是否有死循环或同步问题
+
+[ERROR] ACL Error: 561001
+# 含义：内存分配失败
+# 解决：检查 UB 空间是否超限</code></pre>
+
+<h2>4.2.6 修改代码重新编译运行</h2>
+<p>现在你已经跑通了 swap 算子，让我们尝试修改代码并重新运行。</p>
+
+<h3>练习：添加调试日志</h3>
+<pre><code># 1. 打开 swap_kernel.cpp
+vim blas/swap/arch35/swap_kernel.cpp
+
+# 2. 在 Process 函数中添加日志
+# 找到 Process() 函数，添加：
+printf("Kernel started, block_idx=%d, totalN=%d\n", block_idx, tiling.totalN);
+
+# 3. 重新编译（增量编译，速度更快）
+bash build.sh --ops=swap --soc=ascend950
+
+# 4. 重新运行测试
+cd test/swap && bash run_test.sh
+
+# 5. 查看日志中的新输出
+grep "Kernel started" plog/plog-*.log</code></pre>
+
+<h3>练习：修改数据规模</h3>
+<pre><code># 1. 打开测试配置文件
+vim test/swap/swap_test.csv
+
+# 2. 添加一行新的测试用例
+# 格式：dtype,N,incx,incy
+# 添加：float32,8192,1,1
+
+# 3. 重新运行测试
+bash run_test.sh
+
+# 4. 查看新测试用例的结果
+cat results/swap_test_report.txt | grep 8192</code></pre>
+
+<h3>增量编译 vs 全量编译</h3>
+<table>
+<thead><tr><th>场景</th><th>命令</th><th>耗时</th></tr></thead>
+<tbody>
+<tr><td>只修改了 Kernel 代码</td><td><code>bash build.sh --ops=swap --soc=ascend950</code></td><td>~10 秒</td></tr>
+<tr><td>修改了 CMakeLists.txt</td><td><code>bash build.sh --ops=swap --soc=ascend950 --clean</code></td><td>~30 秒</td></tr>
+<tr><td>切换了目标芯片</td><td><code>bash build.sh --ops=swap --soc=ascend910 --clean</code></td><td>~30 秒</td></tr>
+</tbody>
+</table>
+
+<h2>4.2.7 完整开发流程总结</h2>
+<pre class="ascii-art"><code>┌─────────────────────────────────────────────────────────────────┐
+│                    算子开发完整流程                               │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  1. 获取代码                                                     │
+│     └── git clone ops-blas 仓库                                 │
+│                                                                 │
+│  2. 编译算子                                                     │
+│     └── bash build.sh --ops=swap --soc=ascend950                │
+│                                                                 │
+│  3. 运行测试                                                     │
+│     └── cd test/swap && bash run_test.sh                        │
+│                                                                 │
+│  4. 查看结果                                                     │
+│     ├── 测试报告：test/swap/results/                            │
+│     └── 运行日志：plog/                                         │
+│                                                                 │
+│  5. 修改代码（如有需要）                                          │
+│     └── 编辑源码 → 重新编译 → 重新测试                           │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+
+<h2>参考链接</h2>
+<ul>
+<li><a href="https://gitcode.com/cann/ops-blas">ops-blas 算子仓库</a></li>
+<li><a href="https://gitcode.com/cann/cann-samples">cann-samples 入门样例</a></li>
+<li><a href="https://hiascend.com/document/redirect/CannCommunityOpdevAscendC">Ascend C 官方编程指南</a></li>
+</ul>
+
+<div id="quiz"></div>
+<div class="page-nav"><a href="04-实战演练-4.1-环境搭建.html" class="nav-prev"><span class="nav-label">← 上一篇</span><span class="nav-title">4.1 环境搭建</span></a><a href="04-实战演练-4.3-直调开发-swap算子.html" class="nav-next"><span class="nav-label">下一篇 →</span><span class="nav-title">4.3 直调开发：swap 算子</span></a></div>
+</div>
+</main>
+<script src="js/quiz.js"></script>
+<script>
+renderQuiz('quiz', [
+  {
+    question: "编译 swap 算子时，bash build.sh --ops=swap --soc=ascend950 这个命令中 --ops 和 --soc 分别指定什么？编译产物在哪里？",
+    options: ["--ops 指定目标芯片，--soc 指定算子名，产物在 build/ 目录", "--ops 指定算子名称，--soc 指定目标芯片型号，产物在 out/ 目录", "--ops 指定优化级别，--soc 指定编译模式，产物在 bin/ 目录", "--ops 指定算子包，--soc 指定架构版本，产物在 lib/ 目录"],
+    answer: 1,
+    explanation: "ops-blas 仓库使用统一的 build.sh 脚本编译。--ops 指定算子名称（如 swap），--soc 指定目标芯片型号（如 ascend950 对应 A5 芯片）。编译成功后，产物（动态库 .so、目标文件 .o）在 out/swap/ 目录下。"
+  },
+  {
+    question: "swap 算子的 arch35 目录下包含哪三个文件？它们分别运行在哪里？",
+    options: ["swap.c, swap.h, Makefile，都运行在 CPU", "swap_host.cpp（CPU）, swap_kernel.cpp（NPU）, swap_tiling_data.h（编译时共用）", "swap.py, swap.cpp, swap.json，都运行在 NPU", "main.cpp, utils.cpp, config.h，都运行在 CPU"],
+    answer: 1,
+    explanation: "arch35 目录包含三个核心文件：swap_host.cpp 运行在 CPU（Host 侧），负责参数校验和 Tiling 计算；swap_kernel.cpp 运行在 NPU（Device 侧），是 Ascend C 核函数；swap_tiling_data.h 定义 Tiling 数据结构，Host 和 Kernel 编译时共同引用。"
+  },
+  {
+    question: "编译并运行 swap 算子的完整流程是什么？按正确顺序排列以下步骤。",
+    options: [
+      "运行测试 → 编译算子 → 查看结果 → 克隆仓库",
+      "克隆仓库 → 编译算子（build.sh）→ 运行测试（run_test.sh）→ 查看结果",
+      "编译算子 → 克隆仓库 → 运行测试 → 查看结果",
+      "克隆仓库 → 运行测试 → 编译算子 → 查看结果"
+    ],
+    answer: 1,
+    explanation: "正确流程是：(1) git clone 克隆 ops-blas 仓库；(2) bash build.sh --ops=swap --soc=ascend950 编译算子；(3) 运行 ST 测试验证正确性；(4) 查看测试报告和运行日志确认结果。这个流程适用于所有算子的开发和调试。"
+  }
+]);
+</script>
+</body>
+</html>

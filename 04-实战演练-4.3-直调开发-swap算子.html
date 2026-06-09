@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4.3 直调开发 swap 算子 - AscendC Guide</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<nav class="sidebar"><div class="sidebar-header"><h2><a href="index.html" style="color:inherit;text-decoration:none">AscendC Guide</a></h2><p>算子开发从入门到精通</p></div><ul class="sidebar-nav"><li class="chapter-group"><span class="chapter-title">第1章 基础概念</span><ul class="article-list"><li><a href="01-基础概念-1.1-什么是算子与AscendC.html" class="">1.1 什么是算子与 Ascend C</a></li><li><a href="01-基础概念-1.2-数据类型排布与量化.html" class="">1.2 数据类型、排布与量化</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第2章 硬件与编程模型</span><ul class="article-list"><li><a href="02-硬件与编程模型-2.1-A5硬件架构.html" class="">2.1 A5 硬件架构</a></li><li><a href="02-硬件与编程模型-2.2-编程模型概述.html" class="">2.2 编程模型概述</a></li><li><a href="02-硬件与编程模型-2.3-算子结构与直调开发.html" class="">2.3 算子结构与直调开发</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第3章 核心开发</span><ul class="article-list"><li><a href="03-核心开发-3.1-Tiling设计.html" class="">3.1 Tiling 设计</a></li><li><a href="03-核心开发-3.2-内存管理与数据搬运.html" class="">3.2 内存管理与数据搬运</a></li><li><a href="03-核心开发-3.3-Vector计算.html" class="">3.3 Vector 计算</a></li><li><a href="03-核心开发-3.4-Cube计算.html" class="">3.4 Cube 计算</a></li><li><a href="03-核心开发-3.5-同步与流水线.html" class="">3.5 同步与流水线</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第4章 实战演练</span><ul class="article-list"><li><a href="04-实战演练-4.1-环境搭建.html" class="">4.1 环境搭建</a></li><li><a href="04-实战演练-4.2-五分钟跑通第一个算子.html" class="">4.2 五分钟跑通第一个算子</a></li><li><a href="04-实战演练-4.3-直调开发-swap算子.html" class="active">4.3 直调开发：swap 算子</a></li><li><a href="04-实战演练-4.4-框架开发-add算子.html" class="">4.4 框架开发：add 算子</a></li><li><a href="04-实战演练-4.5-ACL接口使用指南.html" class="">4.5 ACL 接口使用指南</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第5章 调试与优化</span><ul class="article-list"><li><a href="05-调试与优化-5.1-精度不对怎么办.html" class="">5.1 精度不对怎么办</a></li><li><a href="05-调试与优化-5.2-性能不达标怎么办.html" class="">5.2 性能不达标怎么办</a></li><li><a href="05-调试与优化-5.3-算子精度标准.html" class="">5.3 算子精度标准</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第6章 进阶</span><ul class="article-list"><li><a href="06-进阶-6.1-常见踩坑与最佳实践.html" class="">6.1 常见踩坑与最佳实践</a></li><li><a href="06-进阶-6.2-进阶主题.html" class="">6.2 进阶主题</a></li></ul></li><li class="chapter-group"><span class="chapter-title">附录</span><ul class="article-list"><li><a href="附录-A-数据类型速查表.html" class="">A. 数据类型速查表</a></li><li><a href="附录-B-对齐规则速查.html" class="">B. 对齐规则速查</a></li><li><a href="附录-C-错误码速查.html" class="">C. 错误码速查</a></li></ul></li></ul></nav>
+<main class="main">
+<div class="content">
+<div class="meta-bar"><a href="index.html">← 返回目录</a></div>
+
+<h2>4.3.1 swap 算子功能说明</h2>
+<p>swap 是 BLAS Level 1 标准中的算子，功能是<strong>交换两个向量的对应元素</strong>。执行 <code>swap(x, y)</code> 后，x 变成原来的 y，y 变成原来的 x。</p>
+
+<h3>数学定义</h3>
+<pre><code>// BLAS 标准接口
+void cblas_sswap(const int N, float *X, const int incX, float *Y, const int incY);
+
+// 伪代码
+for (int i = 0; i < N; i++) {
+    float temp = X[i * incX];
+    X[i * incX] = Y[i * incY];
+    Y[i * incY] = temp;
+}</code></pre>
+
+<h3>参数说明</h3>
+<table>
+<thead><tr><th>参数</th><th>类型</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td><code>N</code></td><td>int</td><td>向量元素个数</td></tr>
+<tr><td><code>X</code></td><td>float*</td><td>第一个向量（输入/输出）</td></tr>
+<tr><td><code>incX</code></td><td>int</td><td>X 的步长（通常为 1）</td></tr>
+<tr><td><code>Y</code></td><td>float*</td><td>第二个向量（输入/输出）</td></tr>
+<tr><td><code>incY</code></td><td>int</td><td>Y 的步长（通常为 1）</td></tr>
+</tbody>
+</table>
+
+<h3>示例</h3>
+<pre><code>// 输入
+X = [1.0, 2.0, 3.0, 4.0]
+Y = [5.0, 6.0, 7.0, 8.0]
+
+// 执行 swap(X, Y) 后
+X = [5.0, 6.0, 7.0, 8.0]
+Y = [1.0, 2.0, 3.0, 4.0]</code></pre>
+
+<h2>4.3.2 文件结构</h2>
+<p>swap 算子的代码位于 <code>blas/swap/arch35/</code> 目录下，包含三个核心文件：</p>
+
+<pre><code>blas/swap/arch35/
+├── swap_host.cpp          # Host 侧实现（~150 行）
+├── swap_kernel.cpp        # Kernel 侧实现（~100 行）
+└── swap_tiling_data.h     # Tiling 数据结构（~20 行）</code></pre>
+
+<h3>各文件职责</h3>
+<table>
+<thead><tr><th>文件</th><th>职责</th><th>关键函数</th></tr></thead>
+<tbody>
+<tr><td><code>swap_tiling_data.h</code></td><td>定义 Host/Kernel 共享的数据结构</td><td><code>struct SwapTilingData</code></td></tr>
+<tr><td><code>swap_kernel.cpp</code></td><td>Ascend C 核函数实现</td><td><code>class SwapKernel</code>, <code>swap_kernel_entry</code></td></tr>
+<tr><td><code>swap_host.cpp</code></td><td>参数校验、Tiling 计算、启动 Kernel</td><td><code>swap_host()</code></td></tr>
+</tbody>
+</table>
+
+<h2>4.3.3 TilingData 设计</h2>
+<p>TilingData 是 Host 和 Kernel 之间的"通信协议"——Host 计算好 Tiling 参数，通过 TilingData 传递给 Kernel。</p>
+
+<h3>swap_tiling_data.h 完整代码</h3>
+<pre><code>// swap_tiling_data.h
+#ifndef SWAP_TILING_DATA_H
+#define SWAP_TILING_DATA_H
+
+#include &lt;cstdint&gt;
+
+// Tiling 数据结构定义
+// Host 侧计算这些值，传递给 Kernel 侧使用
+struct SwapTilingData {
+    int32_t totalN;      // 总元素个数（N）
+    int32_t perCoreN;    // 每个 AI Core 处理的元素个数
+    int32_t remainder;   // 最后一个 Core 需要额外处理的元素个数
+    int32_t tileSize;    // 每次搬运的元素个数（UB 分块大小）
+    int32_t coreCount;   // 使用的 AI Core 数量
+};
+
+#endif // SWAP_TILING_DATA_H</code></pre>
+
+<h3>Tiling 参数计算逻辑</h3>
+<pre class="ascii-art"><code>假设 N = 10000，AI Core 数量 = 8，UB 容量 = 256KB
+
+1. 多核切分：
+   perCoreN = N / coreCount = 10000 / 8 = 1250
+   remainder = N % coreCount = 10000 % 8 = 0
+
+2. UB 分块：
+   每个元素 4 字节（FP32）
+   UB 可用空间 = 256KB / 2 = 128KB（双 Buffer 需要分两半）
+   但 swap 用单 Buffer，所以 UB 可用空间 = 256KB
+   tileSize = 128KB / 4 bytes / 2 buffers = 8192 个元素
+   （这里 /2 是因为需要同时存 X 和 Y 两个向量）
+
+3. 最终 TilingData：
+   totalN = 10000
+   perCoreN = 1250
+   remainder = 0
+   tileSize = 8192
+   coreCount = 8</code></pre>
+
+<h2>4.3.4 Kernel 实现</h2>
+<p>Kernel 是运行在 NPU AI Core 上的核函数，负责实际的数据搬运。</p>
+
+<h3>swap_kernel.cpp 完整代码</h3>
+<pre><code>// swap_kernel.cpp
+#include "kernel_operator.h"
+#include "swap_tiling_data.h"
+
+using namespace AscendC;
+
+// Ascend C Kernel 类
+class SwapKernel {
+public:
+    // 初始化函数：设置 Buffer 和 Tiling 参数
+    __aicore__ inline void Init(GM_ADDR x, GM_ADDR y, const SwapTilingData &tiling) {
+        // 获取当前 Core 的索引
+        int32_t coreIdx = GetBlockIdx();
+        
+        // 计算当前 Core 负责的数据范围
+        int32_t offset = coreIdx * tiling.perCoreN;
+        int32_t myN = tiling.perCoreN;
+        
+        // 最后一个 Core 需要处理余数
+        if (coreIdx == tiling.coreCount - 1) {
+            myN += tiling.remainder;
+        }
+        
+        // 保存当前 Core 的参数
+        this->myN = myN;
+        this->tileSize = tiling.tileSize;
+        
+        // 设置 GM Buffer（指向全局内存）
+        xGm.SetGlobalBuffer(reinterpret_cast&lt;float*&gt;(x + offset * sizeof(float)));
+        yGm.SetGlobalBuffer(reinterpret_cast&lt;float*&gt;(y + offset * sizeof(float)));
+        
+        // 分配 UB Buffer（片上缓存）
+        // 需要 4 个 Buffer：xIn, yIn（搬入）, xOut, yOut（搬出）
+        // 但 swap 可以用交叉写回技巧，只需要 2 个 Buffer
+        xBuf.Allocate(this->tileSize);
+        yBuf.Allocate(this->tileSize);
+    }
+    
+    // 主处理函数：循环处理所有数据块
+    __aicore__ inline void Process() {
+        int32_t processed = 0;
+        
+        // 循环处理，每次处理 tileSize 个元素
+        while (processed < myN) {
+            int32_t currentSize = (myN - processed < tileSize) 
+                                  ? (myN - processed) 
+                                  : tileSize;
+            SingleIteration(processed, currentSize);
+            processed += currentSize;
+        }
+    }
+    
+    // 单次迭代：处理一个数据块
+    __aicore__ inline void SingleIteration(int32_t offset, int32_t size) {
+        // 1. 从 GM 搬入到 UB（MTE2）
+        DataCopy(xBuf, xGm[offset], size);
+        DataCopy(yBuf, yGm[offset], size);
+        
+        // 2. 交叉写回：x 写回 y，y 写回 x（MTE3）
+        // 这就是 swap 的核心：把 x 的数据写到 y 的位置，把 y 的数据写到 x 的位置
+        DataCopy(xGm[offset], yBuf, size);  // y 的数据写到 x
+        DataCopy(yGm[offset], xBuf, size);  // x 的数据写到 y
+    }
+
+private:
+    GlobalTensor&lt;float&gt; xGm;    // X 向量的全局内存指针
+    GlobalTensor&lt;float&gt; yGm;    // Y 向量的全局内存指针
+    LocalTensor&lt;float&gt; xBuf;    // X 的片上缓存
+    LocalTensor&lt;float&gt; yBuf;    // Y 的片上缓存
+    int32_t myN;                // 当前 Core 需要处理的元素个数
+    int32_t tileSize;           // 每次搬运的元素个数
+};
+
+// Kernel 入口函数（C 接口）
+extern "C" __global__ __aicore__ void swap_kernel_entry(
+    GM_ADDR x, 
+    GM_ADDR y, 
+    GM_ADDR tiling_ptr) 
+{
+    // 从 GM 读取 Tiling 数据
+    SwapTilingData tiling;
+    GM_ADDR tilingAddr = tiling_ptr;
+    for (int i = 0; i < sizeof(SwapTilingData) / sizeof(int32_t); i++) {
+        reinterpret_cast&lt;int32_t*&gt;(&tiling)[i] = 
+            reinterpret_cast&lt;int32_t*&gt;(tilingAddr)[i];
+    }
+    
+    // 创建 Kernel 实例并执行
+    SwapKernel kernel;
+    kernel.Init(x, y, tiling);
+    kernel.Process();
+}</code></pre>
+
+<h3>关键 API 说明</h3>
+<table>
+<thead><tr><th>API</th><th>作用</th><th>示例</th></tr></thead>
+<tbody>
+<tr><td><code>GetBlockIdx()</code></td><td>获取当前 AI Core 的索引</td><td><code>int coreIdx = GetBlockIdx();</code></td></tr>
+<tr><td><code>DataCopy(dst, src, count)</code></td><td>数据搬运（GM↔UB）</td><td><code>DataCopy(buf, gm[0], 256);</code></td></tr>
+<tr><td><code>SetGlobalBuffer(ptr)</code></td><td>设置全局内存指针</td><td><code>gm.SetGlobalBuffer(ptr);</code></td></tr>
+<tr><td><code>Allocate(size)</code></td><td>分配片上 Buffer</td><td><code>buf.Allocate(256);</code></td></tr>
+</tbody>
+</table>
+
+<h2>4.3.5 Host 侧实现</h2>
+<p>Host 侧代码运行在 CPU 上，负责参数校验、Tiling 计算和启动 Kernel。</p>
+
+<h3>swap_host.cpp 完整代码</h3>
+<pre><code>// swap_host.cpp
+#include &lt;iostream&gt;
+#include "acl/acl.h"
+#include "swap_tiling_data.h"
+
+// Kernel 入口函数声明（在 swap_kernel.cpp 中定义）
+extern "C" void swap_kernel_entry(GM_ADDR x, GM_ADDR y, GM_ADDR tiling_ptr);
+
+// Host 侧主函数
+int swap_host(int N, float *x, float *y, int incx, int incy) {
+    // ========== 1. 参数校验 ==========
+    if (N <= 0) {
+        std::cerr << "Error: N must be positive" << std::endl;
+        return -1;
+    }
+    if (x == nullptr || y == nullptr) {
+        std::cerr << "Error: x and y cannot be null" << std::endl;
+        return -1;
+    }
+    if (incx <= 0 || incy <= 0) {
+        std::cerr << "Error: incx and incy must be positive" << std::endl;
+        return -1;
+    }
+    
+    // 目前只支持 incx = incy = 1 的情况
+    if (incx != 1 || incy != 1) {
+        std::cerr << "Warning: incx/incy != 1 not fully supported" << std::endl;
+    }
+    
+    // ========== 2. Tiling 计算 ==========
+    SwapTilingData tiling;
+    tiling.totalN = N;
+    
+    // 获取可用的 AI Core 数量（910B 有 20 个 Core）
+    int32_t maxCoreCount = 20;
+    int32_t minElementsPerCore = 256;  // 每个 Core 至少处理 256 个元素
+    
+    // 计算实际使用的 Core 数量
+    tiling.coreCount = (N + minElementsPerCore - 1) / minElementsPerCore;
+    if (tiling.coreCount > maxCoreCount) {
+        tiling.coreCount = maxCoreCount;
+    }
+    
+    // 多核切分
+    tiling.perCoreN = N / tiling.coreCount;
+    tiling.remainder = N % tiling.coreCount;
+    
+    // UB 分块大小（假设 UB 可用 128KB，FP32 每个元素 4 字节）
+    // 需要同时存 X 和 Y，所以 /2
+    int32_t ubSizeBytes = 128 * 1024;  // 128KB
+    tiling.tileSize = ubSizeBytes / sizeof(float) / 2;  // 16384 个元素
+    
+    // 确保 tileSize 不超过 perCoreN
+    if (tiling.tileSize > tiling.perCoreN) {
+        tiling.tileSize = tiling.perCoreN;
+    }
+    
+    // ========== 3. 分配 Device 内存 ==========
+    void *devX = nullptr;
+    void *devY = nullptr;
+    void *devTiling = nullptr;
+    
+    aclError ret;
+    ret = aclrtMalloc(&devX, N * sizeof(float), ACL_MEM_MALLOC_HUGE_FIRST);
+    if (ret != ACL_SUCCESS) {
+        std::cerr << "Error: Failed to allocate device memory for X" << std::endl;
+        return -1;
+    }
+    
+    ret = aclrtMalloc(&devY, N * sizeof(float), ACL_MEM_MALLOC_HUGE_FIRST);
+    if (ret != ACL_SUCCESS) {
+        std::cerr << "Error: Failed to allocate device memory for Y" << std::endl;
+        aclrtFree(devX);
+        return -1;
+    }
+    
+    ret = aclrtMalloc(&devTiling, sizeof(SwapTilingData), ACL_MEM_MALLOC_HUGE_FIRST);
+    if (ret != ACL_SUCCESS) {
+        std::cerr << "Error: Failed to allocate device memory for Tiling" << std::endl;
+        aclrtFree(devX);
+        aclrtFree(devY);
+        return -1;
+    }
+    
+    // ========== 4. 拷贝数据到 Device ==========
+    ret = aclrtMemcpy(devX, N * sizeof(float), x, N * sizeof(float), 
+                      ACL_MEMCPY_HOST_TO_DEVICE);
+    ret = aclrtMemcpy(devY, N * sizeof(float), y, N * sizeof(float), 
+                      ACL_MEMCPY_HOST_TO_DEVICE);
+    ret = aclrtMemcpy(devTiling, sizeof(SwapTilingData), &tiling, 
+                      sizeof(SwapTilingData), ACL_MEMCPY_HOST_TO_DEVICE);
+    
+    // ========== 5. 启动 Kernel ==========
+    // <<<gridDim, blockDim>>> 语法：gridDim = Core 数量，blockDim = 1（每个 Core 一个线程块）
+    swap_kernel_entry<<<tiling.coreCount, 1>>>(devX, devY, devTiling);
+    
+    // 等待 Kernel 执行完成
+    aclrtSynchronizeDevice();
+    
+    // ========== 6. 拷贝结果回 Host ==========
+    ret = aclrtMemcpy(x, N * sizeof(float), devX, N * sizeof(float), 
+                      ACL_MEMCPY_DEVICE_TO_HOST);
+    ret = aclrtMemcpy(y, N * sizeof(float), devY, N * sizeof(float), 
+                      ACL_MEMCPY_DEVICE_TO_HOST);
+    
+    // ========== 7. 释放 Device 内存 ==========
+    aclrtFree(devX);
+    aclrtFree(devY);
+    aclrtFree(devTiling);
+    
+    return 0;
+}</code></pre>
+
+<h3>关键 API 说明</h3>
+<table>
+<thead><tr><th>API</th><th>作用</th><th>参数</th></tr></thead>
+<tbody>
+<tr><td><code>aclrtMalloc</code></td><td>分配 Device 内存</td><td>(指针, 大小, 策略)</td></tr>
+<tr><td><code>aclrtMemcpy</code></td><td>Host↔Device 数据拷贝</td><td>(dst, dstSize, src, srcSize, 方向)</td></tr>
+<tr><td><code>aclrtFree</code></td><td>释放 Device 内存</td><td>(指针)</td></tr>
+<tr><td><code>aclrtSynchronizeDevice</code></td><td>等待所有 Kernel 完成</td><td>无</td></tr>
+<tr><td><code><<<grid, block>>></code></td><td>启动 Kernel</td><td>(Core数, 线程数)</td></tr>
+</tbody>
+</table>
+
+<h2>4.3.6 交叉写回技巧</h2>
+<p>swap 的核心逻辑是"交换"，最直观的做法是用一个临时变量暂存，然后互相赋值。但在 NPU 上，我们可以用更高效的"交叉写回"技巧。</p>
+
+<h3>传统做法（需要额外 Buffer）</h3>
+<pre><code>// 传统做法：需要 4 个 Buffer
+LocalTensor&lt;float&gt; xBuf, yBuf, tempX, tempY;
+
+// 1. 搬入
+DataCopy(xBuf, xGm[offset], size);
+DataCopy(yBuf, yGm[offset], size);
+
+// 2. 交换（需要额外 Buffer）
+DataCopy(tempX, xBuf, size);
+DataCopy(tempY, yBuf, size);
+
+// 3. 写回
+DataCopy(xGm[offset], tempY, size);  // x = 原来的 y
+DataCopy(yGm[offset], tempX, size);  // y = 原来的 x</code></pre>
+
+<h3>交叉写回（只需要 2 个 Buffer）</h3>
+<pre><code>// 交叉写回：只需要 2 个 Buffer
+LocalTensor&lt;float&gt; xBuf, yBuf;
+
+// 1. 搬入
+DataCopy(xBuf, xGm[offset], size);  // xBuf = x 的数据
+DataCopy(yBuf, yGm[offset], size);  // yBuf = y 的数据
+
+// 2. 交叉写回（关键！）
+DataCopy(xGm[offset], yBuf, size);  // 把 y 的数据写到 x 的位置
+DataCopy(yGm[offset], xBuf, size);  // 把 x 的数据写到 y 的位置</code></pre>
+
+<h3>为什么交叉写回更高效？</h3>
+<table>
+<thead><tr><th>方案</th><th>Buffer 数量</th><th>UB 占用</th><th>性能</th></tr></thead>
+<tbody>
+<tr><td>传统做法</td><td>4 个</td><td>高（需要额外 temp Buffer）</td><td>较慢</td></tr>
+<tr><td>交叉写回</td><td>2 个</td><td>低（只需要 xBuf 和 yBuf）</td><td>更快</td></tr>
+</tbody>
+</table>
+
+<p>交叉写回的核心思想是：<strong>不需要在 UB 内做交换，而是通过写回时的"交叉"来实现交换</strong>。xBuf 里存的是 x 的数据，但我们把它写到 y 的位置；yBuf 里存的是 y 的数据，但我们把它写到 x 的位置。这样就完成了交换，而且不需要额外的 Buffer。</p>
+
+<h2>4.3.7 完整代码走读</h2>
+<p>让我们从头到尾走一遍完整的执行流程：</p>
+
+<h3>执行流程图</h3>
+<pre class="ascii-art"><code>┌─────────────────────────────────────────────────────────────────┐
+│                      Host 侧（CPU）                              │
+├─────────────────────────────────────────────────────────────────┤
+│  1. 参数校验                                                     │
+│     └── 检查 N > 0, x/y 非空, incx/incy > 0                     │
+│                                                                 │
+│  2. Tiling 计算                                                  │
+│     ├── coreCount = min(N/256, 20)                              │
+│     ├── perCoreN = N / coreCount                                │
+│     ├── remainder = N % coreCount                               │
+│     └── tileSize = 128KB / 4 bytes / 2 = 16384                  │
+│                                                                 │
+│  3. 分配 Device 内存                                             │
+│     ├── devX = aclrtMalloc(N * 4)                               │
+│     ├── devY = aclrtMalloc(N * 4)                               │
+│     └── devTiling = aclrtMalloc(sizeof(TilingData))             │
+│                                                                 │
+│  4. 拷贝数据到 Device                                            │
+│     ├── aclrtMemcpy(devX, x, H2D)                               │
+│     ├── aclrtMemcpy(devY, y, H2D)                               │
+│     └── aclrtMemcpy(devTiling, tiling, H2D)                     │
+│                                                                 │
+│  5. 启动 Kernel                                                  │
+│     └── swap_kernel_entry<<<coreCount, 1>>>(devX, devY, devTiling)│
+│                                                                 │
+│  6. 等待完成                                                     │
+│     └── aclrtSynchronizeDevice()                                │
+│                                                                 │
+│  7. 拷贝结果回 Host                                              │
+│     ├── aclrtMemcpy(x, devX, D2H)                               │
+│     └── aclrtMemcpy(y, devY, D2H)                               │
+│                                                                 │
+│  8. 释放内存                                                     │
+│     └── aclrtFree(devX/devY/devTiling)                          │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│                   Kernel 侧（NPU AI Core）                       │
+├─────────────────────────────────────────────────────────────────┤
+│  每个 AI Core 独立执行以下步骤：                                  │
+│                                                                 │
+│  1. Init()                                                       │
+│     ├── 获取 coreIdx = GetBlockIdx()                            │
+│     ├── 计算 offset = coreIdx * perCoreN                        │
+│     ├── 计算 myN = perCoreN + (最后一个 Core ? remainder : 0)   │
+│     └── 分配 UB Buffer: xBuf, yBuf                              │
+│                                                                 │
+│  2. Process()                                                    │
+│     └── 循环处理，每次处理 tileSize 个元素                       │
+│                                                                 │
+│  3. SingleIteration(offset, size)                                │
+│     ├── DataCopy(xBuf, xGm[offset], size)  // GM → UB           │
+│     ├── DataCopy(yBuf, yGm[offset], size)  // GM → UB           │
+│     ├── DataCopy(xGm[offset], yBuf, size)  // UB → GM (交叉)   │
+│     └── DataCopy(yGm[offset], xBuf, size)  // UB → GM (交叉)   │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+
+<h3>数据流示意</h3>
+<pre class="ascii-art"><code>初始状态：
+  X (GM): [1, 2, 3, 4, 5, 6, 7, 8]
+  Y (GM): [a, b, c, d, e, f, g, h]
+
+Core 0 处理前 4 个元素：
+  1. 搬入 UB：
+     xBuf = [1, 2, 3, 4]
+     yBuf = [a, b, c, d]
+  
+  2. 交叉写回 GM：
+     X[0:4] = yBuf = [a, b, c, d]
+     Y[0:4] = xBuf = [1, 2, 3, 4]
+
+Core 1 处理后 4 个元素：
+  1. 搬入 UB：
+     xBuf = [5, 6, 7, 8]
+     yBuf = [e, f, g, h]
+  
+  2. 交叉写回 GM：
+     X[4:8] = yBuf = [e, f, g, h]
+     Y[4:8] = xBuf = [5, 6, 7, 8]
+
+最终结果：
+  X (GM): [a, b, c, d, e, f, g, h]
+  Y (GM): [1, 2, 3, 4, 5, 6, 7, 8]</code></pre>
+
+<h2>4.3.8 关键设计决策</h2>
+
+<h3>为什么用单 Buffer 而不是双 Buffer？</h3>
+<p>双 Buffer 的价值是让"搬运"和"计算"在不同 Buffer 上同时执行。但 swap 没有计算阶段——它只有搬运。搬运和搬运之间无法重叠（MTE2 和 MTE3 是独立的，但同一方向的搬运不能重叠），所以双 Buffer 对 swap 没有额外收益，反而浪费一倍 UB 空间。</p>
+
+<h3>为什么 Core 数量不是越多越好？</h3>
+<p>如果 N 很小（比如 N=100），用 20 个 Core 意味着每个 Core 只处理 5 个元素。启动 Core 的开销可能比实际计算还大。所以代码里设置了 <code>minElementsPerCore = 256</code>，确保每个 Core 至少处理 256 个元素。</p>
+
+<h3>为什么 tileSize 要除以 2？</h3>
+<p>因为需要同时存储 X 和 Y 两个向量的数据。UB 总容量是 256KB，但 xBuf 和 yBuf 各占一半，所以每个 Buffer 只能用 128KB。</p>
+
+<h2>参考链接</h2>
+<ul>
+<li><a href="https://gitcode.com/cann/ops-blas/tree/master/blas/swap">ops-blas swap 源码</a></li>
+<li><a href="https://www.netlib.org/blas/sswap.f">BLAS 标准 sswap 参考实现</a></li>
+<li><a href="https://hiascend.com/document/redirect/CannCommunityAscendCApi">Ascend C API 文档</a></li>
+</ul>
+
+<div id="quiz"></div>
+<div class="page-nav"><a href="04-实战演练-4.2-五分钟跑通第一个算子.html" class="nav-prev"><span class="nav-label">← 上一篇</span><span class="nav-title">4.2 五分钟跑通第一个算子</span></a><a href="04-实战演练-4.4-框架开发-add算子.html" class="nav-next"><span class="nav-label">下一篇 →</span><span class="nav-title">4.4 框架开发：add 算子</span></a></div>
+</div>
+</main>
+<script src="js/quiz.js"></script>
+<script>
+renderQuiz('quiz', [
+  {
+    question: "swap 算子的 TilingData 中，tileSize 的计算为什么要除以 2？",
+    options: ["因为需要双 Buffer", "因为需要同时存储 X 和 Y 两个向量的数据", "因为 UB 只能使用一半", "因为要对齐到 32 字节"],
+    answer: 1,
+    explanation: "swap 需要同时存储 X 和 Y 两个向量的数据到 UB 中。如果 UB 总容量是 256KB，那么 xBuf 和 yBuf 各占一半，每个 Buffer 只能用 128KB。所以 tileSize = UB容量 / 元素大小 / 2。"
+  },
+  {
+    question: "交叉写回技巧的核心思想是什么？",
+    options: ["在 UB 内做数据交换，然后写回", "通过写回时的'交叉'来实现交换，不需要在 UB 内做额外操作", "使用临时变量暂存数据", "使用双 Buffer 实现交换"],
+    answer: 1,
+    explanation: "交叉写回的核心思想是：不需要在 UB 内做交换，而是通过写回时的'交叉'来实现。xBuf 里存的是 x 的数据，但写到 y 的位置；yBuf 里存的是 y 的数据，但写到 x 的位置。这样只需要 2 个 Buffer，不需要额外的 temp Buffer。"
+  },
+  {
+    question: "swap 为什么使用单 Buffer 而不是双 Buffer？",
+    options: ["因为 UB 空间不够", "因为 swap 没有计算阶段，双 Buffer 无法让搬运和计算重叠", "因为双 Buffer 不支持 DataCopy", "因为单 Buffer 代码更简单"],
+    answer: 1,
+    explanation: "双 Buffer 的价值是让'搬运'和'计算'在不同 Buffer 上同时执行。但 swap 只有搬运，没有计算。搬运和搬运之间无法重叠（同一方向的搬运不能并行），所以双 Buffer 对 swap 没有额外收益，反而浪费一倍 UB 空间。"
+  },
+  {
+    question: "Host 侧代码中，<<<tiling.coreCount, 1>>> 的含义是？",
+    options: ["启动 coreCount 个线程", "启动 coreCount 个 AI Core，每个 Core 1 个线程块", "启动 1 个 AI Core，每个 Core coreCount 个线程", "分配 coreCount 个 UB Buffer"],
+    answer: 1,
+    explanation: "<<<gridDim, blockDim>>> 是启动 Kernel 的语法。gridDim = coreCount 表示启动 coreCount 个 AI Core，blockDim = 1 表示每个 Core 1 个线程块。在 Ascend C 中，每个 AI Core 独立执行 Kernel 代码，通过 GetBlockIdx() 获取自己的索引。"
+  },
+  {
+    question: "如果 N=100，maxCoreCount=20，minElementsPerCore=256，实际会使用多少个 Core？",
+    options: ["20 个", "1 个", "10 个", "5 个"],
+    answer: 1,
+    explanation: "计算公式：coreCount = min((N + minElementsPerCore - 1) / minElementsPerCore, maxCoreCount)。N=100 时，(100+255)/256 = 1，所以 coreCount = min(1, 20) = 1。因为 N 太小，用多个 Core 反而启动开销大于计算收益，所以只用 1 个 Core。"
+  },
+  {
+    question: "假设 N = 100000 个 FP32 元素，coreCount = 20，UB 可用 248KB（需要同时存 X 和 Y 两个 Buffer）。请计算 tileSize 的值（每个 Buffer 单轮能处理多少个元素）。",
+    options: ["tileSize = 62000（248KB / 4B）", "tileSize = 31000（248KB / 2 / 4B）", "tileSize = 5000（100000 / 20）", "tileSize = 16000（128KB / 4B / 2）"],
+    answer: 1,
+    explanation: "UB 总空间 248KB 需要同时存 X 和 Y 两个 Buffer，每个 Buffer 124KB。FP32 每个元素 4 字节，所以 tileSize = 124×1024 / 4 = 31744 ≈ 31K 个元素。同时 perCoreN = 100000 / 20 = 5000，因为 tileSize (31K) > perCoreN (5K)，实际 tileSize 会被截断为 perCoreN = 5000，即每个核一轮就能处理完。"
+  },
+  {
+    question: "swap 的数据流中，xBuf 里存的是 x 的原始数据，yBuf 里存的是 y 的原始数据。交叉写回时，DataCopy(xGm[offset], yBuf, size) 这行代码做了什么？",
+    options: ["把 x 的数据从 UB 写回 x 的 GM 位置", "把 y 的数据从 UB 写到 x 的 GM 位置（实现交换）", "把 x 的数据从 GM 搬到 UB", "把 y 的数据从 GM 搬到 UB"],
+    answer: 1,
+    explanation: "交叉写回的关键：yBuf 里存的是 y 的原始数据，但 DataCopy(xGm[offset], yBuf, size) 把它写到了 xGm 的位置——也就是把 y 的数据写到了 x 的位置。同理，DataCopy(yGm[offset], xBuf, size) 把 x 的数据写到 y 的位置。这样就完成了交换，而且不需要额外的临时 Buffer。"
+  }
+]);
+</script>
+</body>
+</html>

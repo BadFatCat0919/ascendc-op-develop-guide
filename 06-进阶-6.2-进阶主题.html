@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>6.2 进阶主题 - AscendC Guide</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<nav class="sidebar"><div class="sidebar-header"><h2><a href="index.html" style="color:inherit;text-decoration:none">AscendC Guide</a></h2><p>算子开发从入门到精通</p></div><ul class="sidebar-nav"><li class="chapter-group"><span class="chapter-title">第1章 基础概念</span><ul class="article-list"><li><a href="01-基础概念-1.1-什么是算子与AscendC.html" class="">1.1 什么是算子与 Ascend C</a></li><li><a href="01-基础概念-1.2-数据类型排布与量化.html" class="">1.2 数据类型、排布与量化</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第2章 硬件与编程模型</span><ul class="article-list"><li><a href="02-硬件与编程模型-2.1-A5硬件架构.html" class="">2.1 A5 硬件架构</a></li><li><a href="02-硬件与编程模型-2.2-编程模型概述.html" class="">2.2 编程模型概述</a></li><li><a href="02-硬件与编程模型-2.3-算子结构与直调开发.html" class="">2.3 算子结构与直调开发</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第3章 核心开发</span><ul class="article-list"><li><a href="03-核心开发-3.1-Tiling设计.html" class="">3.1 Tiling 设计</a></li><li><a href="03-核心开发-3.2-内存管理与数据搬运.html" class="">3.2 内存管理与数据搬运</a></li><li><a href="03-核心开发-3.3-Vector计算.html" class="">3.3 Vector 计算</a></li><li><a href="03-核心开发-3.4-Cube计算.html" class="">3.4 Cube 计算</a></li><li><a href="03-核心开发-3.5-同步与流水线.html" class="">3.5 同步与流水线</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第4章 实战演练</span><ul class="article-list"><li><a href="04-实战演练-4.1-环境搭建.html" class="">4.1 环境搭建</a></li><li><a href="04-实战演练-4.2-五分钟跑通第一个算子.html" class="">4.2 五分钟跑通第一个算子</a></li><li><a href="04-实战演练-4.3-直调开发-swap算子.html" class="">4.3 直调开发：swap 算子</a></li><li><a href="04-实战演练-4.4-框架开发-add算子.html" class="">4.4 框架开发：add 算子</a></li><li><a href="04-实战演练-4.5-ACL接口使用指南.html" class="">4.5 ACL 接口使用指南</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第5章 调试与优化</span><ul class="article-list"><li><a href="05-调试与优化-5.1-精度不对怎么办.html" class="">5.1 精度不对怎么办</a></li><li><a href="05-调试与优化-5.2-性能不达标怎么办.html" class="">5.2 性能不达标怎么办</a></li><li><a href="05-调试与优化-5.3-算子精度标准.html" class="">5.3 算子精度标准</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第6章 进阶</span><ul class="article-list"><li><a href="06-进阶-6.1-常见踩坑与最佳实践.html" class="">6.1 常见踩坑与最佳实践</a></li><li><a href="06-进阶-6.2-进阶主题.html" class="active">6.2 进阶主题</a></li></ul></li><li class="chapter-group"><span class="chapter-title">附录</span><ul class="article-list"><li><a href="附录-A-数据类型速查表.html" class="">A. 数据类型速查表</a></li><li><a href="附录-B-对齐规则速查.html" class="">B. 对齐规则速查</a></li><li><a href="附录-C-错误码速查.html" class="">C. 错误码速查</a></li></ul></li></ul></nav>
+<main class="main">
+<div class="content">
+<div class="meta-bar"><a href="index.html">← 返回目录</a></div>
+<p>本文介绍 Ascend C 在 A5（Ascend 950 / DAV_3510）上引入的一系列高级特性。这些特性面向有经验的开发者，能够进一步释放硬件性能。文中会以 sswap 算子为例，重点说明跨架构兼容的设计思路。</p>
+<h2>5.2.1 SIMD-RegBase 深入</h2>
+<p>在前面的章节中，我们使用的都是 <strong>MemBase</strong> 编程模型——通过 UB 地址访问数据，API 接受 <code>LocalTensor</code> 作为操作数。MemBase 的好处是简单直观，缺点是中间数据必须驻留在 UB，编译器无法对寄存器做深度优化，UB 带宽成为性能瓶颈。</p>
+<p>A5（DAV_3510）在 Vector 单元上引入了 <strong>RegBase</strong> 编程模型，与传统 MemBase 并存。RegBase 的核心思想是：<strong>中间数据存储在寄存器而非 UB</strong>，数据从 UB 加载到寄存器组中，所有计算都在寄存器上完成，最后再写回 UB。这类似于 GPU 的 PTX 或 CPU 的 intrinsics 编程风格。</p>
+<h3>核心优势</h3>
+<ul>
+<li><strong>寄存器内计算</strong> — 减少 UB 访问带宽消耗，中间结果不占 UB 空间</li>
+<li><strong>OOO 指令双发</strong> — 乱序执行双发射，Vector 性能显著提升</li>
+<li><strong>支持非 32B 对齐</strong> — 通过地址寄存器和对齐寄存器，可以处理 LB 非 32B 对齐的数据</li>
+</ul>
+<h3>寄存器组</h3>
+<p>RegBase 模式提供了五类专用寄存器，构成完整的向量寄存器体系：</p>
+<table><thead><tr><th>寄存器类型</th><th>用途</th><th>说明</th></tr></thead><tbody><tr><td>向量寄存器（VR）</td><td>存放向量数据，是主要的计算载体</td><td>每条 VL=256B，承载实际计算数据</td></tr><tr><td>VFScalar</td><td>标量寄存器，存放标量操作数</td><td>用于标量广播、立即数等场景</td></tr><tr><td>地址寄存器</td><td>存放 UB 地址，用于 Load/Store</td><td>指向 UB 中的数据位置</td></tr><tr><td>对齐寄存器</td><td>存放对齐信息，辅助非对齐访问</td><td>配合地址寄存器处理非 32B 对齐数据</td></tr><tr><td>掩码寄存器</td><td>存放 mask，控制哪些元素参与计算</td><td>实现条件计算和尾部处理</td></tr></tbody></table>
+<h3>__VEC_SCOPE__ 声明向量寄存器作用域</h3>
+<p><code>__VEC_SCOPE__</code> 是一个作用域标记，告诉编译器"这个代码块内的向量寄存器分配是局部的"。在 scope 内分配的寄存器，在 scope 结束后会被自动释放，可以被后续代码复用。合理使用 <code>__VEC_SCOPE__</code> 可以大幅降低寄存器压力，让编译器有更多优化空间。</p>
+<pre class=""><code>__VEC_SCOPE__ {
+    RegTensor&lt;float, 128&gt; regA;
+    RegTensor&lt;float, 128&gt; regB;
+    regA.Load(ubA);
+    regB.Load(ubB);
+    regA.Add(regB);
+    regA.Store(ubC);
+}
+__VEC_SCOPE__ {
+    RegTensor&lt;float, 128&gt; regX;
+    regX.Load(ubD);
+    regX.Mul(regX);
+    regX.Store(ubE);
+}</code></pre>
+<p>上面两个 <code>__VEC_SCOPE__</code> 块各自独立分配寄存器，第一个块结束后其寄存器被释放，第二个块可以复用同一组物理寄存器。</p>
+<h3>MicroAPI — 细粒度寄存器操作</h3>
+<p>RegBase 提供了比 MemBase 更细粒度的 API，称为 MicroAPI。MemBase 的 API 以 <code>block</code> / <code>repeat</code> 参数控制批量操作，而 MicroAPI 允许你直接操作寄存器的某几个 lane，或者手动控制寄存器的复用策略。代码形态从 MemBase 的批量参数变为 RegBase 的 for-loop 显式循环：</p>
+<table><thead><tr><th>维度</th><th>MemBase</th><th>RegBase (MicroAPI)</th></tr></thead><tbody><tr><td>操作粒度</td><td>block/repeat 批量</td><td>逐元素 / 逐 lane 精细控制</td></tr><tr><td>代码形态</td><td>API 调用 + 参数</td><td>for-loop 显式循环</td></tr><tr><td>中间数据</td><td>驻留 UB</td><td>驻留寄存器</td></tr><tr><td>寄存器管理</td><td>编译器自动</td><td>开发者手动 + __VEC_SCOPE__</td></tr></tbody></table>
+<h3>OOO 双发 — 乱序执行</h3>
+<p>A5 的 Vector 单元支持 <strong>Out-of-Order 双发射</strong>：两条没有数据依赖的指令可以在同一个时钟周期同时发射。这在 MemBase 模式下由编译器自动调度，而在 RegBase 模式下你可以手动安排指令顺序来最大化双发射的利用率。</p>
+<p>OOO 双发对 Vector 算力的提升是显著的。以 Ascend950PR PCIE 为例，Vector FP16 基础算力为 23.7T，启用 RegBase OOO 双发后翻倍至 47T。Server 版本从 27T 提升至 54T。</p>
+<p>要充分利用 OOO 双发，需要将无依赖的指令交错排列：</p>
+<pre class=""><code>__VEC_SCOPE__ {
+    RegTensor&lt;float, 128&gt; a, b, c, d;
+    a.Load(ubA);
+    c.Load(ubC);
+    b.Load(ubB);
+    d.Load(ubD);
+    a.Add(b);
+    c.Add(d);
+    a.Store(ubOut1);
+    c.Store(ubOut2);
+}</code></pre>
+<p>上述代码中，<code>a.Add(b)</code> 和 <code>c.Add(d)</code> 没有数据依赖，可以被硬件双发执行。</p>
+<h3>RegBase 与 MemBase 详细对比</h3>
+<table><thead><tr><th>维度</th><th>MemBase</th><th>RegBase</th></tr></thead><tbody><tr><td>数据驻留</td><td>UB（Unified Buffer）</td><td>向量寄存器</td></tr><tr><td>API 风格</td><td>LocalTensor + block/repeat</td><td>RegTensor + for-loop / MicroAPI</td></tr><tr><td>中间数据开销</td><td>占用 UB 空间</td><td>不占 UB，驻留寄存器</td></tr><tr><td>编译器优化空间</td><td>有限（UB 访问不可消除）</td><td>大（寄存器分配 + 指令调度）</td></tr><tr><td>OOO 双发</td><td>编译器自动调度</td><td>可手动编排最大化</td></tr><tr><td>对齐要求</td><td>32B 对齐</td><td>支持非 32B 对齐（地址+对齐寄存器）</td></tr><tr><td>适用架构</td><td>所有架构</td><td>仅 DAV_3510（A5）</td></tr><tr><td>学习曲线</td><td>较低</td><td>较高（需理解寄存器管理）</td></tr></tbody></table>
+<h3>完整代码示例</h3>
+<p>下面是一个更完整的 RegBase 示例，展示了向量加法的完整流程：</p>
+<pre class=""><code>__aicore__ inline void VectorAddRegBase(
+    const LocalTensor&lt;float&gt;&amp; ubA,
+    const LocalTensor&lt;float&gt;&amp; ubB,
+    const LocalTensor&lt;float&gt;&amp; ubC,
+    uint32_t elemCount)
+{
+    __VEC_SCOPE__ {
+        RegTensor&lt;float, 256&gt; regA;
+        RegTensor&lt;float, 256&gt; regB;
+        regA.Load(ubA);
+        regB.Load(ubB);
+        regA.Add(regB);
+        regA.Store(ubC);
+    }
+}</code></pre>
+<p>这段代码的含义是：从 UB 加载两个 256 元素的向量到寄存器，做逐元素加法，结果写回 UB。整个过程都在寄存器上完成，没有中间的 UB 读写。</p>
+<h3>适用场景</h3>
+<p>RegBase 的价值在于<strong>计算密集型算子</strong>，典型场景包括：</p>
+<ul>
+<li><strong>GEMM 内核循环</strong> — 矩阵乘法的累加在寄存器中完成，避免频繁的 UB 读写</li>
+<li><strong>Reduce 归约树</strong> — 多级归约的中间结果驻留寄存器，减少 UB 带宽压力</li>
+<li><strong>融合算子</strong> — 多个计算步骤串联时，中间结果全部在寄存器中流转</li>
+</ul>
+<p>sswap 不使用 RegBase，因为它是纯搬运算子，没有 Vector 计算阶段。对于搬运为主的算子，MemBase 已经足够高效。</p>
+<h2>5.2.2 SIMT 混合编程</h2>
+<p>传统的 Ascend C 算子使用 <strong>SIMD</strong> 模式——一个核内的所有计算单元（Vector、Scalar、MTE）协同处理同一份数据。A5（DAV_3510）引入了 <strong>SIMT</strong>（Single Instruction Multiple Threads）模式，让你可以用线程并行处理数据，编程范式从"矢量编程（VF 内连续计算）"变为"标量编程（线程视角）"。</p>
+<p>更强大的是，A5 支持在同一个 Kernel 中<strong>混合使用 SIMT 和 SIMD</strong>：</p>
+<ul>
+<li><strong>SIMT 部分</strong>适合处理离散内存访问（如 Gather/Scatter）和分支密集的逻辑。</li>
+<li><strong>SIMD 部分</strong>适合处理密集的向量计算和规整的数据搬运。</li>
+</ul>
+<h3>SIMT vs SIMD 硬件能力差异</h3>
+<table><thead><tr><th>维度</th><th>SIMT</th><th>SIMD</th></tr></thead><tbody><tr><td>编程范式</td><td>标量编程（线程视角）</td><td>矢量编程（VF 内连续计算）</td></tr><tr><td>控制逻辑</td><td>Warp Scheduler 硬件分支调度</td><td>软件展开循环</td></tr><tr><td>GM 离散访问</td><td><strong>支持直接访问</strong>（核内 DCache）</td><td>不支持，需先搬入 UB</td></tr><tr><td>寄存器类型</td><td>标量寄存器（per-Thread）</td><td>矢量寄存器（per-VF）</td></tr><tr><td>寄存器组织</td><td>128 KB 寄存器堆，按线程并发数切分</td><td>多条 VL=256 B 矢量寄存器</td></tr></tbody></table>
+<p>SIMT 独有硬件（DAV_3510 新增）：Warp Scheduler（每 AIV 4 个）、SIMT Register File、SIMT DCache（最大 128KB，复用 UB 作 Cacheline，128B 粒度）。SIMD/SIMT 共享：ALU / ICache / Unified Buffer。</p>
+<h3>SIMT 线程层次</h3>
+<p>AscendC SIMT 编程模型采用三级线程层次：</p>
+<table><thead><tr><th>层级</th><th>概念</th><th>对应 CUDA</th><th>设置方式</th></tr></thead><tbody><tr><td>启动核数</td><td>Block 数量</td><td>Grid 中的 Block 数</td><td>tiling 侧 <code>SetBlockDim</code></td></tr><tr><td>启动线程数</td><td>单核线程数</td><td>单 Block 线程数</td><td>kernel 侧 <code>constexpr</code> 常量</td></tr><tr><td>Warp</td><td>32 线程分组</td><td>Warp</td><td>硬件自动分组</td></tr></tbody></table>
+<p><strong>核数（Block Dim）</strong>：通过 tiling 侧 <code>SetBlockDim</code> 接口设置，切分公式为 <code>总核数 = ceil(输出元素总数 / 单核最少处理元素数)</code>。</p>
+<p><strong>线程数</strong>：单核最大支持 2048 线程，<strong>必须在编译期确定</strong>（使用 <code>constexpr</code> 或字面量），禁止从 tiling 数据动态获取。<code>LAUNCH_BOUND(N)</code> 和 <code>Simt::Dim3(N)</code> 必须使用同一个编译期常量。默认值 1024。</p>
+<p><strong>Warp 调度</strong>：内部按 32 线程分组形成 warp，warp 是硬件调度的最小单位。每个 AIV 核包含 4 个 Warp Scheduler，调度器编号为 <code>warp_id % 4</code>。同一时刻一个 AIV 核只执行一个线程块任务，线程块内多个 Warp 被依次调度执行。</p>
+<h3>SIMT 内存空间</h3>
+<p>AscendC SIMT 编程模型包含三类内存空间：</p>
+<table><thead><tr><th>内存类型</th><th>说明</th><th>访问范围</th><th>地址空间修饰符</th></tr></thead><tbody><tr><td>寄存器和栈</td><td>每个线程独立</td><td>线程私有</td><td>无（默认）</td></tr><tr><td>Unified Buffer (UB)</td><td>本地内存</td><td>核内共享</td><td><code>__ubuf__</code></td></tr><tr><td>Global Memory (GM)</td><td>全局内存</td><td>所有线程可访问</td><td><code>__gm__</code></td></tr></tbody></table>
+<p><strong>寄存器和栈</strong>：每个线程独享一组寄存器，寄存器数量受线程数影响，超出寄存器容量的变量会栈溢出。</p>
+<p><strong>Unified Buffer (UB)</strong>：核内共享的本地内存，总量 256KB。SIMT 算子不能使用全部 UB 空间，需为 DCache 预留 ≥32KB，实际可用 UB = 256KB - 8KB(预留) - 32KB(DCache) = <strong>216KB</strong>。在 SIMT VF 中通过 <code>__ubuf__</code> 指针访问。</p>
+<p><strong>Global Memory (GM)</strong>：所有核所有线程均可访问。SIMT VF <strong>支持直接读写 GM</strong>，无需显式 Load/Store，通过 <code>__gm__</code> 指针访问，在 kernel 入口通过 <code>GM_ADDR</code> 参数传入。这是 SIMT 相比 SIMD 的一大优势——SIMD 模式下数据必须先搬入 UB 才能被计算单元访问。</p>
+<h3>SIMT 支持直接读写 GM</h3>
+<p>SIMT 模式下，线程可以通过 <code>__gm__</code> 指针直接读写 Global Memory，这是通过核内 DCache 实现的。DCache 最大 128KB，复用 UB 空间作为 Cacheline，以 128B 为粒度缓存 GM 数据。</p>
+<pre class=""><code>__simt_vf__ __aicore__ LAUNCH_BOUND(512) inline void GatherKernel(
+    __gm__ const float* src,
+    __gm__ float* dst,
+    __gm__ const int32_t* indices,
+    uint32_t count)
+{
+    uint32_t tid = Simt::GetThreadId();
+    uint32_t stride = Simt::GetBlockSize();
+    for (uint32_t i = tid; i &lt; count; i += stride) {
+        int32_t idx = indices[i];
+        dst[i] = src[idx];
+    }
+}</code></pre>
+<p>上述 Gather 示例中，每个线程通过 <code>indices</code> 读取不连续的地址，SIMT 的 DCache 会自动处理这些离散访问，无需手动搬入 UB。</p>
+<h3>SIMT 函数调用层级</h3>
+<p>混合编程中，函数调用遵循严格的层级结构：</p>
+<pre class="ascii-art"><code>核函数 (__global__ __aicore__)
+  ├── __aicore__ 函数
+  ├── SIMD VF (__simd_vf__) ← 通过 asc_vf_call 调用
+  │     └── __simd_callee__ 子函数
+  └── SIMT VF (__simt_vf__) ← 通过 VF_CALL 调用
+        └── __simt_callee__ 子函数</code></pre>
+<ul>
+<li><strong>核函数</strong>（<code>__global__ __aicore__</code>）：算子入口，由框架调用，负责 tiling 数据解析和场景分发</li>
+<li><strong>__aicore__ 函数</strong>：核内主逻辑函数，负责 UB buffer 初始化、GM 地址转换，调用 <code>Simt::VF_CALL</code> 启动 SIMT VF</li>
+<li><strong>SIMT VF</strong>（<code>__simt_vf__</code>）：线程级并行计算函数，每个线程独立执行，以 stride 间隔遍历数据</li>
+<li><strong>__simt_callee__</strong>：SIMT VF 内部的辅助函数，必须带修饰符</li>
+</ul>
+<p><strong>调用约束</strong>：<code>__simt_vf__</code> 内只能调用 <code>__simt_callee__</code> 函数和 <code>constexpr</code> 函数；<code>__simd_vf__</code> 内只能调用 <code>__simd_callee__</code> 函数和 <code>constexpr</code> 函数。不可跨模式调用（SIMT VF 不能调用 SIMD callee，反之亦然）。</p>
+<h3>混合编程的声明方式</h3>
+<p>通过 <code>__global__ __aicore__</code> 声明混合核函数，DAV_3510 上提供 <code>__global__</code> 核函数语法和 <code>&lt;&lt;&lt;...&gt;&gt;&gt;</code> 启动方式（等价 CUDA 风格）。SIMT 的 Vector Function 通过 <code>VF_CALL</code> 调用，SIMD 的 Vector Function 通过 <code>asc_vf_call</code> 调用。</p>
+<h3>VF_CALL vs asc_vf_call</h3>
+<table><thead><tr><th>调用方式</th><th>目标 VF 类型</th><th>使用场景</th></tr></thead><tbody><tr><td><code>Simt::VF_CALL</code></td><td>SIMT VF（<code>__simt_vf__</code>）</td><td>启动线程级并行计算</td></tr><tr><td><code>asc_vf_call</code></td><td>SIMD VF（<code>__simd_vf__</code>）</td><td>启动矢量级计算</td></tr></tbody></table>
+<p>在同一个 <code>__global__ __aicore__</code> 核函数中，可以先调用 <code>VF_CALL</code> 执行 SIMT 逻辑（如 Gather），再调用 <code>asc_vf_call</code> 执行 SIMD 逻辑（如密集 Vector 计算），实现混合编程。</p>
+<h3>LAUNCH_BOUND 与寄存器数量</h3>
+<p><code>LAUNCH_BOUND(N)</code> 限定每个 VF Block 使用的最大线程数，线程数直接影响每线程可用寄存器数：</p>
+<table><thead><tr><th>线程数范围</th><th>每线程可用寄存器数</th></tr></thead><tbody><tr><td>1025~2048</td><td>16</td></tr><tr><td>513~1024</td><td>32</td></tr><tr><td>257~512</td><td>64</td></tr><tr><td>1~256</td><td>127</td></tr></tbody></table>
+<p>选择合适的线程数需要根据算子的寄存器压力来决定。如果寄存器不够用，编译器会 spill 到 UB，性能反而会下降。</p>
+<table><thead><tr><th>算子类型</th><th>建议线程数</th><th>原因</th></tr></thead><tbody><tr><td>搬运类算子</td><td>2048 / 1024</td><td>内存带宽受限，更多线程隐藏延迟</td></tr><tr><td>计算类算子</td><td>512 / 1024</td><td>寄存器压力较大，需平衡并行度和寄存器</td></tr></tbody></table>
+<p>寄存器压力随 VF 复杂度增加而增大。极低复杂度（NONE/1D）的 VF 使用 uint32_t 索引时最多支持 1024 线程，最高复杂度（ND 运行时循环）使用 uint64_t 索引时仅支持 128 线程。</p>
+<h3>典型混合编程场景</h3>
+<p><strong>场景一：SIMT 做控制流，SIMD 做数据计算。</strong> 用 SIMT 线程并行遍历稀疏矩阵的非零元素位置，然后调用 SIMD 的 Vector 指令做实际的乘加运算。</p>
+<p><strong>场景二：SIMT 处理 Gather/Scatter，SIMD 处理密集计算。</strong> Embedding 查表用 SIMT（地址不连续），后续的 LayerNorm 用 SIMD（数据连续）。</p>
+<p><strong>场景三：SIMT 处理分支密集逻辑。</strong> 如排序、Hash 插入、随机数生成等包含大量条件分支的操作，SIMT 的 Warp Scheduler 可以高效处理分支发散。</p>
+<h3>混合编程代码示例</h3>
+<pre class=""><code>__global__ __aicore__ void MixedKernel(
+    GM_ADDR input, GM_ADDR output,
+    GM_ADDR indices, GM_ADDR tiling)
+{
+    TilingData tilingData;
+    GET_TILING_DATA_WITH_STRUCT(tilingData, tiling);
+
+    __gm__ const float* gmInput = (__gm__ const float*)input;
+    __gm__ float* gmOutput = (__gm__ float*)output;
+    __gm__ const int32_t* gmIndices = (__gm__ const int32_t*)indices;
+
+    Simt::VF_CALL&lt;GatherSimt, LAUNCH_BOUND_VAL&gt;(
+        gmInput, gmOutput, gmIndices, tilingData.elemCount);
+
+    asc_vf_call&lt;ComputeSimd&gt;(
+        ubInput, ubOutput, tilingData.elemCount);
+}
+
+__simt_vf__ __aicore__ LAUNCH_BOUND(512) inline void GatherSimt(
+    __gm__ const float* src,
+    __gm__ float* dst,
+    __gm__ const int32_t* indices,
+    uint32_t count)
+{
+    uint32_t tid = Simt::GetThreadId();
+    uint32_t stride = Simt::GetBlockSize();
+    for (uint32_t i = tid; i &lt; count; i += stride) {
+        dst[i] = src[indices[i]];
+    }
+}</code></pre>
+<h3>SIMT 适用与不适用场景</h3>
+<p><strong>适用场景</strong>：Gather/Scatter、Hash 插入、随机数、排序（含原子操作）。</p>
+<p><strong>不适用场景</strong>：</p>
+<ul>
+<li>大块 dense BF16/FP16 矩阵乘 / 卷积 — SIMD + Cube 流水更高效</li>
+<li>长向量顺序计算 — SIMD 矢量化指令吞吐更高</li>
+<li>DAV_3510 之前架构 — SIMT 硬件不存在，无法使用</li>
+</ul>
+<h2>5.2.3 NDDMA 高维 DMA</h2>
+<p>传统的 <code>DataCopy</code> 是一维搬运——从 GM 的一段连续地址搬到 UB 的一段连续地址。但在深度学习中，很多场景需要搬运多维张量的某个切片，或者在搬运的同时做转置。传统方式需要多次 DataCopy 配合手动地址计算，代码复杂且效率低。</p>
+<p>A5（DAV_3510）新增的 <strong>NDDMA（N-Dimensional DMA）</strong> 指令支持高维数据搬运，可以在一次 DMA 操作中完成多维 stride 访问和转置。NDDMA 配合 DAV_3510 新增的 ND-DMA Cache，大幅提升离散访问与转置效率。</p>
+<h3>核心思想</h3>
+<p>NDDMA 的核心思想是：<strong>将多维张量的非连续切片在一次 DMA 操作中完成搬运</strong>，避免多次 DataCopy 和手动地址计算。它支持在搬运过程中同时完成 stride 访问和维度转置，将原本需要多步操作的流程压缩为一条 DMA 指令。</p>
+<h3>适用场景：last-axis 较短时</h3>
+<p>NDDMA 特别适合 <strong>last-axis 长度较短</strong>的场景。比如一个形状为 <code>[N, D]</code> 的张量，如果 <code>D = 16</code>（last axis 很短），传统 DataCopy 每次只能搬 16 个元素（FP32 下仅 64B），并行度很低，计算效率仅 16/64 = 25%。</p>
+<p>通过 NDDMA 可以先做转置，把 D 轴转置到高轴凑足并行度后再计算，最后通过 Transpose / DataCopyPad 搬出。</p>
+<h3>使用流程</h3>
+<p>NDDMA 的典型使用流程分为三步：</p>
+<pre class="ascii-art"><code>搬入 (NDDMA) → 计算 (last 轴 reduce 变非 last 轴 reduce) → 搬出 (Transpose + DataCopyPad)</code></pre>
+<ol>
+<li><strong>搬入</strong>：使用 NDDMA 指令将多维张量的切片从 GM 搬入 UB，同时完成维度转置，使短轴不再位于 last axis</li>
+<li><strong>计算</strong>：在 UB 中对转置后的数据执行 Vector 计算，此时 last axis 已变长，并行度充足</li>
+<li><strong>搬出</strong>：通过 Transpose + DataCopyPad 将结果转置回原始维度顺序并搬出到 GM</li>
+</ol>
+<h3>NDDMA 与传统 DataCopy 对比</h3>
+<table><thead><tr><th>维度</th><th>传统 DataCopy</th><th>NDDMA</th></tr></thead><tbody><tr><td>搬运维度</td><td>一维连续搬运</td><td>多维 stride 搬运</td></tr><tr><td>转置能力</td><td>无，需额外 Transpose 操作</td><td>搬运过程中自动转置</td></tr><tr><td>last-axis 短时</td><td>并行度低，效率差</td><td>通过转置凑足并行度</td></tr><tr><td>代码复杂度</td><td>需手动计算多维地址偏移</td><td>一条指令完成多维搬运</td></tr><tr><td>硬件支持</td><td>所有架构</td><td>仅 DAV_3510（配合 ND-DMA Cache）</td></tr></tbody></table>
+<h3>代码示例</h3>
+<p>以形状为 <code>[N, D]</code>（D=16，FP32）的张量归约为例，展示 NDDMA 的使用方式：</p>
+<pre class=""><code>__aicore__ inline void ReduceShortLastAxis(
+    const LocalTensor&lt;float&gt;&amp; ubSrc,
+    const LocalTensor&lt;float&gt;&amp; ubDst,
+    uint32_t n, uint32_t d)
+{
+    NDDMA nddma;
+    nddma.SetSrc(gmSrc, sizeof(float));
+    nddma.SetDim(2);
+    nddma.SetShape(0, n);
+    nddma.SetShape(1, d);
+    nddma.SetStride(0, d * sizeof(float));
+    nddma.SetStride(1, sizeof(float));
+    nddma.SetDst(ubTransposed);
+    nddma.Run();
+
+    ReduceSum(ubTransposed, ubDst, n, d);
+
+    DataCopyPad(gmDst, ubDst, copyPadParams);
+}</code></pre>
+<p>上述代码中，NDDMA 一次性完成了 <code>[N, D]</code> 张量从 GM 到 UB 的搬运和转置，使得原本 last axis 仅 16 个元素的问题变为高轴归约，并行度大幅提升。</p>
+<h3>适用与不适用场景</h3>
+<p>sswap 是一维向量操作，不涉及多维搬运，因此不需要 NDDMA。NDDMA 的典型适用场景包括：</p>
+<ul>
+<li><strong>GEMM 分块搬运</strong> — 矩阵分块时的多维 stride 访问</li>
+<li><strong>Attention QKV 切片</strong> — 从大张量中提取 Q/K/V 切片</li>
+<li><strong>短 last-axis 归约</strong> — 如 D=16 的 embedding 归约</li>
+<li><strong>多维转置</strong> — 需要在搬运过程中改变维度顺序</li>
+</ul>
+<h2>5.2.4 CCU 通算融合</h2>
+<p><strong>CCU（Collective Communication Unit）</strong> 是 A5（DAV_3510）在 IO-Die 上新增的专用通信引擎。在分布式训练中，AllReduce、AllGather 等集合通信操作通常需要占用 AI Core 来完成数据搬运和归约——这意味着通信和计算在抢同一块算力。</p>
+<p>CCU 的出现改变了这个局面：<strong>通信操作由 CCU 独立完成，不占用 AI Core 的计算资源。</strong> 这意味着你可以在 AI Core 做 MatMul 的同时，让 CCU 在后台做 AllReduce，两者完全并行。</p>
+<h3>核心思想</h3>
+<p>CCU 的核心思想是将集合通信从 AI Core 的计算流程中解耦。传统方式下，AIV（Vector Core）需要亲自参与通信的数据搬运和归约操作，消耗计算周期。CCU 模式下，AIV 只需发起通信请求，后续的同步、Reduce、搬运全流程由 CCU 独立完成。</p>
+<h3>三种通信范式</h3>
+<table><thead><tr><th>方式</th><th>说明</th><th>计算核占用</th></tr></thead><tbody><tr><td>AIV + UBMem</td><td>经典方式，AIV 写 UB Mem 触发通信</td><td>占用</td></tr><tr><td>AIV 直驱 URMA</td><td>异步通信，AIV 直接发起 URMA</td><td>占用</td></tr><tr><td><strong>AIV + CCU</strong></td><td>CCU 完成同步、Reduce、搬运</td><td><strong>不占用</strong></td></tr></tbody></table>
+<p><strong>AIV + UBMem</strong>：经典方式，AIV 通过 UB 中转完成通信。AIV 将数据写入 UB 的特定区域来触发通信，整个过程需要 AIV 参与数据搬运和归约，占用计算资源。</p>
+<p><strong>AIV 直驱 URMA</strong>：AIV 直接发起 URMA（Unified Remote Memory Access）异步通信请求。相比 UBMem 方式减少了 UB 中转，但 AIV 仍需参与通信调度和状态轮询。</p>
+<p><strong>AIV + CCU</strong>：AIV 发起通信请求后，CCU 接管全部通信流程——包括跨节点同步、数据 Reduce（如 AllReduce 的求和）、数据搬运。AIV 可以立即返回执行计算任务，通信与计算完全并行。</p>
+<h3>KFC 调度模型变化</h3>
+<p>CCU 的引入改变了 Kernel Function Call 的调度路径：</p>
+<table><thead><tr><th>模式</th><th>调度路径</th></tr></thead><tbody><tr><td>传统</td><td><code>AICore (KFC) ↔ AICPU (KFC) → SDMA</code></td></tr><tr><td>CCU</td><td><code>AICore (KFC) ↔ CCU (KFC) → URMA</code></td></tr></tbody></table>
+<p>CCU 模式下，通信任务通过 KFC 直接调度到 CCU，绕过了 AICPU 中转环节，通信任务展开更快，AICore 发起到通信开始的静态时延更小。</p>
+<h3>CCU 对算子开发的优势</h3>
+<ul>
+<li><strong>通信不占用 AI Core 计算算力</strong> — AI Core 可以全速执行计算，通信在 CCU 上并行完成</li>
+<li><strong>通信任务展开更快</strong> — AICore 发起到通信开始的静态时延更小</li>
+<li><strong>天然零拷贝</strong> — 片上 buffer + Reduce 单元保序，无需额外的数据拷贝</li>
+</ul>
+<h3>适用场景</h3>
+<p>CCU 模式特别适合"计算 + 通信"重叠的场景：</p>
+<ul>
+<li><strong>AllReduce + MatMul 融合</strong> — 大模型训练中，梯度 AllReduce 与下一层 MatMul 并行执行</li>
+<li><strong>AllGather + MatMul 融合</strong> — 模型并行中，参数 AllGather 与当前层计算并行</li>
+<li><strong>Megatron 并行策略</strong> — Tensor Parallelism 中的 AllReduce 与计算重叠</li>
+</ul>
+<h3>CCU 使用前置条件</h3>
+<table><thead><tr><th>条件</th><th>说明</th></tr></thead><tbody><tr><td>架构</td><td>仅 DAV_3510（IO-Die 上配备 CCU）；前代架构无此选项</td></tr><tr><td>算法</td><td>通算融合算子（如 AllReduce / AllGather 与 MatMul 融合）</td></tr><tr><td>拓扑</td><td>集群间通信需支持 URMA 的硬件互联</td></tr></tbody></table>
+<h3>代码示例</h3>
+<p>以下是通算融合的概念性代码，展示 CCU 模式下 AllReduce 与 MatMul 并行的编程模式：</p>
+<pre class=""><code>__global__ __aicore__ void FusedAllReduceMatMul(
+    GM_ADDR gradOutput, GM_ADDR weights,
+    GM_ADDR nextInput, GM_ADDR tiling)
+{
+    TilingData tilingData;
+    GET_TILING_DATA_WITH_STRUCT(tilingData, tiling);
+
+    CcuAllReduce(gradOutput, tilingData.gradSize);
+
+    asc_vf_call&lt;MatMulSimd&gt;(
+        ubA, ubB, ubC,
+        tilingData.m, tilingData.n, tilingData.k);
+}</code></pre>
+<p>在上述代码中，<code>CcuAllReduce</code> 发起 CCU 通信后立即返回，不阻塞后续的 MatMul 计算。CCU 在后台完成梯度 AllReduce，AI Core 同时执行矩阵乘法，两者完全并行。</p>
+<h2>5.2.5 跨架构兼容</h2>
+<p>在实际工程中，同一个算子往往需要同时支持 A2/A3（arch22）和 A5（arch35）。ops-blas 仓的做法是在算子目录下按架构分子目录：</p>
+<pre class="ascii-art"><code>blas/swap/sswap/
+├── arch22/          # A2/A3 实现
+│   ├── sswap_host.cpp
+│   └── sswap_kernel.cpp
+└── arch35/          # A5 实现
+    ├── sswap_host.cpp
+    ├── sswap_kernel.cpp
+    └── sswap_tiling_data.h</code></pre>
+<p>编译时通过 <code>--soc</code> 参数选择目标架构，构建系统会自动选择对应的子目录。</p>
+<h3>架构差异对比：以 sswap 为例</h3>
+<p>sswap 的 arch22 和 arch35 实现展示了两个架构之间的核心差异：</p>
+<p><strong>数据搬运方式不同。</strong> arch22 使用底层的 <code>gm_to_ub_align</code> / <code>ub_to_gm_align</code> 函数，需要手动计算 <code>nBurst</code>、<code>leftPaddingNum</code>、<code>rightPaddingNum</code> 等参数。arch35 使用高层的 <code>DataCopy</code> + <code>DataCopyPad</code> API，对齐细节由框架自动处理。</p>
+<p><strong>同步方式不同。</strong> arch22 需要手动编写 <code>SET_FLAG</code> / <code>WAIT_FLAG</code> 来协调 MTE2 和 MTE3 流水线，还要管理 <code>EVENT_ID0</code> / <code>EVENT_ID1</code> 两个事件 ID。arch35 使用 TQueBind 的 <code>EnQue</code> / <code>DeQue</code>，同步是隐式的。</p>
+<p><strong>Buffer 管理不同。</strong> arch22 手动从 UB 中划分出 ping/pong 四块 Buffer（ub_x_ping、ub_x_pong、ub_y_ping、ub_y_pong），手动管理偏移量。arch35 使用 <code>TPipe::InitBuffer</code> 自动分配，通过 TQueBind 管理生命周期。</p>
+<p><strong>核数获取不同。</strong> arch22 在 Host 侧硬编码了 <code>DEFAULT_VECTOR_CNT = 40</code>。arch35 通过 <code>aclrtGetDeviceInfo(ACL_DEV_ATTR_VECTOR_CORE_NUM)</code> 动态获取。</p>
+<h3>架构兼容模式</h3>
+<p>如果你的算子需要在 Tiling 函数中根据架构选择不同的切分策略，可以使用运行时分支：</p>
+<pre class=""><code>NpuArch npuArch = ascendcPlatform.GetCurNpuArch();
+if (npuArch == NpuArch::DAV_3510) {
+    // A5 特殊逻辑（可用 RegBase/SIMT）
+} else {
+    // A2/A3 通用逻辑（仅 MemBase）
+}</code></pre>
+<p>在 Kernel 侧，可以用编译宏做条件编译：</p>
+<pre class=""><code>#if __NPU_ARCH__ == 3510
+    // A5 专用代码
+#else
+    // 通用代码
+#endif</code></pre>
+<p>不过对于 sswap 这种简单算子，ops-blas 选择了更干净的做法——直接为两个架构各写一套独立的实现，共享同一份 TilingData 定义和接口签名。这样每个架构的代码都是最简洁的，不会因为兼容逻辑而变得复杂。</p>
+<h2>5.2.6 与框架对接</h2>
+<p>算子开发完成后，需要注册到 CANN 框架才能被上层应用调用。常见的对接方式包括：</p>
+<p><strong>CANN 框架直调。</strong> 通过 <code>aclblas</code> 接口直接调用，就像 sswap 的 <code>aclblasSswap</code> 一样。这是最直接的方式，适合 C/C++ 应用。</p>
+<p><strong>PyTorch 自定义算子。</strong> 通过 torch-npu 的自定义算子注册机制，将 Ascend C 算子包装成 PyTorch 的 <code>torch.ops</code> 调用。</p>
+<p>具体的对接方式取决于你的目标框架，这里不展开讨论。核心要点是：无论对接哪个框架，底层的 Ascend C Kernel 代码都是一样的，变的只是 Host 侧的封装层。</p>
+<h2>参考链接</h2>
+<ul>
+<li><a href="https://hiascend.com/document/redirect/CannCommunityOpdevAscendC">Ascend C 编程指南</a></li>
+<li><a href="https://hiascend.com/document/redirect/CannCommunityAscendCBestPractice">Ascend C 实践参考</a></li>
+<li><a href="https://www.hiascend.com/zh/developer/techArticles/20240607-1">基于Ascend C的FlashAttention算子性能优化最佳实践</a></li>
+<li><a href="https://gitcode.com/cann/cann-samples">cann-samples SIMT 样例</a>（<code>Samples/1_Features/hardware_features/simt/</code>）</li>
+<li><a href="https://gitcode.com/cann/cann-samples">cann-samples StreamK 样例</a>（<code>Samples/1_Features/system_optimization/streamk/</code>）</li>
+<li><a href="https://gitcode.com/cann/cann-samples">cann-samples MatMul Story</a>（<code>Samples/2_Performance/matmul_story/</code>）</li>
+<li><a href="https://gitcode.com/cann/asc-devkit.git">asc-devkit RegBase 示例</a>（<code>examples/01_simd_cpp_api/04_best_practices/02_reg_vector_compute_practices/</code>）</li>
+<li><a href="https://www.hiascend.com/zh/developer/courses/detail/1696690858236694530">Ascend C 系列教程（高级）</a></li>
+</ul>
+<div id="quiz"></div>
+<div class="page-nav"><a href="06-进阶-6.1-常见踩坑与最佳实践.html" class="nav-prev"><span class="nav-label">← 上一篇</span><span class="nav-title">6.1 常见踩坑与最佳实践</span></a><a href="附录-A-数据类型速查表.html" class="nav-next"><span class="nav-label">下一篇 →</span><span class="nav-title">A. 数据类型速查表</span></a></div>
+</div>
+</main>
+<script src="js/quiz.js"></script>
+<script>
+renderQuiz('quiz', [
+  {
+    question: "RegBase 编程模型相比 MemBase 的核心优势是什么？",
+    options: ["代码更短", "中间数据存储在寄存器而非 UB，减少 UB 带宽消耗", "不需要 UB 内存", "只支持 FP32"],
+    answer: 1,
+    explanation: "RegBase 的核心思想是中间数据存储在寄存器而非 UB。数据从 UB 加载到寄存器组中，所有计算在寄存器上完成，减少了中间 UB 读写的带宽消耗。"
+  },
+  {
+    question: "RegBase 模式下，__VEC_SCOPE__ 的作用是什么？",
+    options: ["声明全局变量", "标记向量寄存器的局部作用域，scope 结束后寄存器自动释放", "定义循环边界", "设置线程数"],
+    answer: 1,
+    explanation: "__VEC_SCOPE__ 告诉编译器该代码块内的向量寄存器分配是局部的，scope 结束后寄存器被自动释放，可被后续代码复用，从而降低寄存器压力。"
+  },
+  {
+    question: "OOO 双发（Out-of-Order 双发射）对 Vector 算力的影响是什么？",
+    options: ["没有影响", "两条无数据依赖的指令可在同一时钟周期同时发射，Vector 性能翻倍", "只能用于 Cube 计算", "需要手动关闭"],
+    answer: 1,
+    explanation: "A5 的 Vector 单元支持 OOO 双发射，两条没有数据依赖的指令可以在同一时钟周期同时发射。以 Ascend950PR PCIE 为例，Vector FP16 基础算力 23.7T，启用 OOO 双发后提升至 47T。"
+  },
+  {
+    question: "SIMT 混合编程中，SIMT 部分最适合处理什么场景？",
+    options: ["密集的向量计算", "离散内存访问（如 Gather/Scatter）和分支密集的逻辑", "规整的数据搬运", "矩阵乘法"],
+    answer: 1,
+    explanation: "SIMT 适合处理离散内存访问和分支密集的逻辑（如稀疏矩阵遍历、排序、Hash 插入），而 SIMD 适合密集的向量计算和规整的数据搬运。两者可以在同一 Kernel 中混合使用。"
+  },
+  {
+    question: "SIMT 模式下，线程数设为 512 时，每个线程可用多少个寄存器？",
+    options: ["16", "32", "64", "127"],
+    answer: 2,
+    explanation: "LAUNCH_BOUND 与寄存器数量是 trade-off 关系：线程数 257~512 时，每线程可用 64 个寄存器。线程越多，每个线程分到的寄存器越少。"
+  },
+  {
+    question: "SIMT VF 与 SIMD VF 之间能否互相调用对方的 callee 函数？",
+    options: ["可以互相调用", "不可以，SIMT VF 只能调用 __simt_callee__，SIMD VF 只能调用 __simd_callee__", "只有 SIMD 可以调用 SIMT", "只有 SIMT 可以调用 SIMD"],
+    answer: 1,
+    explanation: "调用约束严格：__simt_vf__ 内只能调用 __simt_callee__ 函数和 constexpr 函数；__simd_vf__ 内只能调用 __simd_callee__ 函数和 constexpr 函数。不可跨模式调用。"
+  },
+  {
+    question: "NDDMA（高维 DMA）特别适合什么场景？",
+    options: ["一维向量搬运", "last-axis 长度较短的多维张量", "标量运算", "整数加法"],
+    answer: 1,
+    explanation: "NDDMA 适合 last-axis 较短的场景，比如 [N, D] 中 D=16 时（FP32 计算效率仅 25%），NDDMA 可以先做转置把 D 轴转置到高轴凑足并行度后再计算。"
+  },
+  {
+    question: "CCU（Collective Communication Unit）相比传统 AIV+UBMem 通信方式的最大优势是什么？",
+    options: ["提高计算速度", "通信操作由 CCU 独立完成，不占用 AI Core 计算资源", "减少内存占用", "提高精度"],
+    answer: 1,
+    explanation: "CCU 让通信操作（如 AllReduce/AllGather）由专用通信引擎独立完成，AI Core 可以同时做 MatMul，两者完全并行。此外 CCU 的片上 buffer + Reduce 单元保序，天然零拷贝。"
+  }
+]);
+</script>
+</body>
+</html>

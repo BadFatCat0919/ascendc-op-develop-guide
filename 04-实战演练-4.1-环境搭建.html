@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4.1 环境搭建 - AscendC Guide</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<nav class="sidebar"><div class="sidebar-header"><h2><a href="index.html" style="color:inherit;text-decoration:none">AscendC Guide</a></h2><p>算子开发从入门到精通</p></div><ul class="sidebar-nav"><li class="chapter-group"><span class="chapter-title">第1章 基础概念</span><ul class="article-list"><li><a href="01-基础概念-1.1-什么是算子与AscendC.html" class="">1.1 什么是算子与 Ascend C</a></li><li><a href="01-基础概念-1.2-数据类型排布与量化.html" class="">1.2 数据类型、排布与量化</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第2章 硬件与编程模型</span><ul class="article-list"><li><a href="02-硬件与编程模型-2.1-A5硬件架构.html" class="">2.1 A5 硬件架构</a></li><li><a href="02-硬件与编程模型-2.2-编程模型概述.html" class="">2.2 编程模型概述</a></li><li><a href="02-硬件与编程模型-2.3-算子结构与直调开发.html" class="">2.3 算子结构与直调开发</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第3章 核心开发</span><ul class="article-list"><li><a href="03-核心开发-3.1-Tiling设计.html" class="">3.1 Tiling 设计</a></li><li><a href="03-核心开发-3.2-内存管理与数据搬运.html" class="">3.2 内存管理与数据搬运</a></li><li><a href="03-核心开发-3.3-Vector计算.html" class="">3.3 Vector 计算</a></li><li><a href="03-核心开发-3.4-Cube计算.html" class="">3.4 Cube 计算</a></li><li><a href="03-核心开发-3.5-同步与流水线.html" class="">3.5 同步与流水线</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第4章 实战演练</span><ul class="article-list"><li><a href="04-实战演练-4.1-环境搭建.html" class="active">4.1 环境搭建</a></li><li><a href="04-实战演练-4.2-五分钟跑通第一个算子.html" class="">4.2 五分钟跑通第一个算子</a></li><li><a href="04-实战演练-4.3-直调开发-swap算子.html" class="">4.3 直调开发：swap 算子</a></li><li><a href="04-实战演练-4.4-框架开发-add算子.html" class="">4.4 框架开发：add 算子</a></li><li><a href="04-实战演练-4.5-ACL接口使用指南.html" class="">4.5 ACL 接口使用指南</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第5章 调试与优化</span><ul class="article-list"><li><a href="05-调试与优化-5.1-精度不对怎么办.html" class="">5.1 精度不对怎么办</a></li><li><a href="05-调试与优化-5.2-性能不达标怎么办.html" class="">5.2 性能不达标怎么办</a></li><li><a href="05-调试与优化-5.3-算子精度标准.html" class="">5.3 算子精度标准</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第6章 进阶</span><ul class="article-list"><li><a href="06-进阶-6.1-常见踩坑与最佳实践.html" class="">6.1 常见踩坑与最佳实践</a></li><li><a href="06-进阶-6.2-进阶主题.html" class="">6.2 进阶主题</a></li></ul></li><li class="chapter-group"><span class="chapter-title">附录</span><ul class="article-list"><li><a href="附录-A-数据类型速查表.html" class="">A. 数据类型速查表</a></li><li><a href="附录-B-对齐规则速查.html" class="">B. 对齐规则速查</a></li><li><a href="附录-C-错误码速查.html" class="">C. 错误码速查</a></li></ul></li></ul></nav>
+<main class="main">
+<div class="content">
+<div class="meta-bar"><a href="index.html">← 返回目录</a></div>
+
+<h2>4.1.1 CANN Toolkit 安装（Linux 环境）</h2>
+<p>算子开发的第一步是安装 CANN Toolkit。CANN（Compute Architecture for Neural Networks）是昇腾 NPU 的统一计算架构，Toolkit 里包含了编译器、运行时库和各种开发工具。</p>
+
+<h3>下载 CANN Toolkit</h3>
+<p>访问昇腾社区官网下载页面：</p>
+<pre><code># 访问下载页面
+https://www.hiascend.com/software/cann/community
+
+# 选择对应版本（推荐最新稳定版）
+# 下载文件名格式：Ascend-cann-toolkit_8.x.x_linux-aarch64.run（ARM）
+# 或：Ascend-cann-toolkit_8.x.x_linux-x86_64.run（x86）</code></pre>
+
+<p>根据你的服务器架构选择对应的安装包：</p>
+<table>
+<thead><tr><th>架构</th><th>适用场景</th><th>安装包后缀</th></tr></thead>
+<tbody>
+<tr><td>aarch64</td><td>ARM 服务器（如 Atlas 800）</td><td>linux-aarch64.run</td></tr>
+<tr><td>x86_64</td><td>x86 服务器 + NPU 加速卡</td><td>linux-x86_64.run</td></tr>
+</tbody>
+</table>
+
+<h3>安装步骤</h3>
+<pre><code># 1. 添加执行权限
+chmod +x Ascend-cann-toolkit_8.x.x_linux-aarch64.run
+
+# 2. 执行安装（默认安装到 ~/Ascend/ascend-toolkit）
+./Ascend-cann-toolkit_8.x.x_linux-aarch64.run --install
+
+# 3. 如果需要指定安装路径
+./Ascend-cann-toolkit_8.x.x_linux-aarch64.run --install --install-path=/opt/Ascend
+
+# 4. 安装完成后，目录结构如下
+~/Ascend/ascend-toolkit/latest/
+├── bin/              # 可执行工具
+├── include/          # 头文件
+├── lib64/            # 动态库
+├── toolkit/tools/    # 开发工具
+└── set_env.sh        # 环境变量脚本（重要！）</code></pre>
+
+<h3>安装依赖</h3>
+<p>CANN Toolkit 依赖一些系统库，确保已安装：</p>
+<pre><code># Ubuntu/Debian
+sudo apt-get install -y gcc g++ make cmake python3 python3-pip
+
+# CentOS/RHEL
+sudo yum install -y gcc gcc-c++ make cmake python3 python3-pip
+
+# 安装 Python 依赖（用于算子开发工具链）
+pip3 install numpy decorator sympy cffi pyyaml pathlib psutil</code></pre>
+
+<h2>4.1.2 环境变量配置</h2>
+<p>安装完成后，必须配置环境变量，否则编译器找不到头文件和库。</p>
+
+<h3>临时生效（当前终端）</h3>
+<pre><code># 执行环境变量脚本
+source ~/Ascend/ascend-toolkit/latest/set_env.sh
+
+# 验证环境变量是否生效
+echo $ASCEND_HOME
+# 应输出：/home/你的用户名/Ascend/ascend-toolkit/latest
+
+# 检查 PATH 是否包含 CANN 工具
+which ascendc
+# 应输出：/home/你的用户名/Ascend/ascend-toolkit/latest/toolkit/tools/ascendc</code></pre>
+
+<h3>永久生效（推荐）</h3>
+<pre><code># 将 source 命令添加到 ~/.bashrc
+echo 'source ~/Ascend/ascend-toolkit/latest/set_env.sh' >> ~/.bashrc
+
+# 重新加载配置
+source ~/.bashrc
+
+# 或者添加到 ~/.profile（适用于登录 shell）
+echo 'source ~/Ascend/ascend-toolkit/latest/set_env.sh' >> ~/.profile</code></pre>
+
+<h3>关键环境变量说明</h3>
+<table>
+<thead><tr><th>变量名</th><th>作用</th><th>典型值</th></tr></thead>
+<tbody>
+<tr><td><code>ASCEND_HOME</code></td><td>CANN 安装根目录</td><td>~/Ascend/ascend-toolkit/latest</td></tr>
+<tr><td><code>PATH</code></td><td>可执行文件搜索路径</td><td>包含 $ASCEND_HOME/bin</td></tr>
+<tr><td><code>LD_LIBRARY_PATH</code></td><td>动态库搜索路径</td><td>包含 $ASCEND_HOME/lib64</td></tr>
+<tr><td><code>ASCEND_OPP_PATH</code></td><td>算子包路径</td><td>$ASCEND_HOME/opp</td></tr>
+</tbody>
+</table>
+
+<h2>4.1.3 验证安装</h2>
+<p>安装完成后，运行以下命令验证：</p>
+
+<pre><code># 1. 检查 ascendc 编译器版本
+ascendc --version
+# 输出示例：Ascend C Compiler version 8.x.x
+
+# 2. 检查编译器路径
+which ascendc
+# 应输出 CANN 安装目录下的路径
+
+# 3. 检查运行时库
+ls $ASCEND_HOME/lib64/ | grep libascendcl
+# 应看到 libascendcl.so 等文件
+
+# 4. 检查 NPU 设备（如果有硬件）
+npu-smi info
+# 应显示 NPU 设备信息表格</code></pre>
+
+<h3>npu-smi 输出解读</h3>
+<pre class="ascii-art"><code>+---------------------------------------------------------------------------+
+| npu-smi info                                                              |
++---------------------------------------------------------------------------+
+| NPU   Name   Firmware    Driver   Temp(C)  Power(W)  Memory-Usage(MB)    |
+| 0     910B   1.0.0       24.1.0   45       75        1024/32768          |
++---------------------------------------------------------------------------+
+| Processes:                                                                |
+| NPU   PID     Process Name                Memory(MB)                      |
+| 0     12345   python3                     2048                            |
++---------------------------------------------------------------------------+</code></pre>
+
+<h2>4.1.4 编译器配置</h2>
+<p>Ascend C 使用专用的编译器 <code>ascendc</code>，它基于 LLVM/Clang 开发，支持将 C++ 代码编译成 NPU 可执行的二进制。</p>
+
+<h3>编译器基本用法</h3>
+<pre><code># 编译单个 Kernel 文件
+ascendc -c -O2 -o kernel.o kernel.cpp
+
+# 编译选项说明
+# -c          : 只编译，不链接
+# -O2         : 优化级别（O0/O1/O2/O3）
+# -o          : 输出文件名
+# --target    : 目标架构（如 ascend910b）
+
+# 完整编译命令示例
+ascendc -c -O2 --target=ascend910b -o swap_kernel.o swap_kernel.cpp</code></pre>
+
+<h3>常用编译选项</h3>
+<table>
+<thead><tr><th>选项</th><th>说明</th><th>示例</th></tr></thead>
+<tbody>
+<tr><td><code>--target</code></td><td>目标芯片架构</td><td>--target=ascend910b</td></tr>
+<tr><td><code>-I</code></td><td>头文件搜索路径</td><td>-I$ASCEND_HOME/include</td></tr>
+<tr><td><code>-D</code></td><td>宏定义</td><td>-DENABLE_DEBUG</td></tr>
+<tr><td><code>-g</code></td><td>生成调试信息</td><td>-g（配合仿真器使用）</td></tr>
+<tr><td><code>-std</code></td><td>C++ 标准</td><td>-std=c++17</td></tr>
+</tbody>
+</table>
+
+<h2>4.1.5 仿真器使用</h2>
+<p>如果没有 NPU 硬件，可以使用 CANN Simulator（仿真器）来验证算子功能。</p>
+
+<h3>安装仿真器</h3>
+<pre><code># 仿真器通常随 CANN Toolkit 一起安装
+# 检查是否已安装
+ls $ASCEND_HOME/simulator/
+
+# 如果没有，单独下载安装
+# 从昇腾社区下载 CANN Simulator 安装包
+./Ascend-cann-simulator_8.x.x_linux-aarch64.run --install</code></pre>
+
+<h3>使用仿真器运行算子</h3>
+<pre><code># 1. 编译时添加仿真器支持
+ascendc -c -g --sim-mode -o kernel.o kernel.cpp
+
+# 2. 链接生成可执行文件
+ascendc -o test_sim test_main.cpp kernel.o -lsim_ascend
+
+# 3. 运行仿真
+./test_sim
+
+# 4. 查看仿真输出
+# 仿真器会在当前目录生成 sim_output/ 目录
+# 包含算子的输入输出数据（二进制格式）</code></pre>
+
+<h3>仿真器 vs 真实硬件</h3>
+<table>
+<thead><tr><th>特性</th><th>仿真器</th><th>真实 NPU</th></tr></thead>
+<tbody>
+<tr><td>功能验证</td><td>✅ 支持</td><td>✅ 支持</td></tr>
+<tr><td>精度验证</td><td>✅ 支持</td><td>✅ 支持</td></tr>
+<tr><td>性能测试</td><td>❌ 不准确</td><td>✅ 准确</td></tr>
+<tr><td>调试便利</td><td>✅ 可单步调试</td><td>❌ 需 plog</td></tr>
+<tr><td>运行速度</td><td>慢（CPU 模拟）</td><td>快（硬件加速）</td></tr>
+</tbody>
+</table>
+
+<h2>4.1.6 常见问题排查</h2>
+
+<h3>问题 1：ascendc 命令找不到</h3>
+<pre><code># 现象
+ascendc --version
+# bash: ascendc: command not found
+
+# 原因：环境变量未配置
+# 解决：
+source ~/Ascend/ascend-toolkit/latest/set_env.sh
+
+# 验证
+echo $PATH | grep ascend</code></pre>
+
+<h3>问题 2：编译报错找不到头文件</h3>
+<pre><code># 现象
+fatal error: acl/acl.h: No such file or directory
+
+# 原因：ASCEND_HOME 未正确设置
+# 解决：
+echo $ASCEND_HOME
+# 如果为空，重新 source set_env.sh
+
+# 或者手动指定头文件路径
+ascendc -c -I$ASCEND_HOME/include -o kernel.o kernel.cpp</code></pre>
+
+<h3>问题 3：npu-smi 显示设备离线</h3>
+<pre><code># 现象
+npu-smi info
+# NPU 状态显示 Offline 或 Not Ready
+
+# 解决步骤：
+# 1. 检查驱动是否加载
+lsmod | grep davinci
+
+# 2. 重新加载驱动
+sudo rmmod davinci
+sudo modprobe davinci
+
+# 3. 重启 NPU 设备
+sudo npu-smi set -t reset -i 0
+
+# 4. 如果仍不行，重启服务器</code></pre>
+
+<h3>问题 4：仿真器运行报错</h3>
+<pre><code># 现象
+./test_sim
+# error: libsim_ascend.so: cannot open shared object file
+
+# 原因：仿真器库路径未添加到 LD_LIBRARY_PATH
+# 解决：
+export LD_LIBRARY_PATH=$ASCEND_HOME/simulator/lib64:$LD_LIBRARY_PATH
+
+# 添加到 ~/.bashrc 永久生效
+echo 'export LD_LIBRARY_PATH=$ASCEND_HOME/simulator/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc</code></pre>
+
+<h3>问题 5：Python 版本冲突</h3>
+<pre><code># 现象
+pip3 install numpy
+# 安装到了 Python 3.6，但 CANN 需要 Python 3.9+
+
+# 解决：使用指定版本的 pip
+python3.9 -m pip install numpy decorator sympy cffi pyyaml
+
+# 或者创建虚拟环境
+python3.9 -m venv ~/cann_env
+source ~/cann_env/bin/activate
+pip install numpy decorator sympy cffi pyyaml pathlib psutil</code></pre>
+
+<h2>4.1.7 开发环境检查清单</h2>
+<p>在开始算子开发前，确认以下项目都已就绪：</p>
+
+<table>
+<thead><tr><th>检查项</th><th>验证命令</th><th>预期结果</th></tr></thead>
+<tbody>
+<tr><td>CANN Toolkit 已安装</td><td><code>ascendc --version</code></td><td>显示版本号</td></tr>
+<tr><td>环境变量已配置</td><td><code>echo $ASCEND_HOME</code></td><td>非空路径</td></tr>
+<tr><td>编译器可用</td><td><code>which ascendc</code></td><td>有效路径</td></tr>
+<tr><td>NPU 设备可用</td><td><code>npu-smi info</code></td><td>显示设备信息</td></tr>
+<tr><td>Python 依赖已安装</td><td><code>python3 -c "import numpy"</code></td><td>无报错</td></tr>
+<tr><td>算子仓库已克隆</td><td><code>ls ops-blas/</code></td><td>显示目录结构</td></tr>
+</tbody>
+</table>
+
+<h2>参考链接</h2>
+<ul>
+<li><a href="https://www.hiascend.com/software/cann/community">CANN 社区版下载</a></li>
+<li><a href="https://hiascend.com/document/redirect/CannCommunityOpdevAscendC">Ascend C 官方编程指南</a></li>
+<li><a href="https://www.hiascend.com/cann/ascend-c">Ascend C 主页</a></li>
+</ul>
+
+<div id="quiz"></div>
+<div class="page-nav"><a href="03-核心开发-3.5-同步与流水线.html" class="nav-prev"><span class="nav-label">← 上一篇</span><span class="nav-title">3.5 同步与流水线</span></a><a href="04-实战演练-4.2-五分钟跑通第一个算子.html" class="nav-next"><span class="nav-label">下一篇 →</span><span class="nav-title">4.2 五分钟跑通第一个算子</span></a></div>
+</div>
+</main>
+<script src="js/quiz.js"></script>
+<script>
+renderQuiz('quiz', [
+  {
+    question: "CANN Toolkit 安装后，哪个命令用于配置环境变量？如果希望每次打开终端都自动生效，应该怎么做？",
+    options: ["export CANN_HOME=/opt/Ascend", "source ~/Ascend/ascend-toolkit/latest/set_env.sh，并将其添加到 ~/.bashrc 中", "cann-config --init", "systemctl start cann"],
+    answer: 1,
+    explanation: "CANN Toolkit 安装后，需要执行 source ~/Ascend/ascend-toolkit/latest/set_env.sh 来配置环境变量。这个脚本会设置 ASCEND_HOME、PATH、LD_LIBRARY_PATH 等关键环境变量。建议将其添加到 ~/.bashrc 中实现永久生效，这样每次打开终端都会自动加载。"
+  },
+  {
+    question: "验证 CANN 编译器是否安装成功，应该使用哪个命令？如果提示 command not found，最可能的原因是什么？",
+    options: ["cann --check", "ascendc --version，如果提示 command not found 说明环境变量未配置", "npu-smi install", "python3 -c 'import cann'"],
+    answer: 1,
+    explanation: "ascendc --version 用于检查 Ascend C 编译器是否可用。如果输出显示版本号，说明安装成功。如果提示 command not found，说明环境变量未正确配置——需要重新执行 source set_env.sh。这是环境搭建后第一个要验证的命令。"
+  },
+  {
+    question: "npu-smi info 命令的作用是？如果输出中 NPU 状态显示 Offline，应该怎么排查？",
+    options: ["安装 NPU 驱动", "查看 NPU 设备状态和资源使用情况，Offline 时检查驱动是否加载", "编译算子代码", "配置 CANN 环境变量"],
+    answer: 1,
+    explanation: "npu-smi info 用于查看 NPU 设备的状态信息，包括设备型号、固件版本、驱动版本、温度、功耗和显存使用情况。如果状态显示 Offline，首先检查驱动是否加载（lsmod | grep davinci），必要时重新加载驱动或重启服务器。类似于 NVIDIA 的 nvidia-smi 命令。"
+  }
+]);
+</script>
+</body>
+</html>
