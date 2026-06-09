@@ -106,15 +106,15 @@
 <script>
 renderQuiz('quiz', [
   {
-    question: "AI Core 的三大计算单元在王者团战中分别扮演什么角色？",
+    question: "AI Core 的三大计算单元在王者团战中分别扮演什么角色？（坦克：扛伤害做最重的活；射手：持续稳定输出；辅助：指挥走位做控制流）",
     options: [
-      "Cube=坦克, Vector=射手, Scalar=辅助",
-      "Cube=射手, Vector=坦克, Scalar=法师",
-      "Cube=辅助, Vector=坦克, Scalar=射手",
-      "Cube=法师, Vector=辅助, Scalar=坦克"
+      "Cube=坦克（扛伤害，做最重的矩阵乘），Vector=射手（持续输出，做逐元素运算），Scalar=辅助（指挥走位，做控制流和地址计算）",
+      "Cube=射手（持续输出），Vector=坦克（扛伤害），Scalar=法师（爆发伤害）",
+      "Cube=辅助（指挥走位），Vector=坦克（扛伤害），Scalar=射手（持续输出）",
+      "Cube=法师（爆发伤害），Vector=辅助（指挥走位），Scalar=坦克（扛伤害）"
     ],
     answer: 0,
-    explanation: "Cube 是坦克（扛伤害，做最重的矩阵乘），Vector 是射手（持续输出，做逐元素运算），Scalar 是辅助（指挥走位，做控制流和地址计算）。"
+    explanation: "Cube 是坦克——扛伤害做最重的活（矩阵乘计算量最大）；Vector 是射手——持续稳定输出（逐元素运算，每个元素独立计算）；Scalar 是辅助——指挥走位做控制流（处理分支判断、地址计算等控制逻辑）。"
   },
   {
     question: "把 AI Core 的存储层次比作雪王奶茶门店，UB（Unified Buffer）相当于什么？",
