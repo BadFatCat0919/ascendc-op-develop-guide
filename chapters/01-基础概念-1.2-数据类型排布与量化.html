@@ -27,7 +27,7 @@
 <p>所有浮点数格式都遵循 IEEE 754 标准的基本思想：一个数由三部分组成——<strong>符号位 + 指数位 + 尾数位</strong>。</p>
 <p>类比一下：你可以把浮点数想象成科学计数法 <code>±d.dd × 10^e</code>。符号位决定正负，指数位决定数的大小范围（相当于 <code>10^e</code> 中的 <code>e</code>），尾数位决定有效数字的精度（相当于 <code>d.dd</code> 中有几位小数）。</p>
 <table><thead><tr><th>类型</th><th>位宽</th><th>符号</th><th>指数</th><th>尾数</th><th>动态范围</th><th>精度</th><th>典型用途</th></tr></thead><tbody><tr><td>FP32 (float)</td><td>32</td><td>1</td><td>8</td><td>23</td><td>大</td><td>高</td><td>训练主精度</td></tr><tr><td>FP16 (half)</td><td>16</td><td>1</td><td>5</td><td>10</td><td>小</td><td>中</td><td>推理、混合精度训练</td></tr><tr><td>BF16 (bfloat16)</td><td>16</td><td>1</td><td>8</td><td>7</td><td>大</td><td>低</td><td>混合精度训练</td></tr><tr><td>FP8 E4M3</td><td>8</td><td>1</td><td>4</td><td>3</td><td>很小</td><td>很低</td><td>推理量化</td></tr><tr><td>FP8 E5M2</td><td>8</td><td>1</td><td>5</td><td>2</td><td>小</td><td>很低</td><td>训练梯度量化</td></tr><tr><td>INT8</td><td>8</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>量化推理</td></tr><tr><td>INT4</td><td>4</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>极致量化推理</td></tr></tbody></table>
-<p><strong>BF16 和 FP16 的区别</strong>是面试和实战中的高频考点。它们都是 16 位，但"天赋点点的位置不同"——就像王者里同一个英雄，有人主加攻击（精度），有人主加血量（动态范围）：</p>
+<p><strong>BF16 和 FP16 的区别</strong>是面试和实战中的高频考点。它们都是 16 位，但"天赋点点的位置不同"——就像王者里同一个英雄，有人主加攻击（精度），有人主加血量（动态范围）。所谓"天赋点"，就是游戏中升级时可以分配的属性点，选择不同的加点方向会让英雄有不同的特点：</p>
 <ul>
 <li><strong>BF16</strong> 把 8 位给了指数（和 FP32 一样），所以动态范围和 FP32 一样大，不容易溢出；但尾数只有 7 位，精度比 FP16 低。适合训练场景——梯度值忽大忽小，需要大的动态范围来兜住。</li>
 <li><strong>FP16</strong> 只把 5 位给指数，动态范围较小（最大约 65504），但尾数有 10 位，精度更高。适合推理场景——权重值分布相对稳定，不需要太大的动态范围。</li>
