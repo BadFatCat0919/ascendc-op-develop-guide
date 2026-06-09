@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4.14 ACL 流与事件管理 - AscendC Guide</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<nav class="sidebar"><div class="sidebar-header"><h2><a href="../index.html" style="color:inherit;text-decoration:none">AscendC Guide</a></h2><p>算子开发从入门到精通</p></div><ul class="sidebar-nav"><li class="chapter-group"><span class="chapter-title">第1章 基础概念</span><ul class="article-list"><li><a href="01-基础概念-1.1-什么是算子与AscendC.html">1.1 什么是算子与 Ascend C</a></li><li><a href="01-基础概念-1.2-数据类型排布与量化.html">1.2 数据类型、排布与量化</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第2章 硬件与编程模型</span><ul class="article-list"><li><a href="02-硬件与编程模型-2.1-A5硬件架构.html">2.1 A5 硬件架构</a></li><li><a href="02-硬件与编程模型-2.2-编程模型概述.html">2.2 编程模型概述</a></li><li><a href="02-硬件与编程模型-2.3-算子结构.html">2.3 算子结构</a></li><li><a href="02-硬件与编程模型-2.4-直调开发方式.html">2.4 直调开发方式</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第3章 核心开发</span><ul class="article-list"><li><a href="03-核心开发-3.1-Tiling设计.html">3.1 Tiling 设计</a></li><li><a href="03-核心开发-3.2-内存管理与数据搬运.html">3.2 内存管理与数据搬运</a></li><li><a href="03-核心开发-3.3-Vector计算.html">3.3 Vector 计算</a></li><li><a href="03-核心开发-3.4-Cube计算.html">3.4 Cube 计算</a></li><li><a href="03-核心开发-3.5-同步与流水线.html">3.5 同步与流水线</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第4章 实战演练</span><ul class="article-list"><li><a href="04-实战演练-4.1-CANN安装与配置.html">4.1 CANN 安装与配置</a></li><li><a href="04-实战演练-4.2-编译器与仿真器.html">4.2 编译器与仿真器</a></li><li><a href="04-实战演练-4.3-开发环境检查清单.html">4.3 开发环境检查清单</a></li><li><a href="04-实战演练-4.4-获取与编译算子代码.html">4.4 获取与编译算子代码</a></li><li><a href="04-实战演练-4.5-运行与查看结果.html">4.5 运行与查看结果</a></li><li><a href="04-实战演练-4.6-修改与重新编译.html">4.6 修改与重新编译</a></li><li><a href="04-实战演练-4.7-swap算子需求分析.html">4.7 swap 算子需求分析</a></li><li><a href="04-实战演练-4.8-swap算子Tiling设计.html">4.8 swap 算子 Tiling 设计</a></li><li><a href="04-实战演练-4.9-swap算子Kernel实现.html">4.9 swap 算子 Kernel 实现</a></li><li><a href="04-实战演练-4.10-swap算子Host实现.html">4.10 swap 算子 Host 实现</a></li><li><a href="04-实战演练-4.11-swap算子编译与测试.html">4.11 swap 算子编译与测试</a></li><li><a href="04-实战演练-4.12-add算子需求分析.html">4.12 add 算子需求分析</a></li><li><a href="04-实战演练-4.13-add算子Tiling设计.html">4.13 add 算子 Tiling 设计</a></li><li><a href="04-实战演练-4.14-add算子Kernel实现.html">4.14 add 算子 Kernel 实现</a></li><li><a href="04-实战演练-4.15-add算子框架集成.html">4.15 add 算子框架集成</a></li><li><a href="04-实战演练-4.16-ACL运行时API概览.html">4.16 ACL 运行时 API 概览</a></li><li><a href="04-实战演练-4.17-ACL设备与内存管理.html">4.17 ACL 设备与内存管理</a></li><li><a href="04-实战演练-4.18-ACL流与事件管理.html" class="active">4.18 ACL 流与事件管理</a></li><li><a href="04-实战演练-4.19-ACL错误处理与最佳实践.html">4.19 ACL 错误处理与最佳实践</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第5章 调试与优化</span><ul class="article-list"><li><a href="05-调试与优化-5.1-精度不对怎么办.html">5.1 精度不对怎么办</a></li><li><a href="05-调试与优化-5.2-性能不达标怎么办.html">5.2 性能不达标怎么办</a></li><li><a href="05-调试与优化-5.3-算子精度标准.html">5.3 算子精度标准</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第6章 进阶</span><ul class="article-list"><li><a href="06-进阶-6.1-常见踩坑与最佳实践.html">6.1 常见踩坑与最佳实践</a></li><li><a href="06-进阶-6.2-RegBase编程模型.html">6.2 RegBase 编程模型</a></li><li><a href="06-进阶-6.3-SIMT混合编程.html">6.3 SIMT 混合编程</a></li><li><a href="06-进阶-6.4-NDDMA高维搬运.html">6.4 NDDMA 高维搬运</a></li><li><a href="06-进阶-6.5-CCU通算融合.html">6.5 CCU 通算融合</a></li><li><a href="06-进阶-6.6-跨架构兼容.html">6.6 跨架构兼容</a></li></ul></li><li class="chapter-group"><span class="chapter-title">附录</span><ul class="article-list"><li><a href="附录-A-数据类型速查表.html">A. 数据类型速查表</a></li><li><a href="附录-B-对齐规则速查.html">B. 对齐规则速查</a></li><li><a href="附录-C-错误码速查.html">C. 错误码速查</a></li></ul></li></ul></nav>
+<main class="main">
+<div class="content">
+<div class="meta-bar"><a href="../index.html">← 返回目录</a></div>
+
+<h1>4.14 ACL 流与事件管理</h1>
+
+<p>Stream（流）和 Event（事件）是 ACL 中控制<strong>异步执行和同步</strong>的核心机制。理解它们对于正确使用算子至关重要。</p>
+
+<h2>流管理</h2>
+
+<p>Stream（流）是 NPU 上的<strong>异步执行队列</strong>。同一个 Stream 内的操作按提交顺序执行，不同 Stream 之间的操作可以并行。</p>
+
+<h3>aclrtCreateStream</h3>
+<pre><code class="language-cpp">aclError aclrtCreateStream(aclrtStream *stream);</code></pre>
+
+<p><strong>作用</strong>：创建一个新的执行流。创建后可以用它来启动 Kernel 和执行内存拷贝。</p>
+
+<h3>aclrtDestroyStream</h3>
+<pre><code class="language-cpp">aclError aclrtDestroyStream(aclrtStream stream);</code></pre>
+
+<p><strong>作用</strong>：销毁指定执行流，释放相关资源。</p>
+
+<h3>aclrtSynchronizeStream</h3>
+<pre><code class="language-cpp">aclError aclrtSynchronizeStream(aclrtStream stream);</code></pre>
+
+<p><strong>作用</strong>：阻塞等待指定 Stream 中的所有操作完成。这是最常用的同步方式——Kernel 启动是异步的，调用后不会等 Kernel 跑完就返回，必须用 <code>SynchronizeStream</code> 来等待。</p>
+
+<h3>aclrtGetCurrentContext</h3>
+<pre><code class="language-cpp">aclError aclrtGetCurrentContext(aclrtContext *context);</code></pre>
+
+<p><strong>作用</strong>：获取当前线程的 Context。Context 是设备上的运行环境，一个设备可以有多个 Context。</p>
+
+<pre><code class="language-cpp">// 流管理的典型用法
+aclrtStream stream = nullptr;
+aclrtCreateStream(&amp;stream);
+
+// 使用 stream 启动 Kernel（异步，立即返回）
+my_kernel&lt;&lt;&lt;coreNum, nullptr, stream&gt;&gt;&gt;(devA, devB, devC, tilingGm);
+
+// 等待 Kernel 执行完成
+aclrtSynchronizeStream(stream);
+
+// 此时才能安全地拷贝结果
+aclrtMemcpy(hostOutput, size, devOutput, size, ACL_MEMCPY_DEVICE_TO_HOST);
+
+// 销毁流
+aclrtDestroyStream(stream);</code></pre>
+
+<div class="warning-callout">
+<p><strong>常见错误</strong>：启动 Kernel 后没有调用 <code>aclrtSynchronizeStream</code> 就直接拷贝结果。由于 Kernel 是异步执行的，此时结果还没算完，拷贝回来的数据是未初始化的垃圾值。</p>
+</div>
+
+<h2>事件管理</h2>
+
+<p>Event（事件）用于<strong>流间同步</strong>——当一个 Stream 的操作依赖另一个 Stream 的结果时，用 Event 来建立依赖关系。</p>
+
+<h3>aclrtCreateEvent</h3>
+<pre><code class="language-cpp">aclError aclrtCreateEvent(aclrtEvent *event);</code></pre>
+
+<p><strong>作用</strong>：创建一个事件对象。</p>
+
+<h3>aclrtRecordEvent</h3>
+<pre><code class="language-cpp">aclError aclrtRecordEvent(aclrtEvent event, aclrtStream stream);</code></pre>
+
+<p><strong>作用</strong>：在指定 Stream 中记录一个事件。当 Stream 执行到该事件时，事件被标记为"已完成"。</p>
+
+<h3>aclrtStreamWaitEvent</h3>
+<pre><code class="language-cpp">aclError aclrtStreamWaitEvent(aclrtStream stream, aclrtEvent event);</code></pre>
+
+<p><strong>作用</strong>：让指定 Stream 等待某个事件完成后才继续执行后续操作。</p>
+
+<h3>aclrtSynchronizeEvent</h3>
+<pre><code class="language-cpp">aclError aclrtSynchronizeEvent(aclrtEvent event);</code></pre>
+
+<p><strong>作用</strong>：阻塞等待指定事件完成。</p>
+
+<h3>aclrtDestroyEvent</h3>
+<pre><code class="language-cpp">aclError aclrtDestroyEvent(aclrtEvent event);</code></pre>
+
+<p><strong>作用</strong>：销毁事件对象。</p>
+
+<pre><code class="language-cpp">// 流间同步示例：Stream B 依赖 Stream A 的结果
+aclrtEvent event = nullptr;
+aclrtCreateEvent(&amp;event);
+
+// Stream A 执行计算
+kernelA&lt;&lt;&lt;coreNum, nullptr, streamA&gt;&gt;&gt;(...);
+aclrtRecordEvent(event, streamA);  // 在 Stream A 中记录事件
+
+// Stream B 等待事件完成后再执行
+aclrtStreamWaitEvent(streamB, event);
+kernelB&lt;&lt;&lt;coreNum, nullptr, streamB&gt;&gt;&gt;(...);
+
+// 清理
+aclrtSynchronizeStream(streamA);
+aclrtSynchronizeStream(streamB);
+aclrtDestroyEvent(event);</code></pre>
+
+<!-- SVG: 流与事件时序图 -->
+<div style="text-align:center;margin:2em 0;">
+<svg viewBox="0 0 700 380" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;width:100%;">
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#555" />
+    </marker>
+    <marker id="arrowRed" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#d32f2f" />
+    </marker>
+  </defs>
+  <text x="350" y="25" text-anchor="middle" font-size="15" font-weight="bold" fill="#333">流与事件时序图</text>
+
+  <!-- Time axis labels -->
+  <text x="350" y="370" text-anchor="middle" font-size="11" fill="#888">时间 →</text>
+
+  <!-- Stream A -->
+  <text x="60" y="75" text-anchor="end" font-size="12" font-weight="bold" fill="#1565c0">Stream A</text>
+  <line x1="80" y1="70" x2="650" y2="70" stroke="#90caf9" stroke-width="2" />
+
+  <!-- Stream A operations -->
+  <rect x="100" y="55" width="120" height="30" rx="5" fill="#bbdefb" stroke="#64b5f6" />
+  <text x="160" y="75" text-anchor="middle" font-size="10" fill="#333">kernelA &lt;&lt;&lt;&gt;&gt;&gt;</text>
+
+  <rect x="240" y="55" width="100" height="30" rx="5" fill="#fff9c4" stroke="#fdd835" />
+  <text x="290" y="75" text-anchor="middle" font-size="10" fill="#333">RecordEvent</text>
+
+  <!-- Stream B -->
+  <text x="60" y="175" text-anchor="end" font-size="12" font-weight="bold" fill="#2e7d32">Stream B</text>
+  <line x1="80" y1="170" x2="650" y2="170" stroke="#a5d6a7" stroke-width="2" />
+
+  <!-- Stream B operations -->
+  <rect x="370" y="155" width="120" height="30" rx="5" fill="#c8e6c9" stroke="#81c784" />
+  <text x="430" y="175" text-anchor="middle" font-size="10" fill="#333">kernelB &lt;&lt;&lt;&gt;&gt;&gt;</text>
+
+  <rect x="510" y="155" width="100" height="30" rx="5" fill="#c8e6c9" stroke="#81c784" />
+  <text x="560" y="175" text-anchor="middle" font-size="10" fill="#333">kernelC &lt;&lt;&lt;&gt;&gt;&gt;</text>
+
+  <!-- WaitEvent on Stream B -->
+  <rect x="240" y="155" width="110" height="30" rx="5" fill="#ffcdd2" stroke="#ef9a9a" />
+  <text x="295" y="175" text-anchor="middle" font-size="10" fill="#c62828">WaitEvent</text>
+
+  <!-- Event dependency arrow -->
+  <line x1="290" y1="88" x2="290" y2="152" stroke="#d32f2f" stroke-width="2" stroke-dasharray="5" marker-end="url(#arrowRed)" />
+  <text x="310" y="125" font-size="10" fill="#d32f2f" font-weight="bold">Event 依赖</text>
+
+  <!-- Host thread -->
+  <text x="60" y="275" text-anchor="end" font-size="12" font-weight="bold" fill="#e65100">Host 线程</text>
+  <line x1="80" y1="270" x2="650" y2="270" stroke="#ffcc80" stroke-width="2" />
+
+  <!-- Host operations -->
+  <rect x="100" y="255" width="80" height="30" rx="5" fill="#ffe0b2" stroke="#ffb74d" />
+  <text x="140" y="275" text-anchor="middle" font-size="10" fill="#333">启动 A</text>
+
+  <rect x="200" y="255" width="80" height="30" rx="5" fill="#ffe0b2" stroke="#ffb74d" />
+  <text x="240" y="275" text-anchor="middle" font-size="10" fill="#333">启动 B</text>
+
+  <rect x="420" y="255" width="120" height="30" rx="5" fill="#fff3e0" stroke="#ff9800" />
+  <text x="480" y="275" text-anchor="middle" font-size="10" fill="#333">SyncStream(A)</text>
+
+  <rect x="560" y="255" width="80" height="30" rx="5" fill="#fff3e0" stroke="#ff9800" />
+  <text x="600" y="275" text-anchor="middle" font-size="10" fill="#333">SyncStream(B)</text>
+
+  <!-- Annotations -->
+  <rect x="80" y="310" width="560" height="50" rx="6" fill="#f5f5f5" stroke="#ddd" />
+  <text x="360" y="330" text-anchor="middle" font-size="10" fill="#555">Stream B 的 kernelB 必须等 Stream A 的 kernelA 完成后才能开始</text>
+  <text x="360" y="348" text-anchor="middle" font-size="10" fill="#555">Event 建立了跨 Stream 的依赖关系，保证数据正确性</text>
+</svg>
+</div>
+
+<h2>单流 vs 多流</h2>
+
+<p>在大多数算子开发场景中，使用<strong>单流</strong>就足够了。多流主要用于需要并行执行多个独立算子的场景。</p>
+
+<table>
+<thead><tr><th>场景</th><th>推荐方式</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>单个算子执行</td><td>单流</td><td>创建一个 Stream，启动 Kernel，同步，取结果</td></tr>
+<tr><td>多个独立算子</td><td>多流</td><td>每个算子一个 Stream，可并行执行提升吞吐</td></tr>
+<tr><td>有依赖的算子链</td><td>单流 + Event</td><td>用 Event 建立依赖，保证执行顺序</td></tr>
+</tbody>
+</table>
+
+<h2>Q&amp;A</h2>
+
+<div class="warning-callout">
+<p><strong>Q：Kernel 启动后为什么是异步的？不能改成同步吗？</strong></p>
+<p>A：异步执行是 NPU 的设计特性——Host 提交任务后立即返回，不等待 Device 执行完成。这样可以避免 CPU 空等，提升整体效率。ACL 没有提供"同步启动 Kernel"的接口，必须通过 <code>aclrtSynchronizeStream</code> 显式等待。</p>
+</div>
+
+<div class="warning-callout">
+<p><strong>Q：<code>aclrtMemcpy</code> 是同步的还是异步的？</strong></p>
+<p>A：<code>aclrtMemcpy</code> 默认是<strong>同步的</strong>（阻塞等待拷贝完成）。如果需要异步拷贝，使用 <code>aclrtMemcpyAsync</code>，它需要传入 Stream 参数，拷贝操作会被放入 Stream 的异步队列中。</p>
+</div>
+
+<div class="warning-callout">
+<p><strong>Q：如果只用一个 Stream，还需要 Event 吗？</strong></p>
+<p>A：不需要。同一个 Stream 内的操作天然按提交顺序执行，不需要 Event 来同步。Event 只在需要<strong>跨 Stream 同步</strong>时才有用。</p>
+</div>
+
+<div id="quiz"></div>
+
+<div class="page-nav"><a href="04-实战演练-4.17-ACL设备与内存管理.html" class="nav-prev"><span class="nav-label">&larr; 上一篇</span><span class="nav-title">4.17 ACL 设备与内存管理</span></a><a href="04-实战演练-4.19-ACL错误处理与最佳实践.html" class="nav-next"><span class="nav-label">下一篇 &rarr;</span><span class="nav-title">4.19 ACL 错误处理与最佳实践</span></a></div>
+</div>
+</main>
+<script src="../js/quiz.js"></script>
+<script>
+renderQuiz('quiz', [
+  {
+    question: "启动 Kernel 后，为什么必须调用 aclrtSynchronizeStream 才能拷贝结果？",
+    options: ["因为 Kernel 执行太快，需要减速", "因为 Kernel 是异步执行的，启动后立即返回，结果可能还没算完", "因为 aclrtMemcpy 需要 Stream 参数", "因为 Device 内存需要锁定"],
+    answer: 1,
+    explanation: "Kernel 启动（<<<>>>）是异步的——调用后立即返回，不等 Kernel 执行完。如果此时就拷贝结果，拿到的是未初始化的垃圾值。必须用 aclrtSynchronizeStream 阻塞等待 Kernel 完成。"
+  },
+  {
+    question: "aclrtStreamWaitEvent 的作用是什么？",
+    options: [
+      "阻塞 Host 线程等待事件完成",
+      "让指定 Stream 等待某个事件完成后才继续执行后续操作",
+      "销毁事件对象",
+      "在 Stream 中记录事件"
+    ],
+    answer: 1,
+    explanation: "aclrtStreamWaitEvent 让指定 Stream 等待某个事件完成后才继续执行后续操作。它不阻塞 Host 线程，而是在 Stream 的异步队列中插入一个等待点。"
+  },
+  {
+    question: "aclrtMemcpy 默认是同步的还是异步的？",
+    options: ["异步的，需要手动同步", "同步的，阻塞等待拷贝完成", "取决于 Stream 状态", "取决于拷贝大小"],
+    answer: 1,
+    explanation: "aclrtMemcpy 默认是同步的（阻塞等待拷贝完成）。如果需要异步拷贝，使用 aclrtMemcpyAsync，它需要传入 Stream 参数。"
+  },
+  {
+    question: "在单 Stream 场景中，是否需要使用 Event？",
+    options: [
+      "需要，每个 Kernel 都要记录事件",
+      "不需要，同一 Stream 内的操作天然按提交顺序执行",
+      "需要，用于同步 Host 和 Device",
+      "取决于 Kernel 的数量"
+    ],
+    answer: 1,
+    explanation: "不需要。同一个 Stream 内的操作天然按提交顺序执行，不需要 Event 来同步。Event 只在需要跨 Stream 同步时才有用。"
+  }
+]);
+</script>
+</body>
+</html>

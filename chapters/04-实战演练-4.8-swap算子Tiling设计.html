@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4.4 swap 算子 Tiling 设计 - AscendC Guide</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<nav class="sidebar"><div class="sidebar-header"><h2><a href="../index.html" style="color:inherit;text-decoration:none">AscendC Guide</a></h2><p>算子开发从入门到精通</p></div><ul class="sidebar-nav"><li class="chapter-group"><span class="chapter-title">第1章 基础概念</span><ul class="article-list"><li><a href="01-基础概念-1.1-什么是算子与AscendC.html">1.1 什么是算子与 Ascend C</a></li><li><a href="01-基础概念-1.2-数据类型排布与量化.html">1.2 数据类型、排布与量化</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第2章 硬件与编程模型</span><ul class="article-list"><li><a href="02-硬件与编程模型-2.1-A5硬件架构.html">2.1 A5 硬件架构</a></li><li><a href="02-硬件与编程模型-2.2-编程模型概述.html">2.2 编程模型概述</a></li><li><a href="02-硬件与编程模型-2.3-算子结构.html">2.3 算子结构</a></li><li><a href="02-硬件与编程模型-2.4-直调开发方式.html">2.4 直调开发方式</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第3章 核心开发</span><ul class="article-list"><li><a href="03-核心开发-3.1-Tiling设计.html">3.1 Tiling 设计</a></li><li><a href="03-核心开发-3.2-内存管理与数据搬运.html">3.2 内存管理与数据搬运</a></li><li><a href="03-核心开发-3.3-Vector计算.html">3.3 Vector 计算</a></li><li><a href="03-核心开发-3.4-Cube计算.html">3.4 Cube 计算</a></li><li><a href="03-核心开发-3.5-同步与流水线.html">3.5 同步与流水线</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第4章 实战演练</span><ul class="article-list"><li><a href="04-实战演练-4.1-CANN安装与配置.html">4.1 CANN 安装与配置</a></li><li><a href="04-实战演练-4.2-编译器与仿真器.html">4.2 编译器与仿真器</a></li><li><a href="04-实战演练-4.3-开发环境检查清单.html">4.3 开发环境检查清单</a></li><li><a href="04-实战演练-4.4-获取与编译算子代码.html">4.4 获取与编译算子代码</a></li><li><a href="04-实战演练-4.5-运行与查看结果.html">4.5 运行与查看结果</a></li><li><a href="04-实战演练-4.6-修改与重新编译.html">4.6 修改与重新编译</a></li><li><a href="04-实战演练-4.7-swap算子需求分析.html">4.7 swap 算子需求分析</a></li><li><a href="04-实战演练-4.8-swap算子Tiling设计.html" class="active">4.8 swap 算子 Tiling 设计</a></li><li><a href="04-实战演练-4.9-swap算子Kernel实现.html">4.9 swap 算子 Kernel 实现</a></li><li><a href="04-实战演练-4.10-swap算子Host实现.html">4.10 swap 算子 Host 实现</a></li><li><a href="04-实战演练-4.11-swap算子编译与测试.html">4.11 swap 算子编译与测试</a></li><li><a href="04-实战演练-4.12-add算子需求分析.html">4.12 add 算子需求分析</a></li><li><a href="04-实战演练-4.13-add算子Tiling设计.html">4.13 add 算子 Tiling 设计</a></li><li><a href="04-实战演练-4.14-add算子Kernel实现.html">4.14 add 算子 Kernel 实现</a></li><li><a href="04-实战演练-4.15-add算子框架集成.html">4.15 add 算子框架集成</a></li><li><a href="04-实战演练-4.16-ACL运行时API概览.html">4.16 ACL 运行时 API 概览</a></li><li><a href="04-实战演练-4.17-ACL设备与内存管理.html">4.17 ACL 设备与内存管理</a></li><li><a href="04-实战演练-4.18-ACL流与事件管理.html">4.18 ACL 流与事件管理</a></li><li><a href="04-实战演练-4.19-ACL错误处理与最佳实践.html">4.19 ACL 错误处理与最佳实践</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第5章 调试与优化</span><ul class="article-list"><li><a href="05-调试与优化-5.1-精度不对怎么办.html">5.1 精度不对怎么办</a></li><li><a href="05-调试与优化-5.2-性能不达标怎么办.html">5.2 性能不达标怎么办</a></li><li><a href="05-调试与优化-5.3-算子精度标准.html">5.3 算子精度标准</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第6章 进阶</span><ul class="article-list"><li><a href="06-进阶-6.1-常见踩坑与最佳实践.html">6.1 常见踩坑与最佳实践</a></li><li><a href="06-进阶-6.2-RegBase编程模型.html">6.2 RegBase 编程模型</a></li><li><a href="06-进阶-6.3-SIMT混合编程.html">6.3 SIMT 混合编程</a></li><li><a href="06-进阶-6.4-NDDMA高维搬运.html">6.4 NDDMA 高维搬运</a></li><li><a href="06-进阶-6.5-CCU通算融合.html">6.5 CCU 通算融合</a></li><li><a href="06-进阶-6.6-跨架构兼容.html">6.6 跨架构兼容</a></li></ul></li><li class="chapter-group"><span class="chapter-title">附录</span><ul class="article-list"><li><a href="附录-A-数据类型速查表.html">A. 数据类型速查表</a></li><li><a href="附录-B-对齐规则速查.html">B. 对齐规则速查</a></li><li><a href="附录-C-错误码速查.html">C. 错误码速查</a></li></ul></li></ul></nav>
+<main class="main">
+<div class="content">
+<div class="meta-bar"><a href="../index.html">← 返回目录</a></div>
+
+<h1>4.4 swap 算子 Tiling 设计</h1>
+<p>Tiling（分块）是 Ascend C 算子开发的核心概念。由于 AI Core 的片上内存（UB）有限，我们需要把大规模数据切分成小块，分批次处理。本节将详细讲解 swap 算子的 Tiling 设计。</p>
+
+<h2>4.4.1 TilingData 结构设计</h2>
+<p>TilingData 是 Host 和 Kernel 之间的"通信协议"——Host 计算好 Tiling 参数，通过 TilingData 传递给 Kernel。</p>
+
+<h3>swap_tiling_data.h 完整代码</h3>
+<pre><code class="language-cpp">// swap_tiling_data.h
+#ifndef SWAP_TILING_DATA_H
+#define SWAP_TILING_DATA_H
+
+#include &lt;cstdint&gt;
+
+// Tiling 数据结构定义
+// Host 侧计算这些值，传递给 Kernel 侧使用
+struct SwapTilingData {
+    int32_t totalN;      // 总元素个数（N）
+    int32_t perCoreN;    // 每个 AI Core 处理的元素个数
+    int32_t remainder;   // 最后一个 Core 需要额外处理的元素个数
+    int32_t tileSize;    // 每次搬运的元素个数（UB 分块大小）
+    int32_t coreCount;   // 使用的 AI Core 数量
+};
+
+#endif // SWAP_TILING_DATA_H</code></pre>
+
+<h3>各字段含义</h3>
+<table>
+<thead><tr><th>字段</th><th>类型</th><th>含义</th><th>计算方式</th></tr></thead>
+<tbody>
+<tr><td><code>totalN</code></td><td>int32_t</td><td>总元素个数</td><td>直接取参数 N</td></tr>
+<tr><td><code>perCoreN</code></td><td>int32_t</td><td>每个 Core 处理的基础元素数</td><td>N / coreCount</td></tr>
+<tr><td><code>remainder</code></td><td>int32_t</td><td>最后一个 Core 的额外元素数</td><td>N % coreCount</td></tr>
+<tr><td><code>tileSize</code></td><td>int32_t</td><td>UB 单次搬运的元素数</td><td>UB容量 / 元素大小 / 2</td></tr>
+<tr><td><code>coreCount</code></td><td>int32_t</td><td>使用的 AI Core 数量</td><td>min(N/minPerCore, maxCore)</td></tr>
+</tbody>
+</table>
+
+<h2>4.4.2 多核切分策略</h2>
+<p>多核切分的目标是<strong>把 N 个元素均匀分配到多个 AI Core 上并行处理</strong>。</p>
+
+<h3>切分算法</h3>
+<pre><code class="language-cpp">// 1. 确定 Core 数量
+int32_t maxCoreCount = 20;           // 硬件上限
+int32_t minElementsPerCore = 256;     // 每个 Core 至少处理 256 个元素
+tiling.coreCount = (N + minElementsPerCore - 1) / minElementsPerCore;
+if (tiling.coreCount > maxCoreCount) {
+    tiling.coreCount = maxCoreCount;
+}
+
+// 2. 计算每个 Core 的工作量
+tiling.perCoreN = N / tiling.coreCount;
+tiling.remainder = N % tiling.coreCount;</code></pre>
+
+<h3>切分示例</h3>
+<div style="margin:20px 0;text-align:center">
+<svg viewBox="0 0 660 420" style="width:100%;max-width:700px" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+<rect x="10" y="0" width="640" height="30" rx="6" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+<text x="330" y="20" text-anchor="middle" font-size="13" font-weight="bold" fill="#1e293b">N = 10000 · AI Core = 8 · UB = 256KB</text>
+<text x="10" y="55" font-size="13" font-weight="bold" fill="#6366f1">1. 多核切分</text>
+<rect x="10" y="65" width="640" height="36" rx="4" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<rect x="12" y="67" width="78" height="32" rx="3" fill="#eef2ff" stroke="#6366f1" stroke-width="1"/>
+<text x="51" y="88" text-anchor="middle" font-size="11" fill="#1e293b">Core 0</text>
+<rect x="92" y="67" width="78" height="32" rx="3" fill="#eef2ff" stroke="#6366f1" stroke-width="1"/>
+<text x="131" y="88" text-anchor="middle" font-size="11" fill="#1e293b">Core 1</text>
+<rect x="172" y="67" width="78" height="32" rx="3" fill="#eef2ff" stroke="#6366f1" stroke-width="1"/>
+<text x="211" y="88" text-anchor="middle" font-size="11" fill="#1e293b">Core 2</text>
+<rect x="252" y="67" width="78" height="32" rx="3" fill="#eef2ff" stroke="#6366f1" stroke-width="1"/>
+<text x="291" y="88" text-anchor="middle" font-size="11" fill="#1e293b">Core 3</text>
+<rect x="332" y="67" width="78" height="32" rx="3" fill="#eef2ff" stroke="#6366f1" stroke-width="1"/>
+<text x="371" y="88" text-anchor="middle" font-size="11" fill="#1e293b">Core 4</text>
+<rect x="412" y="67" width="78" height="32" rx="3" fill="#eef2ff" stroke="#6366f1" stroke-width="1"/>
+<text x="451" y="88" text-anchor="middle" font-size="11" fill="#1e293b">Core 5</text>
+<rect x="492" y="67" width="78" height="32" rx="3" fill="#eef2ff" stroke="#6366f1" stroke-width="1"/>
+<text x="531" y="88" text-anchor="middle" font-size="11" fill="#1e293b">Core 6</text>
+<rect x="572" y="67" width="76" height="32" rx="3" fill="#eef2ff" stroke="#6366f1" stroke-width="1"/>
+<text x="610" y="88" text-anchor="middle" font-size="11" fill="#1e293b">Core 7</text>
+<text x="330" y="118" text-anchor="middle" font-size="12" fill="#64748b">perCoreN = 10000 / 8 = 1250 · remainder = 0</text>
+<text x="10" y="148" font-size="13" font-weight="bold" fill="#6366f1">2. UB 分块（每个 Core 的 UB）</text>
+<rect x="10" y="158" width="310" height="50" rx="6" fill="#dbeafe" stroke="#6366f1" stroke-width="1.5"/>
+<text x="165" y="180" text-anchor="middle" font-size="13" fill="#1e293b">xBuf（128KB）</text>
+<text x="165" y="198" text-anchor="middle" font-size="11" fill="#64748b">8192 个 FP32 元素</text>
+<rect x="340" y="158" width="310" height="50" rx="6" fill="#dbeafe" stroke="#6366f1" stroke-width="1.5"/>
+<text x="495" y="180" text-anchor="middle" font-size="13" fill="#1e293b">yBuf（128KB）</text>
+<text x="495" y="198" text-anchor="middle" font-size="11" fill="#64748b">8192 个 FP32 元素</text>
+<text x="330" y="230" text-anchor="middle" font-size="11" fill="#64748b">tileSize = 128KB / 4B / 2 = 8192（÷2 因为同时存 X 和 Y）</text>
+<text x="10" y="260" font-size="13" font-weight="bold" fill="#6366f1">3. 最终 TilingData</text>
+<rect x="10" y="270" width="640" height="140" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+<text x="30" y="296" font-size="13" fill="#1e293b" font-family="monospace">totalN</text>
+<text x="130" y="296" font-size="13" fill="#64748b">=</text>
+<text x="150" y="296" font-size="13" font-weight="bold" fill="#6366f1" font-family="monospace">10000</text>
+<text x="30" y="322" font-size="13" fill="#1e293b" font-family="monospace">perCoreN</text>
+<text x="130" y="322" font-size="13" fill="#64748b">=</text>
+<text x="150" y="322" font-size="13" font-weight="bold" fill="#6366f1" font-family="monospace">1250</text>
+<text x="30" y="348" font-size="13" fill="#1e293b" font-family="monospace">remainder</text>
+<text x="130" y="348" font-size="13" fill="#64748b">=</text>
+<text x="150" y="348" font-size="13" font-weight="bold" fill="#6366f1" font-family="monospace">0</text>
+<text x="350" y="296" font-size="13" fill="#1e293b" font-family="monospace">tileSize</text>
+<text x="450" y="296" font-size="13" fill="#64748b">=</text>
+<text x="470" y="296" font-size="13" font-weight="bold" fill="#6366f1" font-family="monospace">8192</text>
+<text x="350" y="322" font-size="13" fill="#1e293b" font-family="monospace">coreCount</text>
+<text x="450" y="322" font-size="13" fill="#64748b">=</text>
+<text x="470" y="322" font-size="13" font-weight="bold" fill="#6366f1" font-family="monospace">8</text>
+</svg>
+</div>
+
+<h3>有余数时的切分</h3>
+<p>当 N 不能被 Core 数量整除时，最后一个 Core 需要多处理一些元素：</p>
+<div style="margin:20px 0;text-align:center">
+<svg viewBox="0 0 660 160" style="width:100%;max-width:700px" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+<text x="10" y="20" font-size="13" font-weight="bold" fill="#6366f1">N = 10003 · coreCount = 8 · perCoreN = 1250 · remainder = 3</text>
+<rect x="10" y="35" width="640" height="50" rx="4" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+<rect x="12" y="37" width="74" height="46" rx="3" fill="#eef2ff" stroke="#6366f1" stroke-width="1"/>
+<text x="49" y="55" text-anchor="middle" font-size="10" fill="#1e293b">Core 0</text>
+<text x="49" y="72" text-anchor="middle" font-size="9" fill="#64748b">1250</text>
+<rect x="88" y="37" width="74" height="46" rx="3" fill="#eef2ff" stroke="#6366f1" stroke-width="1"/>
+<text x="125" y="55" text-anchor="middle" font-size="10" fill="#1e293b">Core 1</text>
+<text x="125" y="72" text-anchor="middle" font-size="9" fill="#64748b">1250</text>
+<rect x="164" y="37" width="74" height="46" rx="3" fill="#eef2ff" stroke="#6366f1" stroke-width="1"/>
+<text x="201" y="55" text-anchor="middle" font-size="10" fill="#1e293b">Core 2</text>
+<text x="201" y="72" text-anchor="middle" font-size="9" fill="#64748b">1250</text>
+<rect x="240" y="37" width="74" height="46" rx="3" fill="#eef2ff" stroke="#6366f1" stroke-width="1"/>
+<text x="277" y="55" text-anchor="middle" font-size="10" fill="#1e293b">Core 3</text>
+<text x="277" y="72" text-anchor="middle" font-size="9" fill="#64748b">1250</text>
+<rect x="316" y="37" width="74" height="46" rx="3" fill="#eef2ff" stroke="#6366f1" stroke-width="1"/>
+<text x="353" y="55" text-anchor="middle" font-size="10" fill="#1e293b">Core 4</text>
+<text x="353" y="72" text-anchor="middle" font-size="9" fill="#64748b">1250</text>
+<rect x="392" y="37" width="74" height="46" rx="3" fill="#eef2ff" stroke="#6366f1" stroke-width="1"/>
+<text x="429" y="55" text-anchor="middle" font-size="10" fill="#1e293b">Core 5</text>
+<text x="429" y="72" text-anchor="middle" font-size="9" fill="#64748b">1250</text>
+<rect x="468" y="37" width="74" height="46" rx="3" fill="#eef2ff" stroke="#6366f1" stroke-width="1"/>
+<text x="505" y="55" text-anchor="middle" font-size="10" fill="#1e293b">Core 6</text>
+<text x="505" y="72" text-anchor="middle" font-size="9" fill="#64748b">1250</text>
+<rect x="544" y="37" width="104" height="46" rx="3" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+<text x="596" y="55" text-anchor="middle" font-size="10" font-weight="bold" fill="#92400e">Core 7</text>
+<text x="596" y="72" text-anchor="middle" font-size="9" font-weight="bold" fill="#92400e">1250 + 3</text>
+<text x="330" y="110" text-anchor="middle" font-size="12" fill="#64748b">最后一个 Core 处理 perCoreN + remainder = 1250 + 3 = 1253 个元素</text>
+<text x="330" y="135" text-anchor="middle" font-size="11" fill="#6366f1">总计：7 × 1250 + 1253 = 10003 ✓</text>
+</svg>
+</div>
+
+<h2>4.4.3 UB 空间规划</h2>
+<p>UB（Unified Buffer）是 AI Core 的片上高速缓存，容量有限（通常 256KB）。swap 需要在 UB 中同时存放 X 和 Y 两个 Buffer。</p>
+
+<h3>UB 空间分配</h3>
+<div style="margin:20px 0;text-align:center">
+<svg viewBox="0 0 660 200" style="width:100%;max-width:700px" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+<text x="330" y="20" text-anchor="middle" font-size="14" font-weight="bold" fill="#1e293b">UB 空间规划（256KB 总量）</text>
+<rect x="30" y="35" width="600" height="120" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="2"/>
+<text x="330" y="55" text-anchor="middle" font-size="12" fill="#64748b">UB 总容量：256KB</text>
+<rect x="50" y="65" width="270" height="70" rx="6" fill="#dbeafe" stroke="#6366f1" stroke-width="1.5"/>
+<text x="185" y="90" text-anchor="middle" font-size="14" font-weight="bold" fill="#1e293b">xBuf</text>
+<text x="185" y="110" text-anchor="middle" font-size="12" fill="#64748b">128KB = 32768 个 FP32</text>
+<text x="185" y="128" text-anchor="middle" font-size="11" fill="#6366f1">tileSize = 32768 元素</text>
+<rect x="340" y="65" width="270" height="70" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+<text x="475" y="90" text-anchor="middle" font-size="14" font-weight="bold" fill="#1e293b">yBuf</text>
+<text x="475" y="110" text-anchor="middle" font-size="12" fill="#64748b">128KB = 32768 个 FP32</text>
+<text x="475" y="128" text-anchor="middle" font-size="11" fill="#92400e">tileSize = 32768 元素</text>
+<text x="330" y="180" text-anchor="middle" font-size="12" fill="#6366f1" font-weight="bold">tileSize = UB容量 / sizeof(float) / 2 = 256×1024 / 4 / 2 = 32768</text>
+</svg>
+</div>
+
+<h3>tileSize 计算公式</h3>
+<pre><code class="language-cpp">// UB 总容量（字节）
+int32_t ubSizeBytes = 256 * 1024;  // 256KB
+
+// 需要同时存 X 和 Y，所以每个 Buffer 只能用一半
+// FP32 每个元素 4 字节
+tiling.tileSize = ubSizeBytes / sizeof(float) / 2;  // = 32768
+
+// 确保 tileSize 不超过 perCoreN（如果 perCoreN 很小，不需要用满 UB）
+if (tiling.tileSize > tiling.perCoreN) {
+    tiling.tileSize = tiling.perCoreN;
+}</code></pre>
+
+<h3>为什么 tileSize 要除以 2？</h3>
+<p>因为 swap 需要<strong>同时</strong>存储 X 和 Y 两个向量的数据到 UB 中。如果 UB 总容量是 256KB，那么 xBuf 和 yBuf 各占一半，每个 Buffer 只能用 128KB。</p>
+
+<h2>4.4.4 Tiling 完整流程</h2>
+<div style="margin:20px 0;text-align:center">
+<svg viewBox="0 0 660 350" style="width:100%;max-width:700px" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+<text x="330" y="20" text-anchor="middle" font-size="14" font-weight="bold" fill="#1e293b">Tiling 完整流程</text>
+<rect x="200" y="35" width="260" height="36" rx="6" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+<text x="330" y="58" text-anchor="middle" font-size="13" font-weight="bold" fill="#6366f1">输入：N, UB大小, Core数量</text>
+<line x1="330" y1="71" x2="330" y2="85" stroke="#6366f1" stroke-width="2"/>
+<polygon points="325,81 335,81 330,89" fill="#6366f1"/>
+<rect x="180" y="89" width="300" height="40" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+<text x="330" y="108" text-anchor="middle" font-size="12" fill="#1e293b"><tspan font-weight="bold">Step 1:</tspan> 计算 coreCount</text>
+<text x="330" y="123" text-anchor="middle" font-size="10" fill="#64748b">min((N+255)/256, maxCore)</text>
+<line x1="330" y1="129" x2="330" y2="143" stroke="#6366f1" stroke-width="2"/>
+<polygon points="325,139 335,139 330,147" fill="#6366f1"/>
+<rect x="180" y="147" width="300" height="40" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+<text x="330" y="166" text-anchor="middle" font-size="12" fill="#1e293b"><tspan font-weight="bold">Step 2:</tspan> 计算 perCoreN, remainder</text>
+<text x="330" y="181" text-anchor="middle" font-size="10" fill="#64748b">perCoreN = N/coreCount, remainder = N%coreCount</text>
+<line x1="330" y1="187" x2="330" y2="201" stroke="#6366f1" stroke-width="2"/>
+<polygon points="325,197 335,197 330,205" fill="#6366f1"/>
+<rect x="180" y="205" width="300" height="40" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+<text x="330" y="224" text-anchor="middle" font-size="12" fill="#1e293b"><tspan font-weight="bold">Step 3:</tspan> 计算 tileSize</text>
+<text x="330" y="239" text-anchor="middle" font-size="10" fill="#64748b">min(UB/sizeof(float)/2, perCoreN)</text>
+<line x1="330" y1="245" x2="330" y2="259" stroke="#6366f1" stroke-width="2"/>
+<polygon points="325,255 335,255 330,263" fill="#6366f1"/>
+<rect x="180" y="263" width="300" height="40" rx="6" fill="#d1fae5" stroke="#10b981" stroke-width="1.5"/>
+<text x="330" y="282" text-anchor="middle" font-size="12" font-weight="bold" fill="#059669">输出：SwapTilingData</text>
+<text x="330" y="297" text-anchor="middle" font-size="10" fill="#64748b">{totalN, perCoreN, remainder, tileSize, coreCount}</text>
+<line x1="330" y1="303" x2="330" y2="317" stroke="#10b981" stroke-width="2"/>
+<polygon points="325,313 335,313 330,321" fill="#10b981"/>
+<rect x="180" y="321" width="300" height="28" rx="6" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+<text x="330" y="340" text-anchor="middle" font-size="12" fill="#6366f1">通过 GM 传递给 Kernel</text>
+</svg>
+</div>
+
+<h2>Q&A：常见问题</h2>
+
+<h3>Q1：为什么 Core 数量不是越多越好？</h3>
+<p><strong>A：</strong>如果 N 很小（比如 N=100），用 20 个 Core 意味着每个 Core 只处理 5 个元素。启动 Core 的开销可能比实际计算还大。所以代码里设置了 <code>minElementsPerCore = 256</code>，确保每个 Core 至少处理 256 个元素。</p>
+
+<h3>Q2：如果 tileSize 大于 perCoreN 会怎样？</h3>
+<p><strong>A：</strong>如果 tileSize 大于 perCoreN，说明 UB 空间足够大，一次就能搬完一个 Core 的所有数据。此时应该把 tileSize 截断为 perCoreN，避免浪费 UB 空间。</p>
+
+<h3>Q3：为什么不把余数分散到所有 Core？</h3>
+<p><strong>A：</strong>分散余数（如前 remainder 个 Core 各多处理 1 个元素）可以让负载更均衡，但会增加代码复杂度。对于 swap 这种简单算子，把余数集中给最后一个 Core 更简单，性能差异可以忽略。</p>
+
+<div id="quiz"></div>
+<div class="page-nav"><a href="04-实战演练-4.7-swap算子需求分析.html" class="nav-prev"><span class="nav-label">&larr; 上一篇</span><span class="nav-title">4.7 swap 算子需求分析</span></a><a href="04-实战演练-4.9-swap算子Kernel实现.html" class="nav-next"><span class="nav-label">下一篇 &rarr;</span><span class="nav-title">4.9 swap 算子 Kernel 实现</span></a></div>
+</div>
+</main>
+<script src="../js/quiz.js"></script>
+<script>
+renderQuiz('quiz', [
+  {
+    question: "swap 算子的 TilingData 中，tileSize 的计算为什么要除以 2？",
+    options: ["因为需要双 Buffer", "因为需要同时存储 X 和 Y 两个向量的数据", "因为 UB 只能使用一半", "因为要对齐到 32 字节"],
+    answer: 1,
+    explanation: "swap 需要同时存储 X 和 Y 两个向量的数据到 UB 中。如果 UB 总容量是 256KB，那么 xBuf 和 yBuf 各占一半，每个 Buffer 只能用 128KB。所以 tileSize = UB容量 / 元素大小 / 2。"
+  },
+  {
+    question: "假设 N = 100000 个 FP32 元素，coreCount = 20，UB 可用 248KB（需要同时存 X 和 Y 两个 Buffer）。请计算 tileSize 的值。",
+    options: ["tileSize = 62000（248KB / 4B）", "tileSize = 31000（248KB / 2 / 4B）", "tileSize = 5000（100000 / 20）", "tileSize = 16000（128KB / 4B / 2）"],
+    answer: 2,
+    explanation: "UB 总空间 248KB 需要同时存 X 和 Y 两个 Buffer，每个 Buffer 124KB。FP32 每个元素 4 字节，所以 tileSize = 124×1024 / 4 = 31744。同时 perCoreN = 100000 / 20 = 5000，因为 tileSize (31744) > perCoreN (5000)，实际 tileSize 会被截断为 perCoreN = 5000，即每个核一轮就能处理完。"
+  },
+  {
+    question: "如果 N = 10003，coreCount = 8，最后一个 Core 处理多少个元素？",
+    options: ["1250 个", "1253 个", "1254 个", "10003 个"],
+    answer: 1,
+    explanation: "perCoreN = 10003 / 8 = 1250，remainder = 10003 % 8 = 3。最后一个 Core 处理 perCoreN + remainder = 1250 + 3 = 1253 个元素。"
+  },
+  {
+    question: "TilingData 是通过什么方式从 Host 传递给 Kernel 的？",
+    options: ["通过函数参数直接传递", "通过全局内存（GM）传递", "通过寄存器传递", "通过共享内存传递"],
+    answer: 1,
+    explanation: "TilingData 通过全局内存（GM）传递。Host 侧先通过 aclrtMalloc 分配 Device 内存，然后通过 aclrtMemcpy 把 TilingData 拷贝到 Device，最后通过 Kernel 参数传递 GM 指针。Kernel 侧从 GM 读取 TilingData。"
+  },
+  {
+    question: "为什么 minElementsPerCore 设置为 256 而不是 1？",
+    options: ["因为 256 是 UB 的最小分块大小", "因为启动 Core 有固定开销，处理太少元素不划算", "因为 NPU 硬件要求最少 256 个元素", "因为 256 是 FP32 的对齐要求"],
+    answer: 1,
+    explanation: "启动 AI Core 有固定开销（调度、初始化等）。如果每个 Core 只处理 1 个元素，启动开销可能远大于实际计算时间。设置 minElementsPerCore = 256 确保每个 Core 至少处理 256 个元素，让计算收益大于启动开销。"
+  }
+]);
+</script>
+</body>
+</html>

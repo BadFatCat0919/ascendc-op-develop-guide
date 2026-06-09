@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4.11 add 算子框架集成 - AscendC Guide</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<nav class="sidebar"><div class="sidebar-header"><h2><a href="../index.html" style="color:inherit;text-decoration:none">AscendC Guide</a></h2><p>算子开发从入门到精通</p></div><ul class="sidebar-nav"><li class="chapter-group"><span class="chapter-title">第1章 基础概念</span><ul class="article-list"><li><a href="01-基础概念-1.1-什么是算子与AscendC.html">1.1 什么是算子与 Ascend C</a></li><li><a href="01-基础概念-1.2-数据类型排布与量化.html">1.2 数据类型、排布与量化</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第2章 硬件与编程模型</span><ul class="article-list"><li><a href="02-硬件与编程模型-2.1-A5硬件架构.html">2.1 A5 硬件架构</a></li><li><a href="02-硬件与编程模型-2.2-编程模型概述.html">2.2 编程模型概述</a></li><li><a href="02-硬件与编程模型-2.3-算子结构.html">2.3 算子结构</a></li><li><a href="02-硬件与编程模型-2.4-直调开发方式.html">2.4 直调开发方式</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第3章 核心开发</span><ul class="article-list"><li><a href="03-核心开发-3.1-Tiling设计.html">3.1 Tiling 设计</a></li><li><a href="03-核心开发-3.2-内存管理与数据搬运.html">3.2 内存管理与数据搬运</a></li><li><a href="03-核心开发-3.3-Vector计算.html">3.3 Vector 计算</a></li><li><a href="03-核心开发-3.4-Cube计算.html">3.4 Cube 计算</a></li><li><a href="03-核心开发-3.5-同步与流水线.html">3.5 同步与流水线</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第4章 实战演练</span><ul class="article-list"><li><a href="04-实战演练-4.1-CANN安装与配置.html">4.1 CANN 安装与配置</a></li><li><a href="04-实战演练-4.2-编译器与仿真器.html">4.2 编译器与仿真器</a></li><li><a href="04-实战演练-4.3-开发环境检查清单.html">4.3 开发环境检查清单</a></li><li><a href="04-实战演练-4.4-获取与编译算子代码.html">4.4 获取与编译算子代码</a></li><li><a href="04-实战演练-4.5-运行与查看结果.html">4.5 运行与查看结果</a></li><li><a href="04-实战演练-4.6-修改与重新编译.html">4.6 修改与重新编译</a></li><li><a href="04-实战演练-4.7-swap算子需求分析.html">4.7 swap 算子需求分析</a></li><li><a href="04-实战演练-4.8-swap算子Tiling设计.html">4.8 swap 算子 Tiling 设计</a></li><li><a href="04-实战演练-4.9-swap算子Kernel实现.html">4.9 swap 算子 Kernel 实现</a></li><li><a href="04-实战演练-4.10-swap算子Host实现.html">4.10 swap 算子 Host 实现</a></li><li><a href="04-实战演练-4.11-swap算子编译与测试.html">4.11 swap 算子编译与测试</a></li><li><a href="04-实战演练-4.12-add算子需求分析.html">4.12 add 算子需求分析</a></li><li><a href="04-实战演练-4.13-add算子Tiling设计.html">4.13 add 算子 Tiling 设计</a></li><li><a href="04-实战演练-4.14-add算子Kernel实现.html">4.14 add 算子 Kernel 实现</a></li><li><a href="04-实战演练-4.15-add算子框架集成.html" class="active">4.15 add 算子框架集成</a></li><li><a href="04-实战演练-4.16-ACL运行时API概览.html">4.16 ACL 运行时 API 概览</a></li><li><a href="04-实战演练-4.17-ACL设备与内存管理.html">4.17 ACL 设备与内存管理</a></li><li><a href="04-实战演练-4.18-ACL流与事件管理.html">4.18 ACL 流与事件管理</a></li><li><a href="04-实战演练-4.19-ACL错误处理与最佳实践.html">4.19 ACL 错误处理与最佳实践</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第5章 调试与优化</span><ul class="article-list"><li><a href="05-调试与优化-5.1-精度不对怎么办.html">5.1 精度不对怎么办</a></li><li><a href="05-调试与优化-5.2-性能不达标怎么办.html">5.2 性能不达标怎么办</a></li><li><a href="05-调试与优化-5.3-算子精度标准.html">5.3 算子精度标准</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第6章 进阶</span><ul class="article-list"><li><a href="06-进阶-6.1-常见踩坑与最佳实践.html">6.1 常见踩坑与最佳实践</a></li><li><a href="06-进阶-6.2-RegBase编程模型.html">6.2 RegBase 编程模型</a></li><li><a href="06-进阶-6.3-SIMT混合编程.html">6.3 SIMT 混合编程</a></li><li><a href="06-进阶-6.4-NDDMA高维搬运.html">6.4 NDDMA 高维搬运</a></li><li><a href="06-进阶-6.5-CCU通算融合.html">6.5 CCU 通算融合</a></li><li><a href="06-进阶-6.6-跨架构兼容.html">6.6 跨架构兼容</a></li></ul></li><li class="chapter-group"><span class="chapter-title">附录</span><ul class="article-list"><li><a href="附录-A-数据类型速查表.html">A. 数据类型速查表</a></li><li><a href="附录-B-对齐规则速查.html">B. 对齐规则速查</a></li><li><a href="附录-C-错误码速查.html">C. 错误码速查</a></li></ul></li></ul></nav>
+<main class="main">
+<div class="content">
+<div class="meta-bar"><a href="../index.html">← 返回目录</a></div>
+
+<h1>4.11 add 算子框架集成</h1>
+
+<h2>4.11.1 aclnn 两段式接口注册</h2>
+<p>Host 侧负责两件事：<strong>计算 Tiling 数据</strong>和<strong>注册 aclnn 接口</strong>。通过 opbase 框架提供的宏来注册两段式接口：</p>
+
+<pre><code class="language-cpp">// 第一段接口：计算 workspace 大小
+ACLNN_API aclnnStatus aclnnAddGetWorkspaceSize(
+    const aclnnTensorDesc* inputADesc,
+    const aclnnTensorDesc* inputBDesc,
+    const aclnnTensorDesc* outputCDesc,
+    uint64_t* workspaceSize,
+    aclOpExecutor** executor)
+{
+    // add 算子不需要 workspace
+    *workspaceSize = 0;
+
+    // 创建 executor 并注册 Tiling 函数和 Kernel
+    auto exec = new aclOpExecutor();
+    exec-&gt;SetTilingFunc(AddTilingFunc);
+    exec-&gt;SetKernelFunc("add_kernel");
+    exec-&gt;SetBlockDim(tilingData.tileNum);
+    *executor = exec;
+
+    return ACLNN_SUCCESS;
+}
+
+// 第二段接口：执行算子
+ACLNN_API aclnnStatus aclnnAdd(
+    const aclnnTensorDesc* inputADesc, void* inputA,
+    const aclnnTensorDesc* inputBDesc, void* inputB,
+    const aclnnTensorDesc* outputCDesc, void* outputC,
+    uint64_t workspaceSize, void* workspace,
+    aclOpExecutor* executor, aclrtStream stream)
+{
+    // 框架会自动调用 Tiling 函数计算 TilingData，
+    // 然后通过 &lt;&lt;&lt;&gt;&gt;&gt; 启动 Kernel
+    return executor-&gt;Execute(inputA, inputB, outputC,
+                              workspace, stream);
+}</code></pre>
+
+<div class="warning-callout"><p>上面的代码是简化后的伪代码，实际的 aclnn 接口注册需要使用 opbase 框架提供的宏（如 <code>IMPL_ADD_OP</code>）来完成。具体写法请参考 opbase 文档和仓内已有算子的实现。</p></div>
+
+<h3>接口注册流程</h3>
+<div style="margin:24px 0;text-align:center">
+<svg viewBox="0 0 640 260" style="width:100%;max-width:680px" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <text x="320" y="18" text-anchor="middle" font-size="13" font-weight="bold" fill="#1e293b">aclnn 接口注册与调用流程</text>
+  
+  <!-- Developer side -->
+  <rect x="20" y="35" width="180" height="100" rx="8" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="110" y="55" text-anchor="middle" font-size="12" font-weight="bold" fill="#4338ca">开发者实现</text>
+  <text x="110" y="75" text-anchor="middle" font-size="10" fill="#64748b">TilingFunc</text>
+  <text x="110" y="92" text-anchor="middle" font-size="10" fill="#64748b">Kernel 入口</text>
+  <text x="110" y="109" text-anchor="middle" font-size="10" fill="#64748b">IMPL_ADD_OP 宏</text>
+  
+  <!-- Arrow -->
+  <line x1="200" y1="85" x2="240" y2="85" stroke="#6366f1" stroke-width="2"/>
+  <polygon points="236,79 236,91 244,85" fill="#6366f1"/>
+  <text x="220" y="75" font-size="9" fill="#64748b">注册</text>
+  
+  <!-- Framework side -->
+  <rect x="245" y="35" width="180" height="100" rx="8" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="335" y="55" text-anchor="middle" font-size="12" font-weight="bold" fill="#92400e">opbase 框架</text>
+  <text x="335" y="75" text-anchor="middle" font-size="10" fill="#64748b">aclnnAddGetWorkspaceSize</text>
+  <text x="335" y="92" text-anchor="middle" font-size="10" fill="#64748b">aclnnAdd</text>
+  <text x="335" y="109" text-anchor="middle" font-size="10" fill="#64748b">executor 调度</text>
+  
+  <!-- Arrow -->
+  <line x1="425" y1="85" x2="465" y2="85" stroke="#f59e0b" stroke-width="2"/>
+  <polygon points="461,79 461,91 469,85" fill="#f59e0b"/>
+  <text x="445" y="75" font-size="9" fill="#64748b">暴露</text>
+  
+  <!-- Upper layer -->
+  <rect x="470" y="35" width="150" height="100" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="545" y="55" text-anchor="middle" font-size="12" font-weight="bold" fill="#166534">上层框架</text>
+  <text x="545" y="75" text-anchor="middle" font-size="10" fill="#64748b">PyTorch</text>
+  <text x="545" y="92" text-anchor="middle" font-size="10" fill="#64748b">torch.add()</text>
+  <text x="545" y="109" text-anchor="middle" font-size="10" fill="#64748b">自动调用 aclnn</text>
+  
+  <!-- Runtime flow -->
+  <rect x="20" y="160" width="600" height="85" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="40" y="180" font-size="12" font-weight="bold" fill="#1e293b">运行时调用链</text>
+  
+  <rect x="40" y="192" width="100" height="28" rx="4" fill="#dbeafe" stroke="#3b82f6" stroke-width="1"/>
+  <text x="90" y="210" text-anchor="middle" font-size="10" fill="#1e40af">PyTorch</text>
+  
+  <line x1="140" y1="206" x2="165" y2="206" stroke="#94a3b8" stroke-width="1.5"/>
+  <polygon points="162,201 162,211 168,206" fill="#94a3b8"/>
+  
+  <rect x="170" y="192" width="110" height="28" rx="4" fill="#fef3c7" stroke="#f59e0b" stroke-width="1"/>
+  <text x="225" y="210" text-anchor="middle" font-size="10" fill="#92400e">aclnnAdd</text>
+  
+  <line x1="280" y1="206" x2="305" y2="206" stroke="#94a3b8" stroke-width="1.5"/>
+  <polygon points="302,201 302,211 308,206" fill="#94a3b8"/>
+  
+  <rect x="310" y="192" width="110" height="28" rx="4" fill="#eef2ff" stroke="#6366f1" stroke-width="1"/>
+  <text x="365" y="210" text-anchor="middle" font-size="10" fill="#4338ca">TilingFunc</text>
+  
+  <line x1="420" y1="206" x2="445" y2="206" stroke="#94a3b8" stroke-width="1.5"/>
+  <polygon points="442,201 442,211 448,206" fill="#94a3b8"/>
+  
+  <rect x="450" y="192" width="150" height="28" rx="4" fill="#dcfce7" stroke="#16a34a" stroke-width="1"/>
+  <text x="525" y="210" text-anchor="middle" font-size="10" fill="#166534">&lt;&lt;&lt;&gt;&gt;&gt; add_kernel</text>
+</svg>
+</div>
+
+<h2>4.11.2 CMakeLists 配置</h2>
+<p>算子需要注册到构建系统中才能被编译。在 ops-blas 仓中，每个算子需要在对应的 CMakeLists.txt 中添加编译配置：</p>
+
+<pre><code class="language-cmake"># CMakeLists.txt（简化示例）
+
+# 添加 Kernel 源文件
+set(KERNEL_SRC
+    ${CMAKE_CURRENT_SOURCE_DIR}/add/arch35/add_kernel.cpp
+)
+
+# 添加 Host 源文件
+set(HOST_SRC
+    ${CMAKE_CURRENT_SOURCE_DIR}/add/arch35/add_host.cpp
+)
+
+# 编译 Kernel 二进制
+ascendc_library(add_kernel OBJECT ${KERNEL_SRC})
+target_include_directories(add_kernel PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/add/arch35
+)
+
+# 编译 Host 侧代码
+add_library(add_host OBJECT ${HOST_SRC})
+target_include_directories(add_host PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/add/arch35
+    ${OPBASE_INCLUDE_DIRS}
+)</code></pre>
+
+<p>实际工程中，CMakeLists 的配置由 opbase 框架统一管理，开发者通常只需要在算子目录的 CMakeLists.txt 中添加源文件路径即可。</p>
+
+<h3>编译产物</h3>
+<p>编译过程会依次执行：</p>
+<ol>
+<li><strong>Ascend C 编译器</strong>编译 Kernel → 生成 <code>add_kernel.o</code></li>
+<li><strong>C++ 编译器</strong>编译 Host 侧 → 生成 <code>add_host.o</code></li>
+<li><strong>链接器</strong>链接生成动态库 <code>libadd.so</code></li>
+</ol>
+
+<h2>4.11.3 编译与测试</h2>
+
+<h3>编译</h3>
+<p>使用 ops-blas 仓提供的 build.sh 脚本编译：</p>
+
+<pre><code class="language-bash"># 编译 add 算子（指定目标芯片）
+bash build.sh --ops=add --soc=Ascend910B
+
+# 编译成功后，Kernel 二进制会生成在 out/ 目录下
+ls out/kernel/add_kernel.o</code></pre>
+
+<h3>测试</h3>
+<p>编译通过后，运行 ST（System Test）用例验证功能正确性：</p>
+
+<pre><code class="language-bash"># 运行 add 算子的 ST 测试
+cd build &amp;&amp; ctest -R add --output-on-failure</code></pre>
+
+<p>ST 测试会自动：</p>
+<ol>
+<li>生成随机输入数据</li>
+<li>调用 CPU golden 计算期望结果</li>
+<li>在 NPU 上执行算子</li>
+<li>比对 NPU 输出和 golden 是否在精度范围内</li>
+</ol>
+
+<h2>4.11.4 完整开发 Checklist</h2>
+<p>开发一个 aclnn 框架算子，按以下顺序逐项完成：</p>
+
+<div style="margin:20px 0;padding:16px 20px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px">
+<ol style="list-style:none;padding:0;margin:0">
+<li style="padding:6px 0;border-bottom:1px solid #e2e8f0"><strong>1.</strong> 定义 TilingData 结构体（<code>add_tiling_data.h</code>）</li>
+<li style="padding:6px 0;border-bottom:1px solid #e2e8f0"><strong>2.</strong> 实现 Kernel 类和入口函数（<code>add_kernel.cpp</code>）</li>
+<li style="padding:6px 0;border-bottom:1px solid #e2e8f0"><strong>3.</strong> 实现 Tiling 函数和 aclnn 两段式接口（<code>add_host.cpp</code>）</li>
+<li style="padding:6px 0;border-bottom:1px solid #e2e8f0"><strong>4.</strong> 配置 CMakeLists.txt</li>
+<li style="padding:6px 0;border-bottom:1px solid #e2e8f0"><strong>5.</strong> 编译通过，确认 Kernel 二进制生成</li>
+<li style="padding:6px 0;border-bottom:1px solid #e2e8f0"><strong>6.</strong> ST 测试通过，精度达标</li>
+<li style="padding:6px 0"><strong>7.</strong> 性能测试，确认达到预期带宽利用率</li>
+</ol>
+</div>
+
+<h2>参考链接</h2>
+<ul>
+<li><a href="https://hiascend.com/document/redirect/CannCommunityOpdevAscendC">Ascend C 编程指南 — aclnn 算子开发</a></li>
+<li><a href="https://www.hiascend.com/zh/developer/techArticles/20240523-1">Ascend C 算子的调用方式</a></li>
+<li><a href="https://gitcode.com/cann/cann-samples">cann-samples Vector Add 样例</a>（<code>Samples/0_Introduction/vector_add_custom/</code>）</li>
+<li><a href="https://gitcode.com/cann/opbase">opbase 基础框架</a></li>
+<li><a href="https://gitcode.com/cann/asc-devkit.git">asc-devkit 高性能模板</a></li>
+</ul>
+
+<h2>Q&amp;A</h2>
+<div class="qa-section">
+<h3>Q：IMPL_ADD_OP 宏具体做了什么？</h3>
+<p>A：这个宏是 opbase 框架提供的注册工具，它会自动生成 aclnn 两段式接口的样板代码，包括：参数解析、类型校验、Tiling 函数注册、Kernel 查找和启动。开发者只需要提供 Tiling 函数和 Kernel 入口，宏会处理框架对接的所有细节。</p>
+
+<h3>Q：编译时 ascendc_library 和 add_library 有什么区别？</h3>
+<p>A：<code>ascendc_library</code> 是 Ascend C 编译器提供的专用编译命令，它会使用 Ascend C 编译器（而非普通 C++ 编译器）来编译 Kernel 代码，生成 AI Core 可执行的二进制。<code>add_library</code> 是标准 CMake 命令，用于编译 Host 侧的 C++ 代码。</p>
+
+<h3>Q：ST 测试失败后应该怎么办？</h3>
+<p>A：首先检查编译是否成功（Kernel 二进制是否生成），然后检查 Tiling 计算是否正确（打印 TilingData 各字段），最后检查 Kernel 逻辑（搬入/计算/搬出的长度是否匹配）。不要修改测试代码，应该修复算子代码。</p>
+</div>
+
+<div id="quiz"></div>
+
+<div class="page-nav"><a href="04-实战演练-4.14-add算子Kernel实现.html" class="nav-prev"><span class="nav-label">&larr; 上一篇</span><span class="nav-title">4.14 add 算子 Kernel 实现</span></a><a href="04-实战演练-4.16-ACL运行时API概览.html" class="nav-next"><span class="nav-label">下一篇 &rarr;</span><span class="nav-title">4.16 ACL 运行时 API 概览</span></a></div>
+</div>
+</main>
+<script src="../js/quiz.js"></script>
+<script>
+renderQuiz('quiz', [
+  {
+    question: "aclnn 两段式接口中，executor 的作用是什么？",
+    options: ["存储输入数据", "封装 Tiling 函数和 Kernel 入口，由框架自动调度执行", "管理 UB 内存", "计算 Tiling 数据"],
+    answer: 1,
+    explanation: "executor 是 opbase 框架的调度器，它封装了 Tiling 函数和 Kernel 入口。当上层框架调用第二段接口时，executor 会自动调用 Tiling 函数计算切分策略，然后通过 <<<>>> 启动 Kernel。"
+  },
+  {
+    question: "编译 add 算子时，ascendc_library 和 add_library 的区别是什么？",
+    options: ["没有区别", "ascendc_library 用 Ascend C 编译器编译 Kernel，add_library 用 C++ 编译器编译 Host", "ascendc_library 编译 Host，add_library 编译 Kernel", "两者都编译 Kernel"],
+    answer: 1,
+    explanation: "ascendc_library 使用 Ascend C 编译器编译 Kernel 代码，生成 AI Core 可执行的二进制；add_library 使用标准 C++ 编译器编译 Host 侧代码。两者使用不同的编译器和目标架构。"
+  },
+  {
+    question: "ST 测试的正确执行顺序是什么？",
+    options: ["先编译再测试", "先测试再编译", "编译和测试可以并行", "不需要编译直接测试"],
+    answer: 0,
+    explanation: "必须先编译通过（生成 Kernel 二进制和动态库），然后才能运行 ST 测试。ST 测试会加载编译好的算子库，在 NPU 上执行并与 CPU golden 比对结果。"
+  },
+  {
+    question: "如果 ST 测试失败，以下哪种做法是正确的？",
+    options: ["修改测试用例让测试通过", "降低精度标准", "检查算子代码（Tiling/Kernel/Host）并修复", "跳过失败的测试用例"],
+    answer: 2,
+    explanation: "测试失败时应该修复算子代码，而非修改测试代码。常见排查方向：Tiling 计算是否正确、Kernel 搬入/计算/搬出的长度是否匹配、Host 侧接口注册是否正确。"
+  },
+  {
+    question: "add 算子的 workspace 大小是多少？",
+    options: ["与输入大小相同", "与 UB 大小相同", "0（不需要额外临时内存）", "由 Tiling 函数动态计算"],
+    answer: 2,
+    explanation: "add 是简单的 Element-wise 算子，不需要额外的临时内存做中间计算，所以 workspace 大小为 0。但两段式接口的形式仍然保留，以保持框架接口统一。"
+  }
+]);
+</script>
+</body>
+</html>

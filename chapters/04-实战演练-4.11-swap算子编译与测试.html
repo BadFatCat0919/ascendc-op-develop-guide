@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4.7 swap 算子编译与测试 - AscendC Guide</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<nav class="sidebar"><div class="sidebar-header"><h2><a href="../index.html" style="color:inherit;text-decoration:none">AscendC Guide</a></h2><p>算子开发从入门到精通</p></div><ul class="sidebar-nav"><li class="chapter-group"><span class="chapter-title">第1章 基础概念</span><ul class="article-list"><li><a href="01-基础概念-1.1-什么是算子与AscendC.html">1.1 什么是算子与 Ascend C</a></li><li><a href="01-基础概念-1.2-数据类型排布与量化.html">1.2 数据类型、排布与量化</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第2章 硬件与编程模型</span><ul class="article-list"><li><a href="02-硬件与编程模型-2.1-A5硬件架构.html">2.1 A5 硬件架构</a></li><li><a href="02-硬件与编程模型-2.2-编程模型概述.html">2.2 编程模型概述</a></li><li><a href="02-硬件与编程模型-2.3-算子结构.html">2.3 算子结构</a></li><li><a href="02-硬件与编程模型-2.4-直调开发方式.html">2.4 直调开发方式</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第3章 核心开发</span><ul class="article-list"><li><a href="03-核心开发-3.1-Tiling设计.html">3.1 Tiling 设计</a></li><li><a href="03-核心开发-3.2-内存管理与数据搬运.html">3.2 内存管理与数据搬运</a></li><li><a href="03-核心开发-3.3-Vector计算.html">3.3 Vector 计算</a></li><li><a href="03-核心开发-3.4-Cube计算.html">3.4 Cube 计算</a></li><li><a href="03-核心开发-3.5-同步与流水线.html">3.5 同步与流水线</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第4章 实战演练</span><ul class="article-list"><li><a href="04-实战演练-4.1-CANN安装与配置.html">4.1 CANN 安装与配置</a></li><li><a href="04-实战演练-4.2-编译器与仿真器.html">4.2 编译器与仿真器</a></li><li><a href="04-实战演练-4.3-开发环境检查清单.html">4.3 开发环境检查清单</a></li><li><a href="04-实战演练-4.4-获取与编译算子代码.html">4.4 获取与编译算子代码</a></li><li><a href="04-实战演练-4.5-运行与查看结果.html">4.5 运行与查看结果</a></li><li><a href="04-实战演练-4.6-修改与重新编译.html">4.6 修改与重新编译</a></li><li><a href="04-实战演练-4.7-swap算子需求分析.html">4.7 swap 算子需求分析</a></li><li><a href="04-实战演练-4.8-swap算子Tiling设计.html">4.8 swap 算子 Tiling 设计</a></li><li><a href="04-实战演练-4.9-swap算子Kernel实现.html">4.9 swap 算子 Kernel 实现</a></li><li><a href="04-实战演练-4.10-swap算子Host实现.html">4.10 swap 算子 Host 实现</a></li><li><a href="04-实战演练-4.11-swap算子编译与测试.html" class="active">4.11 swap 算子编译与测试</a></li><li><a href="04-实战演练-4.12-add算子需求分析.html">4.12 add 算子需求分析</a></li><li><a href="04-实战演练-4.13-add算子Tiling设计.html">4.13 add 算子 Tiling 设计</a></li><li><a href="04-实战演练-4.14-add算子Kernel实现.html">4.14 add 算子 Kernel 实现</a></li><li><a href="04-实战演练-4.15-add算子框架集成.html">4.15 add 算子框架集成</a></li><li><a href="04-实战演练-4.16-ACL运行时API概览.html">4.16 ACL 运行时 API 概览</a></li><li><a href="04-实战演练-4.17-ACL设备与内存管理.html">4.17 ACL 设备与内存管理</a></li><li><a href="04-实战演练-4.18-ACL流与事件管理.html">4.18 ACL 流与事件管理</a></li><li><a href="04-实战演练-4.19-ACL错误处理与最佳实践.html">4.19 ACL 错误处理与最佳实践</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第5章 调试与优化</span><ul class="article-list"><li><a href="05-调试与优化-5.1-精度不对怎么办.html">5.1 精度不对怎么办</a></li><li><a href="05-调试与优化-5.2-性能不达标怎么办.html">5.2 性能不达标怎么办</a></li><li><a href="05-调试与优化-5.3-算子精度标准.html">5.3 算子精度标准</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第6章 进阶</span><ul class="article-list"><li><a href="06-进阶-6.1-常见踩坑与最佳实践.html">6.1 常见踩坑与最佳实践</a></li><li><a href="06-进阶-6.2-RegBase编程模型.html">6.2 RegBase 编程模型</a></li><li><a href="06-进阶-6.3-SIMT混合编程.html">6.3 SIMT 混合编程</a></li><li><a href="06-进阶-6.4-NDDMA高维搬运.html">6.4 NDDMA 高维搬运</a></li><li><a href="06-进阶-6.5-CCU通算融合.html">6.5 CCU 通算融合</a></li><li><a href="06-进阶-6.6-跨架构兼容.html">6.6 跨架构兼容</a></li></ul></li><li class="chapter-group"><span class="chapter-title">附录</span><ul class="article-list"><li><a href="附录-A-数据类型速查表.html">A. 数据类型速查表</a></li><li><a href="附录-B-对齐规则速查.html">B. 对齐规则速查</a></li><li><a href="附录-C-错误码速查.html">C. 错误码速查</a></li></ul></li></ul></nav>
+<main class="main">
+<div class="content">
+<div class="meta-bar"><a href="../index.html">← 返回目录</a></div>
+
+<h1>4.7 swap 算子编译与测试</h1>
+<p>代码写完后，我们需要编译并在 NPU 上运行测试。本节将介绍编译命令、测试方法和常见问题排查。</p>
+
+<h2>4.7.1 编译命令</h2>
+<p>ops-blas 提供了统一的构建脚本 <code>build.sh</code>，支持按算子名和芯片版本编译。</p>
+
+<h3>基本编译命令</h3>
+<pre><code class="language-bash"># 编译 swap 算子（指定目标芯片）
+bash build.sh --ops=swap --soc=Ascend910B
+
+# 编译所有算子
+bash build.sh --soc=Ascend910B
+
+# 清理编译产物
+bash build.sh --clean</code></pre>
+
+<h3>编译参数说明</h3>
+<table>
+<thead><tr><th>参数</th><th>说明</th><th>示例</th></tr></thead>
+<tbody>
+<tr><td><code>--ops</code></td><td>指定要编译的算子名</td><td><code>--ops=swap</code></td></tr>
+<tr><td><code>--soc</code></td><td>指定目标芯片版本</td><td><code>--soc=Ascend910B</code></td></tr>
+<tr><td><code>--clean</code></td><td>清理编译产物</td><td><code>--clean</code></td></tr>
+<tr><td><code>--debug</code></td><td>启用调试模式</td><td><code>--debug</code></td></tr>
+</tbody>
+</table>
+
+<h3>编译产物</h3>
+<pre><code>build/
+├── swap/
+│   ├── swap_kernel.o          # Kernel 目标文件
+│   ├── swap_host.o            # Host 目标文件
+│   └── libswap.so             # 动态链接库
+└── test/
+    └── swap_test              # 测试可执行文件</code></pre>
+
+<h2>4.7.2 运行测试</h2>
+<p>编译成功后，运行测试程序验证 swap 算子的正确性。</p>
+
+<h3>运行命令</h3>
+<pre><code class="language-bash"># 运行 swap 测试
+./build/test/swap_test
+
+# 指定测试用例（通过 GTest 过滤器）
+./build/test/swap_test --gtest_filter="SwapTest.BasicSwap"
+
+# 运行所有测试并输出详细信息
+./build/test/swap_test --gtest_print_time=1</code></pre>
+
+<h3>测试用例说明</h3>
+<table>
+<thead><tr><th>测试用例</th><th>说明</th><th>预期结果</th></tr></thead>
+<tbody>
+<tr><td><code>BasicSwap</code></td><td>基本交换（N=4）</td><td>X 和 Y 内容互换</td></tr>
+<tr><td><code>LargeN</code></td><td>大规模数据（N=100000）</td><td>所有元素正确交换</td></tr>
+<tr><td><code>SmallN</code></td><td>小规模数据（N=1）</td><td>单个元素正确交换</td></tr>
+<tr><td><code>OddN</code></td><td>奇数个元素（N=1001）</td><td>余数处理正确</td></tr>
+<tr><td><code>MultiCore</code></td><td>多核并行（N=50000）</td><td>多核切分正确</td></tr>
+</tbody>
+</table>
+
+<h2>4.7.3 查看结果</h2>
+
+<h3>成功输出示例</h3>
+<pre><code class="language-text">[==========] Running 5 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 5 tests from SwapTest
+[ RUN      ] SwapTest.BasicSwap
+[       OK ] SwapTest.BasicSwap (12 ms)
+[ RUN      ] SwapTest.LargeN
+[       OK ] SwapTest.LargeN (45 ms)
+[ RUN      ] SwapTest.SmallN
+[       OK ] SwapTest.SmallN (8 ms)
+[ RUN      ] SwapTest.OddN
+[       OK ] SwapTest.OddN (15 ms)
+[ RUN      ] SwapTest.MultiCore
+[       OK ] SwapTest.MultiCore (38 ms)
+[----------] 5 tests from SwapTest (118 ms total)
+[==========] 5 tests from 1 test suite ran. (118 ms total)
+[  PASSED  ] 5 tests.</code></pre>
+
+<h3>失败输出示例</h3>
+<pre><code class="language-text">[ RUN      ] SwapTest.LargeN
+swap_test.cpp:42: Failure
+Expected equality of these values:
+  expected[i]
+    Which is: 5.0
+  actual[i]
+    Which is: 0.0
+[  FAILED  ] SwapTest.LargeN (45 ms)</code></pre>
+
+<h2>4.7.4 常见问题</h2>
+
+<h3>问题 1：编译报错 "kernel_operator.h: No such file"</h3>
+<p><strong>原因：</strong>CANN 环境变量未配置。</p>
+<pre><code class="language-bash"># 解决方案：source CANN 环境变量
+source /usr/local/Ascend/ascend-toolkit/set_env.sh</code></pre>
+
+<h3>问题 2：运行时报错 "Failed to allocate device memory"</h3>
+<p><strong>原因：</strong>NPU 内存不足或设备未初始化。</p>
+<pre><code class="language-bash"># 检查 NPU 设备状态
+npu-smi info
+
+# 检查是否有其他进程占用 NPU
+npu-smi info -t usages -i 0</code></pre>
+
+<h3>问题 3：测试结果全为 0</h3>
+<p><strong>原因：</strong>Kernel 未正确执行，可能是 TilingData 传递错误。</p>
+<pre><code class="language-cpp">// 检查 TilingData 是否正确传递
+// 在 Kernel 入口函数中添加调试输出
+printf("totalN=%d, perCoreN=%d, tileSize=%d\n", 
+       tiling.totalN, tiling.perCoreN, tiling.tileSize);</code></pre>
+
+<h3>问题 4：部分元素未交换</h3>
+<p><strong>原因：</strong>余数处理不正确，最后一个 Core 的数据没有完全处理。</p>
+<pre><code class="language-cpp">// 检查 Init 函数中的余数处理
+if (coreIdx == tiling.coreCount - 1) {
+    myN += tiling.remainder;  // 确保最后一个 Core 处理余数
+}</code></pre>
+
+<h3>问题 5：aclrtSynchronizeDevice 超时</h3>
+<p><strong>原因：</strong>Kernel 死循环或卡死。</p>
+<pre><code class="language-cpp">// 检查 Process 函数的循环条件
+while (processed &lt; myN) {  // 确保循环能终止
+    int32_t currentSize = ...;
+    SingleIteration(processed, currentSize);
+    processed += currentSize;  // 确保 processed 递增
+}</code></pre>
+
+<h2>4.7.5 调试技巧</h2>
+
+<h3>1. 使用 printf 调试</h3>
+<p>在 Kernel 中可以使用 <code>printf</code> 输出调试信息（注意：输出可能乱序）。</p>
+<pre><code class="language-cpp">// 在 Kernel 中添加调试输出
+__aicore__ inline void Init(...) {
+    printf("Core %d: myN=%d, tileSize=%d\n", 
+           GetBlockIdx(), myN, tileSize);
+}</code></pre>
+
+<h3>2. 使用 plog 日志</h3>
+<p>对于生产环境，建议使用 plog 日志框架。</p>
+<pre><code class="language-cpp">#include "log_inner.h"
+
+// 记录日志
+ASCEND_LOG_INFO("swap kernel: coreIdx=%d, myN=%d", coreIdx, myN);</code></pre>
+
+<h3>3. 使用 Simulator 调试</h3>
+<p>如果没有 NPU 硬件，可以使用 CANN Simulator 进行仿真调试。</p>
+<pre><code class="language-bash"># 使用 Simulator 编译
+bash build.sh --ops=swap --soc=Ascend910B --simulator
+
+# 运行仿真
+./build/test/swap_test --simulator</code></pre>
+
+<h2>4.7.6 性能测试</h2>
+<p>功能验证通过后，可以使用 profiling 工具测试性能。</p>
+
+<pre><code class="language-bash"># 使用 msprof 采集性能数据
+msprof op --kernel=swap_kernel_entry --input=swap_input.json
+
+# 查看性能报告
+cat profiling_result.csv</code></pre>
+
+<h3>性能指标</h3>
+<table>
+<thead><tr><th>指标</th><th>说明</th><th>参考值</th></tr></thead>
+<tbody>
+<tr><td>执行时间</td><td>Kernel 执行耗时（μs）</td><td>N=100000 时 &lt; 50μs</td></tr>
+<tr><td>带宽利用率</td><td>实际带宽 / 理论带宽</td><td>&gt; 80%</td></tr>
+<tr><td>AI Core 利用率</td><td>活跃的 Core 比例</td><td>&gt; 90%</td></tr>
+</tbody>
+</table>
+
+<h2>Q&A：常见问题</h2>
+
+<h3>Q1：为什么编译时需要指定 --soc 参数？</h3>
+<p><strong>A：</strong>不同芯片版本（如 Ascend910A、Ascend910B）的 AI Core 架构不同，支持的指令集和 UB 大小也不同。编译器需要根据目标芯片生成对应的机器码。</p>
+
+<h3>Q2：测试失败时应该先检查什么？</h3>
+<p><strong>A：</strong>按以下顺序排查：1) 检查编译是否成功（Kernel 二进制是否生成）→ 2) 检查 TilingData 是否正确传递 → 3) 检查 Kernel 是否正确执行（添加 printf 调试）→ 4) 检查数据拷贝是否正确（H2D 和 D2H）。</p>
+
+<h3>Q3：如何在没有 NPU 的环境下调试？</h3>
+<p><strong>A：</strong>使用 CANN Simulator。Simulator 可以在 CPU 上模拟 NPU 的执行行为，支持断点调试和单步执行。虽然性能数据不准确，但功能验证完全可用。</p>
+
+<div id="quiz"></div>
+<div class="page-nav"><a href="04-实战演练-4.10-swap算子Host实现.html" class="nav-prev"><span class="nav-label">&larr; 上一篇</span><span class="nav-title">4.10 swap 算子 Host 实现</span></a><a href="04-实战演练-4.12-add算子需求分析.html" class="nav-next"><span class="nav-label">下一篇 &rarr;</span><span class="nav-title">4.12 add 算子需求分析</span></a></div>
+</div>
+</main>
+<script src="../js/quiz.js"></script>
+<script>
+renderQuiz('quiz', [
+  {
+    question: "编译 swap 算子时，--soc=Ascend910B 参数的作用是？",
+    options: ["指定编译器版本", "指定目标芯片版本，生成对应的机器码", "指定 NPU 设备 ID", "指定内存大小"],
+    answer: 1,
+    explanation: "不同芯片版本（如 Ascend910A、Ascend910B）的 AI Core 架构不同，支持的指令集和 UB 大小也不同。--soc 参数告诉编译器目标芯片型号，以便生成对应的机器码。"
+  },
+  {
+    question: "运行测试时报错 'Failed to allocate device memory'，最可能的原因是？",
+    options: ["代码有语法错误", "NPU 内存不足或设备未初始化", "编译器版本不对", "测试用例写错了"],
+    answer: 1,
+    explanation: "'Failed to allocate device memory' 表示 NPU 内存分配失败。常见原因：1) NPU 设备未初始化（需要先 aclInit）；2) NPU 内存不足（其他进程占用了大量内存）；3) 请求的内存大小不合理。可以用 npu-smi info 检查设备状态。"
+  },
+  {
+    question: "测试结果全为 0，最可能的原因是？",
+    options: ["NPU 硬件故障", "Kernel 未正确执行，TilingData 传递错误", "编译器优化导致", "测试数据有问题"],
+    answer: 1,
+    explanation: "结果全为 0 通常说明 Kernel 没有正确执行。最常见的原因是 TilingData 传递错误（如 GM 指针为空、TilingData 未正确拷贝到 Device）。可以在 Kernel 入口函数中添加 printf 调试输出，检查 TilingData 的值是否正确。"
+  },
+  {
+    question: "aclrtSynchronizeDevice 超时的原因是？",
+    options: ["网络延迟", "Kernel 死循环或卡死", "CPU 负载过高", "内存不足"],
+    answer: 1,
+    explanation: "aclrtSynchronizeDevice 等待所有 Kernel 执行完成。如果超时，说明某个 Kernel 卡住了。常见原因：1) Process 函数的循环条件有误，导致死循环；2) DataCopy 访问了非法地址；3) 多个 Core 之间发生了死锁。需要检查循环条件和内存访问。"
+  },
+  {
+    question: "在没有 NPU 的环境下，如何调试 swap 算子？",
+    options: ["无法调试，必须等待 NPU", "使用 CANN Simulator 进行仿真调试", "使用 GDB 直接调试 Kernel", "在 CPU 上手动模拟"],
+    answer: 1,
+    explanation: "CANN Simulator 可以在 CPU 上模拟 NPU 的执行行为，支持断点调试和单步执行。虽然性能数据不准确，但功能验证完全可用。使用 --simulator 参数编译和运行即可。"
+  }
+]);
+</script>
+</body>
+</html>

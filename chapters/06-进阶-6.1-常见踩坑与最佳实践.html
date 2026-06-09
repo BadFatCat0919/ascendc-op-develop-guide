@@ -4,15 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>6.1 常见踩坑与最佳实践 - AscendC Guide</title>
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-<nav class="sidebar"><div class="sidebar-header"><h2><a href="index.html" style="color:inherit;text-decoration:none">AscendC Guide</a></h2><p>算子开发从入门到精通</p></div><ul class="sidebar-nav"><li class="chapter-group"><span class="chapter-title">第1章 基础概念</span><ul class="article-list"><li><a href="01-基础概念-1.1-什么是算子与AscendC.html" class="">1.1 什么是算子与 Ascend C</a></li><li><a href="01-基础概念-1.2-数据类型排布与量化.html" class="">1.2 数据类型、排布与量化</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第2章 硬件与编程模型</span><ul class="article-list"><li><a href="02-硬件与编程模型-2.1-A5硬件架构.html" class="">2.1 A5 硬件架构</a></li><li><a href="02-硬件与编程模型-2.2-编程模型概述.html" class="">2.2 编程模型概述</a></li><li><a href="02-硬件与编程模型-2.3-算子结构与直调开发.html" class="">2.3 算子结构与直调开发</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第3章 核心开发</span><ul class="article-list"><li><a href="03-核心开发-3.1-Tiling设计.html" class="">3.1 Tiling 设计</a></li><li><a href="03-核心开发-3.2-内存管理与数据搬运.html" class="">3.2 内存管理与数据搬运</a></li><li><a href="03-核心开发-3.3-Vector计算.html" class="">3.3 Vector 计算</a></li><li><a href="03-核心开发-3.4-Cube计算.html" class="">3.4 Cube 计算</a></li><li><a href="03-核心开发-3.5-同步与流水线.html" class="">3.5 同步与流水线</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第4章 实战演练</span><ul class="article-list"><li><a href="04-实战演练-4.1-环境搭建.html" class="">4.1 环境搭建</a></li><li><a href="04-实战演练-4.2-五分钟跑通第一个算子.html" class="">4.2 五分钟跑通第一个算子</a></li><li><a href="04-实战演练-4.3-直调开发-swap算子.html" class="">4.3 直调开发：swap 算子</a></li><li><a href="04-实战演练-4.4-框架开发-add算子.html" class="">4.4 框架开发：add 算子</a></li><li><a href="04-实战演练-4.5-ACL接口使用指南.html" class="">4.5 ACL 接口使用指南</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第5章 调试与优化</span><ul class="article-list"><li><a href="05-调试与优化-5.1-精度不对怎么办.html" class="">5.1 精度不对怎么办</a></li><li><a href="05-调试与优化-5.2-性能不达标怎么办.html" class="">5.2 性能不达标怎么办</a></li><li><a href="05-调试与优化-5.3-算子精度标准.html" class="">5.3 算子精度标准</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第6章 进阶</span><ul class="article-list"><li><a href="06-进阶-6.1-常见踩坑与最佳实践.html" class="active">6.1 常见踩坑与最佳实践</a></li><li><a href="06-进阶-6.2-进阶主题.html" class="">6.2 进阶主题</a></li></ul></li><li class="chapter-group"><span class="chapter-title">附录</span><ul class="article-list"><li><a href="附录-A-数据类型速查表.html" class="">A. 数据类型速查表</a></li><li><a href="附录-B-对齐规则速查.html" class="">B. 对齐规则速查</a></li><li><a href="附录-C-错误码速查.html" class="">C. 错误码速查</a></li></ul></li></ul></nav>
+<nav class="sidebar"><div class="sidebar-header"><h2><a href="../index.html" style="color:inherit;text-decoration:none">AscendC Guide</a></h2><p>算子开发从入门到精通</p></div><ul class="sidebar-nav"><li class="chapter-group"><span class="chapter-title">第1章 基础概念</span><ul class="article-list"><li><a href="01-基础概念-1.1-什么是算子与AscendC.html">1.1 什么是算子与 Ascend C</a></li><li><a href="01-基础概念-1.2-数据类型排布与量化.html">1.2 数据类型、排布与量化</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第2章 硬件与编程模型</span><ul class="article-list"><li><a href="02-硬件与编程模型-2.1-A5硬件架构.html">2.1 A5 硬件架构</a></li><li><a href="02-硬件与编程模型-2.2-编程模型概述.html">2.2 编程模型概述</a></li><li><a href="02-硬件与编程模型-2.3-算子结构.html">2.3 算子结构</a></li><li><a href="02-硬件与编程模型-2.4-直调开发方式.html">2.4 直调开发方式</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第3章 核心开发</span><ul class="article-list"><li><a href="03-核心开发-3.1-Tiling设计.html">3.1 Tiling 设计</a></li><li><a href="03-核心开发-3.2-内存管理与数据搬运.html">3.2 内存管理与数据搬运</a></li><li><a href="03-核心开发-3.3-Vector计算.html">3.3 Vector 计算</a></li><li><a href="03-核心开发-3.4-Cube计算.html">3.4 Cube 计算</a></li><li><a href="03-核心开发-3.5-同步与流水线.html">3.5 同步与流水线</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第4章 实战演练</span><ul class="article-list"><li><a href="04-实战演练-4.1-CANN安装与配置.html">4.1 CANN 安装与配置</a></li><li><a href="04-实战演练-4.2-编译器与仿真器.html">4.2 编译器与仿真器</a></li><li><a href="04-实战演练-4.3-开发环境检查清单.html">4.3 开发环境检查清单</a></li><li><a href="04-实战演练-4.4-获取与编译算子代码.html">4.4 获取与编译算子代码</a></li><li><a href="04-实战演练-4.5-运行与查看结果.html">4.5 运行与查看结果</a></li><li><a href="04-实战演练-4.6-修改与重新编译.html">4.6 修改与重新编译</a></li><li><a href="04-实战演练-4.7-swap算子需求分析.html">4.7 swap 算子需求分析</a></li><li><a href="04-实战演练-4.8-swap算子Tiling设计.html">4.8 swap 算子 Tiling 设计</a></li><li><a href="04-实战演练-4.9-swap算子Kernel实现.html">4.9 swap 算子 Kernel 实现</a></li><li><a href="04-实战演练-4.10-swap算子Host实现.html">4.10 swap 算子 Host 实现</a></li><li><a href="04-实战演练-4.11-swap算子编译与测试.html">4.11 swap 算子编译与测试</a></li><li><a href="04-实战演练-4.12-add算子需求分析.html">4.12 add 算子需求分析</a></li><li><a href="04-实战演练-4.13-add算子Tiling设计.html">4.13 add 算子 Tiling 设计</a></li><li><a href="04-实战演练-4.14-add算子Kernel实现.html">4.14 add 算子 Kernel 实现</a></li><li><a href="04-实战演练-4.15-add算子框架集成.html">4.15 add 算子框架集成</a></li><li><a href="04-实战演练-4.16-ACL运行时API概览.html">4.16 ACL 运行时 API 概览</a></li><li><a href="04-实战演练-4.17-ACL设备与内存管理.html">4.17 ACL 设备与内存管理</a></li><li><a href="04-实战演练-4.18-ACL流与事件管理.html">4.18 ACL 流与事件管理</a></li><li><a href="04-实战演练-4.19-ACL错误处理与最佳实践.html">4.19 ACL 错误处理与最佳实践</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第5章 调试与优化</span><ul class="article-list"><li><a href="05-调试与优化-5.1-精度不对怎么办.html">5.1 精度不对怎么办</a></li><li><a href="05-调试与优化-5.2-性能不达标怎么办.html">5.2 性能不达标怎么办</a></li><li><a href="05-调试与优化-5.3-算子精度标准.html">5.3 算子精度标准</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第6章 进阶</span><ul class="article-list"><li><a href="06-进阶-6.1-常见踩坑与最佳实践.html" class="active">6.1 常见踩坑与最佳实践</a></li><li><a href="06-进阶-6.2-RegBase编程模型.html">6.2 RegBase 编程模型</a></li><li><a href="06-进阶-6.3-SIMT混合编程.html">6.3 SIMT 混合编程</a></li><li><a href="06-进阶-6.4-NDDMA高维搬运.html">6.4 NDDMA 高维搬运</a></li><li><a href="06-进阶-6.5-CCU通算融合.html">6.5 CCU 通算融合</a></li><li><a href="06-进阶-6.6-跨架构兼容.html">6.6 跨架构兼容</a></li></ul></li><li class="chapter-group"><span class="chapter-title">附录</span><ul class="article-list"><li><a href="附录-A-数据类型速查表.html">A. 数据类型速查表</a></li><li><a href="附录-B-对齐规则速查.html">B. 对齐规则速查</a></li><li><a href="附录-C-错误码速查.html">C. 错误码速查</a></li></ul></li></ul></nav>
 <main class="main">
 <div class="content">
-<div class="meta-bar"><a href="index.html">← 返回目录</a></div>
+<div class="meta-bar"><a href="../index.html">← 返回目录</a></div>
 <p>本文以 sswap 算子（arch35）为贯穿示例。sswap 是 BLAS Level-1 算子，功能是交换两个向量的对应元素——纯数据搬运，不涉及 Vector 计算，使用 Single Buffer 和 TQueBind 流水线。</p>
-<h2>5.1.1 对齐问题</h2>
+<h2>6.1.1 对齐问题</h2>
 <p>对齐问题是 Ascend C 开发中最常见、也最容易让人抓狂的坑。根本原因在于 Da Vinci 核的 MTE（Memory Transfer Engine）搬运数据时，硬件要求每次搬运的长度必须是 32 字节的整数倍。你可以把它想象成"集装箱装车"——每辆车只能装整箱，散货必须凑齐一整箱才能发。</p>
 <h3>常见场景</h3>
 <p><strong>场景一：DataCopy 长度不是 32B 的倍数。</strong> 假设你要搬运 10 个 FP32 元素（40 字节），而 40 不是 32 的倍数，直接调用 <code>DataCopy</code> 会报错或产生静默错误——数据看起来对了，但多出来的部分可能是垃圾值。</p>
@@ -40,7 +40,7 @@
 <li><strong>在 Tiling 阶段就做好对齐。</strong> sswap 的 Host 侧 <code>CalSswapTilingData</code> 函数中，<code>perCoreN</code> 和 <code>tileSize</code> 都做了向下对齐到 <code>ELEMENTS_PER_BLOCK</code> 的处理，从源头避免不对齐的情况。</li>
 </ol>
 <p>详细计算见 <a href="附录-B-对齐规则速查.html">附录 B：对齐规则速查</a>。</p>
-<h2>5.1.2 repeat 限制</h2>
+<h2>6.1.2 repeat 限制</h2>
 <p>Ascend C 的 Vector 指令有一个 <code>repeatTimes</code> 参数，用来指定同一条指令连续执行多少次。但这个参数有上限——通常是 <strong>255</strong>。</p>
 <p>如果你的数据量很大，一条指令处理不完怎么办？答案是<strong>分多轮处理</strong>。比如你要对 10000 个元素做 Add 运算，每条指令最多处理 255 轮（每轮 128 个 FP16 元素），那就需要把数据切成多个 chunk，循环调用。</p>
 <p>sswap 本身不涉及 Vector 计算，所以没有 repeat 的问题。但它的 tile loop 设计思路是类似的——把大量数据切成 <code>tileSize</code> 大小的块，每次处理一块：</p>
@@ -54,7 +54,7 @@ if (tileTail &gt; 0) {
     SingleIteration(curOffset, tileTail);
 }</code></pre>
 <p>这个"切块 + 循环 + 处理尾巴"的模式，在几乎所有算子中都会用到。</p>
-<h2>5.1.3 Buffer 冲突</h2>
+<h2>6.1.3 Buffer 冲突</h2>
 <p>Buffer 冲突是指同一块 UB 内存被同时读写，导致数据错乱。打个比方：一个人在往黑板上写字，另一个人在同时擦黑板——结果就是谁都看不清写了什么。</p>
 <h3>sswap 的做法：两个独立的 TQueBind</h3>
 <p>sswap 需要同时处理 x 和 y 两个向量，它用了<strong>两个独立的 TQueBind</strong> 分别管理：</p>
@@ -67,14 +67,56 @@ TQueBind&lt;QuePosition::VECIN, QuePosition::VECOUT, 1&gt; inQueueY_;</code></pr
 <h3>EnQue/DeQue 必须配对</h3>
 <p>使用 TQueBind 时，每次 <code>AllocTensor</code> + <code>EnQue</code> 后，必须有对应的 <code>DeQue</code> + <code>FreeTensor</code>。如果漏掉了 <code>FreeTensor</code>，Queue 会认为 Buffer 还在被使用，下一次 <code>AllocTensor</code> 就会卡住，造成死锁。</p>
 <p>sswap 的流程非常清晰：</p>
-<pre class="ascii-art"><code>AllocTensor(x) → AllocTensor(y) → DataCopy → EnQue(x) → EnQue(y)
-→ DeQue(x) → DeQue(y) → DataCopy(交叉写回) → FreeTensor(x) → FreeTensor(y)</code></pre>
-<h2>5.1.4 精度陷阱</h2>
+<div style="margin:20px 0;text-align:center">
+<svg viewBox="0 0 1020 90" style="width:100%;max-width:700px" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+<rect x="0" y="15" width="88" height="50" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+<text x="44" y="37" text-anchor="middle" font-size="10" fill="#1e293b">AllocTensor</text>
+<text x="44" y="52" text-anchor="middle" font-size="10" font-weight="bold" fill="#6366f1">(x)</text>
+<polygon points="91,40 98,36 98,44" fill="#6366f1"/>
+<rect x="100" y="15" width="88" height="50" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+<text x="144" y="37" text-anchor="middle" font-size="10" fill="#1e293b">AllocTensor</text>
+<text x="144" y="52" text-anchor="middle" font-size="10" font-weight="bold" fill="#6366f1">(y)</text>
+<polygon points="191,40 198,36 198,44" fill="#6366f1"/>
+<rect x="200" y="15" width="88" height="50" rx="6" fill="#dbeafe" stroke="#6366f1" stroke-width="1.5"/>
+<text x="244" y="44" text-anchor="middle" font-size="10" font-weight="bold" fill="#1e293b">DataCopy</text>
+<polygon points="291,40 298,36 298,44" fill="#6366f1"/>
+<rect x="300" y="15" width="88" height="50" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+<text x="344" y="37" text-anchor="middle" font-size="10" fill="#1e293b">EnQue</text>
+<text x="344" y="52" text-anchor="middle" font-size="10" font-weight="bold" fill="#6366f1">(x)</text>
+<polygon points="391,40 398,36 398,44" fill="#6366f1"/>
+<rect x="400" y="15" width="88" height="50" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+<text x="444" y="37" text-anchor="middle" font-size="10" fill="#1e293b">EnQue</text>
+<text x="444" y="52" text-anchor="middle" font-size="10" font-weight="bold" fill="#6366f1">(y)</text>
+<polygon points="491,40 498,36 498,44" fill="#6366f1"/>
+<rect x="500" y="15" width="88" height="50" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+<text x="544" y="37" text-anchor="middle" font-size="10" fill="#1e293b">DeQue</text>
+<text x="544" y="52" text-anchor="middle" font-size="10" font-weight="bold" fill="#6366f1">(x)</text>
+<polygon points="591,40 598,36 598,44" fill="#6366f1"/>
+<rect x="600" y="15" width="88" height="50" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+<text x="644" y="37" text-anchor="middle" font-size="10" fill="#1e293b">DeQue</text>
+<text x="644" y="52" text-anchor="middle" font-size="10" font-weight="bold" fill="#6366f1">(y)</text>
+<polygon points="691,40 698,36 698,44" fill="#6366f1"/>
+<rect x="700" y="15" width="108" height="50" rx="6" fill="#eef2ff" stroke="#6366f1" stroke-width="2"/>
+<text x="754" y="37" text-anchor="middle" font-size="10" fill="#1e293b">DataCopy</text>
+<text x="754" y="52" text-anchor="middle" font-size="10" font-weight="bold" fill="#6366f1">(交叉写回)</text>
+<polygon points="811,40 818,36 818,44" fill="#6366f1"/>
+<rect x="820" y="15" width="88" height="50" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+<text x="864" y="37" text-anchor="middle" font-size="10" fill="#1e293b">FreeTensor</text>
+<text x="864" y="52" text-anchor="middle" font-size="10" font-weight="bold" fill="#6366f1">(x)</text>
+<polygon points="911,40 918,36 918,44" fill="#6366f1"/>
+<rect x="920" y="15" width="88" height="50" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+<text x="964" y="37" text-anchor="middle" font-size="10" fill="#1e293b">FreeTensor</text>
+<text x="964" y="52" text-anchor="middle" font-size="10" font-weight="bold" fill="#6366f1">(y)</text>
+<text x="244" y="80" text-anchor="middle" font-size="9" fill="#64748b">GM → UB</text>
+<text x="754" y="80" text-anchor="middle" font-size="9" fill="#64748b">UB → GM</text>
+</svg>
+</div>
+<h2>6.1.4 精度陷阱</h2>
 <p>精度问题在浮点运算中无处不在，Ascend C 也不例外。</p>
 <p><strong>FP16 累加溢出。</strong> FP16 的最大值只有 65504，如果你用 FP16 做累加器，累加几千个中等大小的数就可能溢出。解决方案是使用 <strong>FP32 累加器</strong>——先把 FP16 数据 Cast 到 FP32，用 FP32 做累加，最后再 Cast 回 FP16。</p>
 <p><strong>BF16 精度更低。</strong> BF16 的尾数只有 7 位（FP16 有 10 位），所以 BF16 的精度实际上比 FP16 更差。它的优势在于动态范围和 FP32 一样大（指数位都是 8 位），不容易溢出，但精度损失更明显。</p>
 <p>sswap 是纯数据搬运，不涉及任何计算，所以不存在精度问题——它的测试使用的是 <code>PrecisionMode::EXACT</code>（精确比对）。但对于有计算的算子，精度标准的选择至关重要，详见 <a href="05-调试与优化-5.3-算子精度标准.html">5.3 算子精度标准</a>。</p>
-<h2>5.1.5 硬编码硬件参数</h2>
+<h2>6.1.5 硬编码硬件参数</h2>
 <p>这是一个看似方便、实则致命的坏习惯。</p>
 <h3>为什么不能硬编码</h3>
 <p>不同的昇腾芯片型号，Vector 核数、UB 大小等硬件参数完全不同。A2 不同型号核数不同（如 910B2 有 48 个 Vector 核），sswap arch22 代码中使用 DEFAULT_VECTOR_CNT = 40。这就是为什么必须动态获取核数而不是硬编码。如果你在代码里写死 <code>CORE_NUM = 32</code>，换一块芯片就可能出问题——要么浪费了一半的核，要么核数不够导致数据丢失。</p>
@@ -106,7 +148,7 @@ constexpr uint32_t UB_SIZE = 248 * 1024;
 uint32_t coreNum = ascendcPlatform.GetCoreNumAiv();
 uint64_t ubSize;
 ascendcPlatform.GetCoreMemSize(platform_ascendc::CoreMemType::UB, ubSize);</code></pre>
-<h2>5.1.6 流水线同步遗漏</h2>
+<h2>6.1.6 流水线同步遗漏</h2>
 <p>在多流水线协同工作时，同步是保证数据正确性的关键。忘记同步或同步配对错误，轻则数据竞争（读到还没搬完的脏数据），重则死锁（两个流水线互相等待）。</p>
 <h3>传统方式：SetFlag/WaitFlag</h3>
 <p>在 arch22（A2/A3）上，你需要手动管理 <code>SET_FLAG</code> 和 <code>WAIT_FLAG</code>。以 arch22 的 sswap 为例：</p>
@@ -116,13 +158,13 @@ WAIT_FLAG(MTE2, MTE3, event_id);  // MTE3 等待 MTE2 搬完</code></pre>
 <h3>A5 的简化：TQueBind 隐式同步</h3>
 <p>在 arch35（A5）上，TQueBind 的 <code>EnQue</code>/<code>DeQue</code> 机制自动处理了流水线间的同步。sswap 的 arch35 实现中，你完全看不到 <code>SET_FLAG</code> 和 <code>WAIT_FLAG</code>——<code>EnQue</code> 会自动通知下游流水线"数据准备好了"，<code>DeQue</code> 会自动等待上游流水线"数据搬完了再读"。</p>
 <p>这是 A5 相比 A2/A3 的一个重要改进：把容易出错的显式同步，变成了不容易出错的隐式同步。</p>
-<h2>5.1.7 编码规范要点</h2>
+<h2>6.1.7 编码规范要点</h2>
 <p>ops-blas 仓有严格的编码规范，以下几点尤其重要：</p>
 <p><strong>变量命名清晰。</strong> 不要用 <code>a</code>、<code>b</code>、<code>tmp</code> 这种含义不明的名字。sswap 中的 <code>myOffset_</code>、<code>myCount_</code>、<code>alignedCount</code>、<code>tailCount</code> 都是自解释的命名。</p>
 <p><strong>避免魔法数字。</strong> sswap 中用 <code>ELEMENTS_PER_BLOCK</code> 代替了硬编码的 <code>8</code>，用 <code>BUFFER_NUM</code> 代替了硬编码的 <code>1</code>。如果将来换了数据类型（比如从 FP32 换成 FP16），只需要改一处定义。</p>
 <p><strong>检查 API 返回值。</strong> sswap 的 Host 侧对 <code>aclrtMalloc</code>、<code>aclrtMemcpy</code> 的返回值都做了检查，失败时打印日志并返回对应的错误码。不要假设 API 调用一定会成功。</p>
 <p><strong>遵循 ops-blas 编码规范。</strong> 加载 <code>blas-ascendc-coding-rules</code> skill 可以查看完整的编码约束和正反例。</p>
-<h2>5.1.8 最佳实践清单</h2>
+<h2>6.1.8 最佳实践清单</h2>
 <p>以下是 Ascend C 算子开发的最佳实践总结，建议作为日常开发的 checklist：</p>
 <ol>
 <li><strong>先跑通仿真器，再上板优化性能。</strong> 仿真器可以快速验证功能正确性，不需要排队等 NPU 资源。</li>
@@ -142,10 +184,10 @@ WAIT_FLAG(MTE2, MTE3, event_id);  // MTE3 等待 MTE2 搬完</code></pre>
 <li><a href="https://gitcode.com/cann/asc-devkit.git">asc-devkit 最佳实践</a>（<code>examples/04_best_practices/</code>）</li>
 </ul>
 <div id="quiz"></div>
-<div class="page-nav"><a href="05-调试与优化-5.3-算子精度标准.html" class="nav-prev"><span class="nav-label">← 上一篇</span><span class="nav-title">5.3 算子精度标准</span></a><a href="06-进阶-6.2-进阶主题.html" class="nav-next"><span class="nav-label">下一篇 →</span><span class="nav-title">6.2 进阶主题</span></a></div>
+<div class="page-nav"><a href="05-调试与优化-5.3-算子精度标准.html" class="nav-prev"><span class="nav-label">&larr; 上一篇</span><span class="nav-title">5.3 算子精度标准</span></a><a href="06-进阶-6.2-RegBase编程模型.html" class="nav-next"><span class="nav-label">下一篇 &rarr;</span><span class="nav-title">6.2 RegBase 编程模型</span></a></div>
 </div>
 </main>
-<script src="js/quiz.js"></script>
+<script src="../js/quiz.js"></script>
 <script>
 renderQuiz('quiz', [
   {

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4.10 add 算子 Kernel 实现 - AscendC Guide</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<nav class="sidebar"><div class="sidebar-header"><h2><a href="../index.html" style="color:inherit;text-decoration:none">AscendC Guide</a></h2><p>算子开发从入门到精通</p></div><ul class="sidebar-nav"><li class="chapter-group"><span class="chapter-title">第1章 基础概念</span><ul class="article-list"><li><a href="01-基础概念-1.1-什么是算子与AscendC.html">1.1 什么是算子与 Ascend C</a></li><li><a href="01-基础概念-1.2-数据类型排布与量化.html">1.2 数据类型、排布与量化</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第2章 硬件与编程模型</span><ul class="article-list"><li><a href="02-硬件与编程模型-2.1-A5硬件架构.html">2.1 A5 硬件架构</a></li><li><a href="02-硬件与编程模型-2.2-编程模型概述.html">2.2 编程模型概述</a></li><li><a href="02-硬件与编程模型-2.3-算子结构.html">2.3 算子结构</a></li><li><a href="02-硬件与编程模型-2.4-直调开发方式.html">2.4 直调开发方式</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第3章 核心开发</span><ul class="article-list"><li><a href="03-核心开发-3.1-Tiling设计.html">3.1 Tiling 设计</a></li><li><a href="03-核心开发-3.2-内存管理与数据搬运.html">3.2 内存管理与数据搬运</a></li><li><a href="03-核心开发-3.3-Vector计算.html">3.3 Vector 计算</a></li><li><a href="03-核心开发-3.4-Cube计算.html">3.4 Cube 计算</a></li><li><a href="03-核心开发-3.5-同步与流水线.html">3.5 同步与流水线</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第4章 实战演练</span><ul class="article-list"><li><a href="04-实战演练-4.1-CANN安装与配置.html">4.1 CANN 安装与配置</a></li><li><a href="04-实战演练-4.2-编译器与仿真器.html">4.2 编译器与仿真器</a></li><li><a href="04-实战演练-4.3-开发环境检查清单.html">4.3 开发环境检查清单</a></li><li><a href="04-实战演练-4.4-获取与编译算子代码.html">4.4 获取与编译算子代码</a></li><li><a href="04-实战演练-4.5-运行与查看结果.html">4.5 运行与查看结果</a></li><li><a href="04-实战演练-4.6-修改与重新编译.html">4.6 修改与重新编译</a></li><li><a href="04-实战演练-4.7-swap算子需求分析.html">4.7 swap 算子需求分析</a></li><li><a href="04-实战演练-4.8-swap算子Tiling设计.html">4.8 swap 算子 Tiling 设计</a></li><li><a href="04-实战演练-4.9-swap算子Kernel实现.html">4.9 swap 算子 Kernel 实现</a></li><li><a href="04-实战演练-4.10-swap算子Host实现.html">4.10 swap 算子 Host 实现</a></li><li><a href="04-实战演练-4.11-swap算子编译与测试.html">4.11 swap 算子编译与测试</a></li><li><a href="04-实战演练-4.12-add算子需求分析.html">4.12 add 算子需求分析</a></li><li><a href="04-实战演练-4.13-add算子Tiling设计.html">4.13 add 算子 Tiling 设计</a></li><li><a href="04-实战演练-4.14-add算子Kernel实现.html" class="active">4.14 add 算子 Kernel 实现</a></li><li><a href="04-实战演练-4.15-add算子框架集成.html">4.15 add 算子框架集成</a></li><li><a href="04-实战演练-4.16-ACL运行时API概览.html">4.16 ACL 运行时 API 概览</a></li><li><a href="04-实战演练-4.17-ACL设备与内存管理.html">4.17 ACL 设备与内存管理</a></li><li><a href="04-实战演练-4.18-ACL流与事件管理.html">4.18 ACL 流与事件管理</a></li><li><a href="04-实战演练-4.19-ACL错误处理与最佳实践.html">4.19 ACL 错误处理与最佳实践</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第5章 调试与优化</span><ul class="article-list"><li><a href="05-调试与优化-5.1-精度不对怎么办.html">5.1 精度不对怎么办</a></li><li><a href="05-调试与优化-5.2-性能不达标怎么办.html">5.2 性能不达标怎么办</a></li><li><a href="05-调试与优化-5.3-算子精度标准.html">5.3 算子精度标准</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第6章 进阶</span><ul class="article-list"><li><a href="06-进阶-6.1-常见踩坑与最佳实践.html">6.1 常见踩坑与最佳实践</a></li><li><a href="06-进阶-6.2-RegBase编程模型.html">6.2 RegBase 编程模型</a></li><li><a href="06-进阶-6.3-SIMT混合编程.html">6.3 SIMT 混合编程</a></li><li><a href="06-进阶-6.4-NDDMA高维搬运.html">6.4 NDDMA 高维搬运</a></li><li><a href="06-进阶-6.5-CCU通算融合.html">6.5 CCU 通算融合</a></li><li><a href="06-进阶-6.6-跨架构兼容.html">6.6 跨架构兼容</a></li></ul></li><li class="chapter-group"><span class="chapter-title">附录</span><ul class="article-list"><li><a href="附录-A-数据类型速查表.html">A. 数据类型速查表</a></li><li><a href="附录-B-对齐规则速查.html">B. 对齐规则速查</a></li><li><a href="附录-C-错误码速查.html">C. 错误码速查</a></li></ul></li></ul></nav>
+<main class="main">
+<div class="content">
+<div class="meta-bar"><a href="../index.html">← 返回目录</a></div>
+
+<h1>4.10 add 算子 Kernel 实现</h1>
+
+<h2>4.10.1 数据流概览</h2>
+<p>add 算子的 Kernel 实现遵循经典的<strong>搬入 → 计算 → 搬出</strong>三步走模式。下图展示了数据在各存储层级之间的流动：</p>
+
+<div style="margin:24px 0;text-align:center">
+<svg viewBox="0 0 700 340" style="width:100%;max-width:750px" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <text x="350" y="20" text-anchor="middle" font-size="14" font-weight="bold" fill="#1e293b">add 算子数据流</text>
+  
+  <!-- GM layer -->
+  <rect x="30" y="40" width="640" height="60" rx="8" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="50" y="60" font-size="12" font-weight="bold" fill="#475569">GM（全局内存）</text>
+  <rect x="50" y="68" width="120" height="24" rx="3" fill="#dbeafe" stroke="#3b82f6" stroke-width="1"/>
+  <text x="110" y="84" text-anchor="middle" font-size="10" fill="#1e40af">A[offset..]</text>
+  <rect x="190" y="68" width="120" height="24" rx="3" fill="#dbeafe" stroke="#3b82f6" stroke-width="1"/>
+  <text x="250" y="84" text-anchor="middle" font-size="10" fill="#1e40af">B[offset..]</text>
+  <rect x="490" y="68" width="120" height="24" rx="3" fill="#dcfce7" stroke="#16a34a" stroke-width="1"/>
+  <text x="550" y="84" text-anchor="middle" font-size="10" fill="#166534">C[offset..]</text>
+  
+  <!-- Arrows: CopyIn -->
+  <line x1="110" y1="100" x2="110" y2="140" stroke="#3b82f6" stroke-width="2" stroke-dasharray="4,2"/>
+  <polygon points="104,136 116,136 110,144" fill="#3b82f6"/>
+  <text x="120" y="125" font-size="10" fill="#3b82f6">DataCopy</text>
+  
+  <line x1="250" y1="100" x2="250" y2="140" stroke="#3b82f6" stroke-width="2" stroke-dasharray="4,2"/>
+  <polygon points="244,136 256,136 250,144" fill="#3b82f6"/>
+  <text x="260" y="125" font-size="10" fill="#3b82f6">DataCopy</text>
+  
+  <!-- UB layer -->
+  <rect x="30" y="145" width="640" height="80" rx="8" fill="#fefce8" stroke="#eab308" stroke-width="1.5"/>
+  <text x="50" y="165" font-size="12" font-weight="bold" fill="#854d0e">UB（统一缓冲区）</text>
+  
+  <rect x="50" y="175" width="100" height="24" rx="3" fill="#dbeafe" stroke="#3b82f6" stroke-width="1"/>
+  <text x="100" y="191" text-anchor="middle" font-size="10" fill="#1e40af">inQueueA_</text>
+  
+  <rect x="170" y="175" width="100" height="24" rx="3" fill="#dbeafe" stroke="#3b82f6" stroke-width="1"/>
+  <text x="220" y="191" text-anchor="middle" font-size="10" fill="#1e40af">inQueueB_</text>
+  
+  <!-- Compute arrow -->
+  <line x1="150" y1="187" x2="310" y2="187" stroke="#6366f1" stroke-width="2"/>
+  <line x1="270" y1="187" x2="310" y2="187" stroke="#6366f1" stroke-width="2"/>
+  <polygon points="306,181 306,193 314,187" fill="#6366f1"/>
+  
+  <rect x="320" y="170" width="120" height="34" rx="4" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="380" y="191" text-anchor="middle" font-size="11" font-weight="bold" fill="#4338ca">AscendC::Add</text>
+  
+  <!-- Arrow to outQueue -->
+  <line x1="440" y1="187" x2="490" y2="187" stroke="#16a34a" stroke-width="2"/>
+  <polygon points="486,181 486,193 494,187" fill="#16a34a"/>
+  
+  <rect x="500" y="175" width="100" height="24" rx="3" fill="#dcfce7" stroke="#16a34a" stroke-width="1"/>
+  <text x="550" y="191" text-anchor="middle" font-size="10" fill="#166534">outQueue_</text>
+  
+  <!-- Arrow: CopyOut -->
+  <line x1="550" y1="225" x2="550" y2="260" stroke="#16a34a" stroke-width="2" stroke-dasharray="4,2"/>
+  <polygon points="544,256 556,256 550,264" fill="#16a34a"/>
+  <text x="560" y="248" font-size="10" fill="#16a34a">DataCopy</text>
+  
+  <!-- GM output -->
+  <rect x="30" y="265" width="640" height="50" rx="8" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="50" y="285" font-size="12" font-weight="bold" fill="#475569">GM（输出）</text>
+  <rect x="490" y="275" width="120" height="24" rx="3" fill="#dcfce7" stroke="#16a34a" stroke-width="1"/>
+  <text x="550" y="291" text-anchor="middle" font-size="10" fill="#166534">C = A + B</text>
+  
+  <!-- Legend -->
+  <text x="50" y="335" font-size="11" fill="#64748b">搬入长度: alignSize（32B 对齐）  |  计算/搬出长度: processLength（实际数据量）</text>
+</svg>
+</div>
+
+<h2>4.10.2 Kernel 类结构</h2>
+<p>Kernel 类采用 <strong>Init → Process</strong> 的两阶段结构。Process 内部按顺序执行 CopyIn、Compute、CopyOut：</p>
+
+<pre><code class="language-cpp">// add_kernel.cpp
+#include "kernel_operator.h"
+#include "add_tiling_data.h"
+
+class AddKernel {
+public:
+    __aicore__ inline AddKernel() {}
+
+    __aicore__ inline void Init(GM_ADDR a, GM_ADDR b, GM_ADDR c,
+                                 GM_ADDR tilingGm)
+    {
+        // 解析 Tiling 数据
+        __gm__ AddTilingData* tilingPtr =
+            reinterpret_cast&lt;__gm__ AddTilingData*&gt;(tilingGm);
+        totalLength_ = tilingPtr-&gt;totalLength;
+        tileSize_ = tilingPtr-&gt;tileSize;
+        alignSize_ = tilingPtr-&gt;alignSize;
+
+        // 计算当前核的数据范围
+        blockIdx_ = AscendC::GetBlockIdx();
+        offset_ = blockIdx_ * tileSize_;
+
+        // 最后一个核可能处理的数据不足 tileSize，需要截断
+        processLength_ = tileSize_;
+        if (offset_ + tileSize_ &gt; totalLength_) {
+            processLength_ = totalLength_ - offset_;
+        }
+
+        // 初始化 GM 地址
+        aGm_ = reinterpret_cast&lt;__gm__ float*&gt;(a) + offset_;
+        bGm_ = reinterpret_cast&lt;__gm__ float*&gt;(b) + offset_;
+        cGm_ = reinterpret_cast&lt;__gm__ float*&gt;(c) + offset_;
+
+        // 分配 UB Buffer（双 Buffer 流水线）
+        pipe_.InitBuffer(inQueueA_, 2, alignSize_ * sizeof(float));
+        pipe_.InitBuffer(inQueueB_, 2, alignSize_ * sizeof(float));
+        pipe_.InitBuffer(outQueue_, 1, alignSize_ * sizeof(float));
+    }
+
+    __aicore__ inline void Process()
+    {
+        CopyIn();
+        Compute();
+        CopyOut();
+    }
+
+private:
+    // ... 成员方法见下文
+
+    // 成员变量
+    AscendC::TPipe pipe_;
+    AscendC::TQue&lt;AscendC::QuePosition::VECIN, 1&gt; inQueueA_;
+    AscendC::TQue&lt;AscendC::QuePosition::VECIN, 1&gt; inQueueB_;
+    AscendC::TQue&lt;AscendC::QuePosition::VECOUT, 1&gt; outQueue_;
+
+    __gm__ float* aGm_ = nullptr;
+    __gm__ float* bGm_ = nullptr;
+    __gm__ float* cGm_ = nullptr;
+
+    uint32_t totalLength_ = 0;
+    uint32_t tileSize_ = 0;
+    uint32_t alignSize_ = 0;
+    uint32_t processLength_ = 0;
+    uint32_t blockIdx_ = 0;
+    uint32_t offset_ = 0;
+};</code></pre>
+
+<h2>4.10.3 数据搬运流程</h2>
+
+<h3>CopyIn：从 GM 搬入到 UB</h3>
+<pre><code class="language-cpp">__aicore__ inline void CopyIn()
+{
+    // 从 GM 搬入数据到 UB
+    auto aLocal = inQueueA_.AllocTensor&lt;float&gt;();
+    auto bLocal = inQueueB_.AllocTensor&lt;float&gt;();
+    AscendC::DataCopy(aLocal, aGm_, alignSize_);
+    AscendC::DataCopy(bLocal, bGm_, alignSize_);
+    inQueueA_.EnQue(aLocal);
+    inQueueB_.EnQue(bLocal);
+}</code></pre>
+
+<p>要点：</p>
+<ul>
+<li>使用 <code>DataCopy</code> 从 GM 搬入 A 和 B 两个向量到 UB</li>
+<li>搬入长度使用 <code>alignSize</code>（32B 对齐），即使实际数据不足也要搬对齐长度</li>
+<li>搬入后通过 <code>EnQue</code> 入队，供计算阶段使用</li>
+</ul>
+
+<h3>Compute：Vector 计算</h3>
+<pre><code class="language-cpp">__aicore__ inline void Compute()
+{
+    // 从队列取出数据，执行加法
+    auto aLocal = inQueueA_.DeQue&lt;float&gt;();
+    auto bLocal = inQueueB_.DeQue&lt;float&gt;();
+    auto cLocal = outQueue_.AllocTensor&lt;float&gt;();
+
+    AscendC::Add(cLocal, aLocal, bLocal, processLength_);
+
+    outQueue_.EnQue(cLocal);
+    inQueueA_.FreeTensor(aLocal);
+    inQueueB_.FreeTensor(bLocal);
+}</code></pre>
+
+<p>要点：</p>
+<ul>
+<li>通过 <code>DeQue</code> 从输入队列取出数据</li>
+<li>调用 <code>AscendC::Add</code> 执行逐元素加法</li>
+<li>计算长度使用 <code>processLength</code>（实际数据长度），而非 alignSize</li>
+<li>计算完成后释放输入 Tensor，结果入队</li>
+</ul>
+
+<h3>CopyOut：从 UB 搬回 GM</h3>
+<pre><code class="language-cpp">__aicore__ inline void CopyOut()
+{
+    // 将结果从 UB 搬回 GM
+    auto cLocal = outQueue_.DeQue&lt;float&gt;();
+    AscendC::DataCopy(cGm_, cLocal, processLength_);
+    outQueue_.FreeTensor(cLocal);
+}</code></pre>
+
+<p>搬出长度同样使用 <code>processLength</code>，只搬出有效数据。</p>
+
+<h2>4.10.4 Kernel 入口函数</h2>
+<p>Kernel 入口函数是 AI Core 的执行入口，使用 <code>__global__</code> 和 <code>__aicore__</code> 标记：</p>
+
+<pre><code class="language-cpp">// Kernel 入口函数
+extern "C" __global__ __aicore__ void add_kernel(
+    GM_ADDR a, GM_ADDR b, GM_ADDR c,
+    GM_ADDR workspace, GM_ADDR tiling)
+{
+    AddKernel op;
+    op.Init(a, b, c, tiling);
+    op.Process();
+}</code></pre>
+
+<div class="warning-callout"><p><strong>搬入和计算/搬出的长度不同</strong>：DataCopy 要求 32B 对齐，所以搬入用 <code>alignSize</code>；但实际计算和搬出只需要 <code>processLength</code> 个元素。这是 add 算子中最容易踩的坑之一。</p></div>
+
+<h2>4.10.5 Vector 计算详解</h2>
+<p><code>AscendC::Add</code> 是 Vector 计算 API，底层调用 Vector 单元执行逐元素加法。Vector 单元的工作方式：</p>
+
+<div style="margin:24px 0;text-align:center">
+<svg viewBox="0 0 640 180" style="width:100%;max-width:680px" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
+  <text x="320" y="18" text-anchor="middle" font-size="13" font-weight="bold" fill="#1e293b">Vector 单元处理流程（processLength=500, Vector 宽度=64 float）</text>
+  
+  <!-- Repeat 1-7 -->
+  <rect x="30" y="40" width="60" height="30" rx="3" fill="#dbeafe" stroke="#3b82f6" stroke-width="1"/>
+  <text x="60" y="60" text-anchor="middle" font-size="9" fill="#1e40af">64 elem</text>
+  <rect x="95" y="40" width="60" height="30" rx="3" fill="#dbeafe" stroke="#3b82f6" stroke-width="1"/>
+  <text x="125" y="60" text-anchor="middle" font-size="9" fill="#1e40af">64 elem</text>
+  <rect x="160" y="40" width="60" height="30" rx="3" fill="#dbeafe" stroke="#3b82f6" stroke-width="1"/>
+  <text x="190" y="60" text-anchor="middle" font-size="9" fill="#1e40af">64 elem</text>
+  <rect x="225" y="40" width="60" height="30" rx="3" fill="#dbeafe" stroke="#3b82f6" stroke-width="1"/>
+  <text x="255" y="60" text-anchor="middle" font-size="9" fill="#1e40af">64 elem</text>
+  <rect x="290" y="40" width="60" height="30" rx="3" fill="#dbeafe" stroke="#3b82f6" stroke-width="1"/>
+  <text x="320" y="60" text-anchor="middle" font-size="9" fill="#1e40af">64 elem</text>
+  <rect x="355" y="40" width="60" height="30" rx="3" fill="#dbeafe" stroke="#3b82f6" stroke-width="1"/>
+  <text x="385" y="60" text-anchor="middle" font-size="9" fill="#1e40af">64 elem</text>
+  <rect x="420" y="40" width="60" height="30" rx="3" fill="#dbeafe" stroke="#3b82f6" stroke-width="1"/>
+  <text x="450" y="60" text-anchor="middle" font-size="9" fill="#1e40af">64 elem</text>
+  
+  <!-- Repeat 8 (partial) -->
+  <rect x="485" y="40" width="50" height="30" rx="3" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="510" y="60" text-anchor="middle" font-size="9" fill="#92400e">52 elem</text>
+  
+  <!-- Labels -->
+  <text x="250" y="90" text-anchor="middle" font-size="10" fill="#64748b">Repeat 1~7: 每次 64 个元素（共 448）</text>
+  <text x="510" y="90" text-anchor="middle" font-size="10" fill="#92400e">Repeat 8: mask 处理 52 个</text>
+  
+  <!-- Summary -->
+  <rect x="30" y="110" width="580" height="50" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="50" y="132" font-size="11" fill="#1e293b">总 repeat 次数 = ceil(500 / 64) = 8</text>
+  <text x="50" y="150" font-size="11" fill="#64748b">前 7 次满向量（7 &times; 64 = 448），第 8 次通过 mask 只处理剩余 52 个元素</text>
+</svg>
+</div>
+
+<p>Vector 的 <strong>repeat + mask</strong> 机制让它能处理任意长度的向量，不需要程序员手写循环。<code>AscendC::Add</code> 内部自动计算 repeat 次数和最后一次 repeat 的 mask。</p>
+
+<h2>Q&amp;A</h2>
+<div class="qa-section">
+<h3>Q：Init 阶段为什么要检查 offset_ + tileSize_ &gt; totalLength_？</h3>
+<p>A：当 totalLength 不能被 coreNum 整除时，最后一个核分到的数据量不足 tileSize。如果不做截断，这个核会访问超出向量边界的数据，导致越界。所以需要计算 <code>processLength = totalLength - offset</code> 来截断。</p>
+
+<h3>Q：为什么 UB Buffer 用双 Buffer（InitBuffer 的第二个参数为 2）？</h3>
+<p>A：双 Buffer 支持流水线：当一个 Buffer 在做计算时，另一个 Buffer 可以同时搬入下一批数据。虽然 add 算子只有一轮搬入→计算→搬出，双 Buffer 的优势不明显，但在多轮循环的场景下（大数据量分块处理），双 Buffer 能显著提升吞吐。</p>
+
+<h3>Q：如果 processLength = 500，Vector 宽度为 256 Bytes（64 个 float），需要多少次 repeat？</h3>
+<p>A：ceil(500 / 64) = 8 次 repeat。前 7 次每次处理 64 个元素（共 448 个），第 8 次通过 mask 机制只处理剩余的 52 个元素。</p>
+</div>
+
+<div id="quiz"></div>
+
+<div class="page-nav"><a href="04-实战演练-4.13-add算子Tiling设计.html" class="nav-prev"><span class="nav-label">&larr; 上一篇</span><span class="nav-title">4.13 add 算子 Tiling 设计</span></a><a href="04-实战演练-4.15-add算子框架集成.html" class="nav-next"><span class="nav-label">下一篇 &rarr;</span><span class="nav-title">4.15 add 算子框架集成</span></a></div>
+</div>
+</main>
+<script src="../js/quiz.js"></script>
+<script>
+renderQuiz('quiz', [
+  {
+    question: "add 算子的 Kernel 中，DataCopy 搬入使用 alignSize，而 Add 计算使用 processLength，为什么长度不同？",
+    options: ["写错了，应该用同一个长度", "DataCopy 要求 32B 对齐，所以搬入用对齐后的长度；计算只需要实际数据长度", "processLength 比对齐长度大", "这是为了兼容不同芯片架构"],
+    answer: 1,
+    explanation: "DataCopy API 要求搬运长度必须是 32B 对齐的，所以搬入时使用 alignSize（向上对齐到 32B 边界）。但实际计算只需要 processLength 个有效元素，多出的对齐部分是无效数据，不参与计算。"
+  },
+  {
+    question: "Kernel 入口函数的签名中，GM_ADDR workspace 参数的作用是什么？",
+    options: ["存储输入数据", "存储输出数据", "提供算子执行所需的临时内存空间", "存储 Tiling 数据"],
+    answer: 2,
+    explanation: "workspace 是 aclnn 框架为算子分配的临时内存空间，用于中间计算。对于 add 这种简单算子，workspace 大小为 0，但参数仍然保留以保持接口统一。"
+  },
+  {
+    question: "如果 processLength = 500，Vector 宽度为 256 Bytes（64 个 float），需要多少次 repeat 才能处理完？",
+    options: ["1 次", "7 次", "8 次", "500 次"],
+    answer: 2,
+    explanation: "Vector 单次处理 64 个 float（256B / 4B = 64）。500 个元素需要 ceil(500 / 64) = 8 次 repeat。前 7 次每次处理 64 个元素（共 448 个），第 8 次通过 mask 机制只处理剩余的 52 个元素。"
+  },
+  {
+    question: "Init 阶段 pipe_.InitBuffer(inQueueA_, 2, alignSize_ * sizeof(float)) 中，参数 2 表示什么？",
+    options: ["队列深度为 2", "双 Buffer，支持流水线", "分配 2 个 Tensor", "2 字节对齐"],
+    answer: 1,
+    explanation: "参数 2 表示双 Buffer 模式：分配 2 个 Buffer 交替使用。当一个 Buffer 在做计算时，另一个可以同时搬入下一批数据，实现流水线并行。"
+  },
+  {
+    question: "CopyOut 阶段，DataCopy 搬出的长度应该用什么？",
+    options: ["alignSize", "tileSize", "processLength", "totalLength"],
+    answer: 2,
+    explanation: "搬出使用 processLength（实际数据长度）。搬入用 alignSize 是因为 DataCopy 的 32B 对齐要求，但搬出时只需要写回有效数据，避免覆盖 GM 中其他核的数据。"
+  }
+]);
+</script>
+</body>
+</html>
