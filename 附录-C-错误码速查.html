@@ -97,9 +97,9 @@ renderQuiz('quiz', [
   },
   {
     question: "sswap 的参数校验中，当 n <= 0 时应该返回什么？",
-    options: ["ACLBLAS_STATUS_INVALID_VALUE", "ACLBLAS_STATUS_SUCCESS（BLAS 标准行为）", "ACLBLAS_STATUS_NOT_SUPPORTED", "ACLBLAS_STATUS_INTERNAL_ERROR"],
+    options: ["ACLBLAS_STATUS_INVALID_VALUE", "ACLBLAS_STATUS_SUCCESS（不需要做任何操作）", "ACLBLAS_STATUS_NOT_SUPPORTED", "ACLBLAS_STATUS_INTERNAL_ERROR"],
     answer: 1,
-    explanation: "按照 BLAS 标准行为，n <= 0 时直接返回 ACLBLAS_STATUS_SUCCESS，因为不需要做任何操作。"
+    explanation: "当 n <= 0 时，表示没有元素需要交换，所以直接返回 ACLBLAS_STATUS_SUCCESS。这是一种边界情况处理——不需要做任何操作，但也不算错误。"
   },
   {
     question: "错误排查流程的第一步应该做什么？",

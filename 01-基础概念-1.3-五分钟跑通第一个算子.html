@@ -131,10 +131,10 @@ constexpr uint32_t ELEMENTS_PER_BLOCK = 32 / sizeof(float);</code></pre>
 <script>
 renderQuiz('quiz', [
   {
-    question: "sswap 是 BLAS Level-1 中的一个 routine，它的功能是什么？",
-    options: ["计算两个向量的点积", "对向量中的每个元素取绝对值", "交换两个向量的对应元素（x 变成原来的 y，y 变成原来的 x）", "将两个向量相加"],
+    question: "sswap 算子的功能是什么？它在 Ascend C 中属于哪类算子？",
+    options: ["计算两个向量的点积（计算密集型）", "对向量中的每个元素取绝对值（逐元素运算）", "交换两个向量的对应元素（纯数据搬运型）", "将两个向量相加（逐元素运算）"],
     answer: 2,
-    explanation: "sswap 的功能是交换两个向量的对应元素——调用 swap(x, y) 后，x 变成原来的 y，y 变成原来的 x。它不做任何加减乘除，纯粹是把数据从 A 搬到 B、从 B 搬到 A，属于数据搬运算子。"
+    explanation: "sswap 的功能是交换两个向量的对应元素——调用 swap(x, y) 后，x 变成原来的 y，y 变成原来的 x。它不做任何加减乘除，纯粹是把数据从 A 搬到 B、从 B 搬到 A，属于数据搬运算子。这类算子的优化重点是搬运效率，而不是计算能力。"
   },
   {
     question: "sswap 算子的代码放在 arch35 目录下，这个目录包含三个文件。以下哪个文件负责定义「每个 NPU 核该处理多少数据」？",

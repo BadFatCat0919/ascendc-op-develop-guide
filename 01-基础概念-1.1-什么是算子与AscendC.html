@@ -140,10 +140,10 @@ renderQuiz('quiz', [
     explanation: "opbase 是所有算子仓库的「标准库」——它提供公共头文件、调度框架、内存管理等基础设施。所有算子仓库（ops-blas、ops-nn、ops-math 等）都依赖它。它位于 Ascend C 算子库和 CANN Toolkit 之间。"
   },
   {
-    question: "sswap 算子属于哪个仓库？它属于 BLAS 标准的哪个 Level？",
-    options: ["ops-nn，BLAS Level-2", "ops-math，BLAS Level-3", "ops-blas，BLAS Level-1", "ops-transformer，BLAS Level-1"],
+    question: "sswap 算子属于哪个算子仓库？它的主要计算特点是什么？",
+    options: ["ops-nn，需要大量 Vector 计算", "ops-math，需要复杂的数学运算", "ops-blas，纯数据搬运，不涉及数值计算", "ops-transformer，需要 Cube 矩阵乘"],
     answer: 2,
-    explanation: "sswap 属于 ops-blas 仓，因为它是 BLAS（Basic Linear Algebra Subprograms）标准中 Level-1 的一个 routine。BLAS Level-1 处理的都是向量与向量之间的操作，sswap 的功能就是交换两个向量的对应元素。"
+    explanation: "sswap 属于 ops-blas 仓（线性代数算子库），它的功能是交换两个向量的对应元素。这个算子的特点是纯数据搬运——不做任何加减乘除，只是把数据从 A 搬到 B、从 B 搬到 A，所以关键不在于'算什么'，而在于'怎么搬得更快'。"
   }
 ]);
 </script>
