@@ -17,7 +17,7 @@
 <h2>2.2.1 并行编程模型总览</h2>
 <p>编程模型是硬件能力和软件表达之间的抽象层——它决定了程序员如何描述并行计算。选对编程模型，代码写起来事半功倍；选错了，要么性能上不去，要么根本实现不了。</p>
 <p>昇腾 NPU 支持以下几种编程模型：</p>
-<table><thead><tr><th>编程模型</th><th>全称</th><th>核心思想</th><th>昇腾支持</th></tr></thead><tbody><tr><td><strong>SIMD</strong></td><td>Single Instruction Multiple Data</td><td>一条指令同时处理多个数据</td><td>✅ 所有架构</td></tr><tr><td><strong>SIMT</strong></td><td>Single Instruction Multiple Threads</td><td>一条指令调度多个线程</td><td>✅ 仅 A5</td></tr><tr><td><strong>SPMD</strong></td><td>Single Program Multiple Data</td><td>多个核运行同一份代码，处理不同数据</td><td>✅ 默认模型</td></tr><tr><td><strong>MPMD</strong></td><td>Multiple Program Multiple Data</td><td>多个核运行不同代码</td><td>❌ 不直接支持</td></tr></tbody></table>
+<table><thead><tr><th>编程模型</th><th>全称</th><th>核心思想</th><th>昇腾支持</th></tr></thead><tbody><tr><td><strong>SIMD</strong></td><td>Single Instruction Multiple Data</td><td>一条指令同时处理多个数据</td><td>✅ 所有架构</td></tr><tr><td><strong>SIMT</strong></td><td>Single Instruction Multiple Threads</td><td>一条指令调度多个线程</td><td>✅ 仅 A5</td></tr><tr><td><strong>SPMD</strong></td><td>Single Program Multiple Data</td><td>多个核运行同一份代码，处理不同数据</td><td>✅ Ascend C 默认模型</td></tr><tr><td><strong>MPMD</strong></td><td>Multiple Program Multiple Data</td><td>多个核运行不同代码</td><td>✅ 通过 <a href="https://gitcode.com/cann/pypto">PyPTO</a> 框架支持</td></tr></tbody></table>
 <p>下面从外到内、从粗到细逐一讲解。</p>
 <h2>2.2.2 SPMD：多核并行的基础</h2>
 <p>SPMD 是昇腾多核并行的核心模型。它的意思是：所有 AI Core 运行同一份 Kernel 代码，但每个核处理不同的数据块。</p>
@@ -31,8 +31,8 @@
 <p>SPMD 是<strong>外层</strong>的多核并行模型。在每个核<strong>内部</strong>，还可以选择 SIMD 或 SIMT 作为单核的计算方式。因此昇腾的编程模型可以理解为两层嵌套：<strong>SPMD（多核）嵌套 SIMD/SIMT（单核）</strong>。</p>
 <div class="sswap-callout"><p>sswap 的 Host 侧通过 <code>GetVectorCoreCount()</code> 获取可用的 Vector 核数，然后将 n 个元素均分给各个核。每个核拿到自己的 <code>blockIdx_</code> 后，算出 <code>myOffset_</code> 和 <code>myCount_</code>，只处理自己负责的那段数据。这就是典型的 SPMD。</p></div>
 <h3>SPMD vs MPMD</h3>
-<table><thead><tr><th>维度</th><th>SPMD</th><th>MPMD</th></tr></thead><tbody><tr><td>程序</td><td>所有核运行同一份代码</td><td>不同核运行不同代码</td></tr><tr><td>编程复杂度</td><td>低</td><td>高</td></tr><tr><td>灵活性</td><td>中（通过 if/else 区分行为）</td><td>高</td></tr><tr><td>昇腾支持</td><td>是（默认模型）</td><td>不直接支持</td></tr></tbody></table>
-<p>MPMD 在昇腾上可以通过让不同核启动不同的 Kernel 来间接实现，但这不是标准用法，日常开发中几乎不会遇到。</p>
+<table><thead><tr><th>维度</th><th>SPMD（Ascend C）</th><th>MPMD（PyPTO）</th></tr></thead><tbody><tr><td>程序</td><td>所有核运行同一份代码</td><td>不同核运行不同代码</td></tr><tr><td>编程复杂度</td><td>低</td><td>高</td></tr><tr><td>灵活性</td><td>中（通过 if/else 区分行为）</td><td>高</td></tr><tr><td>昇腾支持</td><td>Ascend C 默认模型</td><td>通过 <a href="https://gitcode.com/cann/pypto">PyPTO</a> 框架支持</td></tr><tr><td>适用场景</td><td>单个算子开发</td><td>复杂融合算子、整网模型开发</td></tr></tbody></table>
+<p><strong>SPMD 是 Ascend C 算子开发的基础</strong>，日常开发单个算子时只需要掌握 SPMD 就够了。如果你的需求更复杂——比如需要不同核运行不同的计算逻辑（MPMD），或者要开发复杂的融合算子乃至整个模型网络，可以考虑使用 <a href="https://gitcode.com/cann/pypto">PyPTO</a>（Parallel Tensor/Tile Operation）框架。PyPTO 采用基于 Tile 的编程模型，通过多层次编译优化，将 Python 代码编译为高效的 NPU 可执行代码，并以 MPMD 方式调度到设备上的处理器核。</p>
 <h2>2.2.3 SIMD：传统向量编程</h2>
 <p>SIMD 的核心思想是"一条指令处理多个数据"。Vector 单元是一个 128 bit 宽的 SIMD 单元，一条 Add 指令就可以同时完成 64 个 float 的加法。</p>
 <p>类比：你在音符软件上刷视频，一屏推荐 10 个视频，你手指一划全部划过——不需要一个一个点进去看，一划就处理了一整屏。Vector 单元也是这样，一条指令就能同时处理 64 个 float。</p>
