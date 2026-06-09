@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4.1 精度不对怎么办 - AscendC Guide</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<nav class="sidebar"><div class="sidebar-header"><h2>AscendC Guide</h2><p>算子开发从入门到精通</p></div><ul class="sidebar-nav"><li class="chapter-group"><span class="chapter-title">第1章 基础概念</span><ul class="article-list"><li><a href="01-基础概念-1.1-什么是算子与AscendC.html" class=""><span class="doc-type">📘</span>1.1 什么是算子与 Ascend C</a></li><li><a href="01-基础概念-1.2-数据类型排布与量化.html" class=""><span class="doc-type">📘📕</span>1.2 数据类型、排布与量化</a></li><li><a href="01-基础概念-1.3-五分钟跑通第一个算子.html" class=""><span class="doc-type">📗</span>1.3 五分钟跑通第一个算子</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第2章 硬件与编程模型</span><ul class="article-list"><li><a href="02-硬件与编程模型-2.1-A5硬件架构.html" class=""><span class="doc-type">📘</span>2.1 A5 硬件架构</a></li><li><a href="02-硬件与编程模型-2.2-编程模型概述.html" class=""><span class="doc-type">📘</span>2.2 编程模型概述</a></li><li><a href="02-硬件与编程模型-2.3-算子结构与直调开发.html" class=""><span class="doc-type">📘📗</span>2.3 算子结构与直调开发</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第3章 核心开发</span><ul class="article-list"><li><a href="03-核心开发-3.1-Tiling设计.html" class=""><span class="doc-type">📘</span>3.1 Tiling 设计</a></li><li><a href="03-核心开发-3.2-内存管理与数据搬运.html" class=""><span class="doc-type">📘📕</span>3.2 内存管理与数据搬运</a></li><li><a href="03-核心开发-3.3-Vector计算.html" class=""><span class="doc-type">📘📕</span>3.3 Vector 计算</a></li><li><a href="03-核心开发-3.4-Cube计算.html" class=""><span class="doc-type">📘📕</span>3.4 Cube 计算</a></li><li><a href="03-核心开发-3.5-同步与流水线.html" class=""><span class="doc-type">📘</span>3.5 同步与流水线</a></li><li><a href="03-核心开发-3.6-实战-从零实现一个完整算子.html" class=""><span class="doc-type">📗</span>3.6 实战：从零实现一个完整算子</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第4章 调试与优化</span><ul class="article-list"><li><a href="04-调试与优化-4.1-精度不对怎么办.html" class="active"><span class="doc-type">📙</span>4.1 精度不对怎么办</a></li><li><a href="04-调试与优化-4.2-性能不达标怎么办.html" class=""><span class="doc-type">📙</span>4.2 性能不达标怎么办</a></li><li><a href="04-调试与优化-4.3-算子精度标准.html" class=""><span class="doc-type">📕</span>4.3 算子精度标准</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第5章 进阶</span><ul class="article-list"><li><a href="05-进阶-5.1-常见踩坑与最佳实践.html" class=""><span class="doc-type">📙</span>5.1 常见踩坑与最佳实践</a></li><li><a href="05-进阶-5.2-进阶主题.html" class=""><span class="doc-type">📘</span>5.2 进阶主题</a></li></ul></li><li class="chapter-group"><span class="chapter-title">附录</span><ul class="article-list"><li><a href="附录-A-数据类型速查表.html" class=""><span class="doc-type">📕</span>A. 数据类型速查表</a></li><li><a href="附录-B-对齐规则速查.html" class=""><span class="doc-type">📕</span>B. 对齐规则速查</a></li><li><a href="附录-C-错误码速查.html" class=""><span class="doc-type">📕</span>C. 错误码速查</a></li></ul></li></ul></nav>
+<main class="main">
+<div class="content">
+<div class="meta-bar">
+<span class="doc-badge badge-howto">📙 How-to Guide</span>
+<a href="../index.html">← 返回目录</a>
+</div>
+<h2>4.1.1 精度问题的常见表现</h2>
+<p>算子跑完了，结果不对——这是开发中最让人头疼的事情。就像你在大绿书搜"三亚旅游攻略"，搜到的内容可能是：全篇广告（输出全 0）、大致靠谱但酒店价格差了两倍（偏差大）、有的景点对有的景点错（部分错误）。精度问题也有这三种表现形式，每种背后对应着不同的根因方向：</p>
+<p><strong>输出全为 0 或随机值</strong> — 这往往意味着数据根本没有被正确处理。最常见的原因是 Buffer 未初始化，或者流水线同步出了问题：数据还没从 GM 搬到 UB，计算单元就已经开始读了，读到的全是垃圾值。</p>
+<p><strong>输出与 golden 偏差大</strong> — 数据流是对的，但数值算错了。常见于类型转换（比如 FP32 先转成 FP16 再转回 FP32，中间丢失了精度）或累加器精度不够（FP16 累加大量数据时溢出）。</p>
+<p><strong>部分元素正确、部分错误</strong> — 这类问题最隐蔽。通常是 DataCopy 不对齐（导致数据错位）、尾块 mask 算错（最后几个元素没处理到），或者多核切分时边界计算有误。</p>
+<blockquote><p><strong>sswap 的例子</strong>：sswap 是位精确算子（<code>PrecisionMode::EXACT</code>），它只做数据交换，不涉及任何数值计算。所以如果 sswap 的精度不对，问题一定出在数据搬运环节——要么地址写错了，要么数据没搬完。</p></blockquote>
+<h2>4.1.2 排查流程</h2>
+<p>遇到精度问题，不要慌，按照下面这棵决策树一步步排查：</p>
+<pre class="ascii-art"><code>精度不对
+  ├── 1. 检查输入数据是否正确
+  │     └── 用 printf 打印前几个元素，对比预期
+  ├── 2. 检查 DataCopy 是否对齐
+  │     └── 长度和地址是否 32B 对齐？→ 见附录 B
+  ├── 3. 检查流水线同步
+  │     └── EnQue/DeQue 是否配对？SetFlag/WaitFlag 是否正确？
+  ├── 4. 检查类型转换
+  │     └── FP32→FP16→FP32 往返转换有精度损失
+  ├── 5. 检查累加器精度
+  │     └── FP16 累加大量数据可能溢出，改用 FP32 累加器
+  └── 6. 检查尾块处理
+        └── 最后一个 tile 的 mask 是否正确？</code></pre>
+<h2>4.1.3 问题1：输出全为 0</h2>
+<p><strong>可能原因</strong>：</p>
+<ul>
+<li>Buffer 未初始化</li>
+<li>流水线同步错误（数据还没搬完就开始计算）</li>
+<li>EnQue/DeQue 不配对</li>
+</ul>
+<p><strong>排查步骤</strong>：</p>
+<ol>
+<li>在 DataCopy 之后加 printf，确认数据已搬入 UB</li>
+<li>检查 SetFlag/WaitFlag 的 Pipe 参数是否正确</li>
+<li>检查 Queue 的 stageNum 是否与实际使用匹配</li>
+</ol>
+<h2>4.1.4 问题2：输出与 golden 偏差大</h2>
+<p><strong>可能原因</strong>：</p>
+<ul>
+<li>FP16 累加溢出（大量数据累加时 FP16 精度不够）</li>
+<li>类型转换损失（FP32→FP16→FP32 的往返转换）</li>
+<li>量化/反量化参数错误</li>
+</ul>
+<p><strong>排查步骤</strong>：</p>
+<ol>
+<li>将累加器改为 FP32，看精度是否改善</li>
+<li>检查 Cast API 的源/目标类型是否正确</li>
+<li>对比中间结果，定位精度损失发生在哪一步</li>
+</ol>
+<h2>4.1.5 问题3：部分元素正确、部分错误</h2>
+<p><strong>可能原因</strong>：</p>
+<ul>
+<li>DataCopy 不对齐（导致数据错位）</li>
+<li>尾块 mask 计算错误</li>
+<li>多核切分时边界计算错误</li>
+</ul>
+<p><strong>排查步骤</strong>：</p>
+<ol>
+<li>检查 DataCopy 的长度是否是 32B 的倍数</li>
+<li>检查最后一个 tile 的 mask 值</li>
+<li>用 printf 打印每个核的 block_idx 和处理范围</li>
+</ol>
+<h2>4.1.6 实战案例：sswap 的交叉写回问题</h2>
+<p>sswap 的功能是交换两个向量 x 和 y 的对应元素。在 Kernel 内部，数据流是这样的：</p>
+<pre class="ascii-art"><code>GM(x) ──CopyIn──→ UB(bufX) ──Swap──→ UB(bufX_out)  ──CopyOut──→ GM(y)
+GM(y) ──CopyIn──→ UB(bufY) ──Swap──→ UB(bufY_out)  ──CopyOut──→ GM(x)</code></pre>
+<p>注意最后一步：x 的数据要写回到 <strong>y 的地址</strong>，y 的数据要写回到 <strong>x 的地址</strong>。这就是"交叉写回"。</p>
+<p>如果你在写 CopyOut 时把地址搞反了——比如把 bufX_out 写回了 GM(x) 而不是 GM(y)——结果就是：算子跑完，x 和 y 的内容完全没变。表面上看"好像算子没干活"，实际上是写回地址错了。</p>
+<p>这类问题在 sswap 的 ST 测试中会被精确捕获，因为测试代码使用了 <code>PrecisionMode::EXACT</code> 模式做位精确比对：</p>
+<pre class=""><code>VerifyConfig cfg;
+cfg.mode = PrecisionMode::EXACT;
+EXPECT_TRUE(Verifier::verifyVector(xPtr, goldenX.data(), ...));
+EXPECT_TRUE(Verifier::verifyVector(yPtr, goldenY.data(), ...));</code></pre>
+<p>只要有一个 bit 不对，测试就会失败。对于 sswap 这种纯搬运算子，这是完全合理的——交换操作不应该改变任何一位数据。</p>
+<h2>4.1.7 精度比对方法</h2>
+<p>精度验证的核心思路很简单：把 NPU 的输出和 CPU golden 的输出逐元素对比。</p>
+<p>对于浮点类算子，使用 atol（绝对误差）和 rtol（相对误差）来评估精度：</p>
+<pre class=""><code>对于每个元素：
+|actual - expected| &lt;= atol + rtol * |expected|</code></pre>
+<p>这个公式的含义是：允许的误差由两部分组成——一个固定的绝对误差 atol，加上一个与期望值成正比的相对误差 rtol。当期望值很大时，允许的绝对误差也相应放大。</p>
+<blockquote><p>这里用 atol/rtol 做简化说明，便于快速理解。实际 opbase 标准使用 MERE/MARE 聚合指标，详见 <a href="./4.3-算子精度标准.md">4.3 算子精度标准</a>。</p></blockquote>
+<p>对于 sswap 这类位精确算子，atol 和 rtol 都是 0——不允许任何偏差。详细的精度标准见 <a href="./4.3-算子精度标准.md">4.3 算子精度标准</a>。</p>
+<h2>4.1.8 调试工具</h2>
+<p>排查精度问题时，有几个趁手的工具：</p>
+<p><strong>printf</strong> — 最简单粗暴的方式。直接在 Device 侧的 Kernel 代码里加 <code>PRINTF</code>，打印 UB 中的数据。优点是所见即所得，缺点是会严重影响性能，而且大量打印会刷屏。适合在开发初期快速验证数据流。</p>
+<p><strong>仿真器</strong> — CANN Simulator 可以在 CPU 上模拟 NPU 的执行行为，支持单步调试、断点、变量查看。最大的优势是可以和 CPU golden 逐步对比，精确到每一条指令。适合定位复杂的流水线同步问题。</p>
+<p><strong>plog</strong> — 昇腾的结构化日志系统，支持日志级别控制（INFO/WARN/ERROR）。相比 printf，plog 的输出更规范，可以按级别过滤，适合在生产环境中排查问题。</p>
+<h2>参考链接</h2>
+<ul>
+<li><a href="https://www.hiascend.com/zh/developer/techArticles/20231215-2">Ascend C 孪生调试</a></li>
+<li><a href="https://www.hiascend.com/zh/developer/techArticles/20240106-1">Ascend C 算子开发常见问题案例</a></li>
+<li><a href="https://www.hiascend.com/zh/developer/techArticles/20250107-1">含有Matmul高阶API的算子精度问题定位</a></li>
+<li><a href="https://gitcode.com/cann/opbase/blob/master/docs/zh/ops_precision_standard/commercial_standard.md">opbase 标准算子精度标准</a></li>
+<li><a href="https://gitcode.com/cann/opbase/blob/master/docs/zh/ops_precision_standard/experimental_standard.md">opbase 生态算子精度标准</a></li>
+</ul>
+<div class="page-nav"><a href="03-核心开发-3.6-实战-从零实现一个完整算子.html" class="nav-prev"><span class="nav-label">← 上一篇</span><span class="nav-title">3.6 实战：从零实现一个完整算子</span></a><a href="04-调试与优化-4.2-性能不达标怎么办.html" class="nav-next"><span class="nav-label">下一篇 →</span><span class="nav-title">4.2 性能不达标怎么办</span></a></div>
+</div>
+</main>
+</body>
+</html>

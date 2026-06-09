@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2.3 算子结构与直调开发 - AscendC Guide</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<nav class="sidebar"><div class="sidebar-header"><h2>AscendC Guide</h2><p>算子开发从入门到精通</p></div><ul class="sidebar-nav"><li class="chapter-group"><span class="chapter-title">第1章 基础概念</span><ul class="article-list"><li><a href="01-基础概念-1.1-什么是算子与AscendC.html" class=""><span class="doc-type">📘</span>1.1 什么是算子与 Ascend C</a></li><li><a href="01-基础概念-1.2-数据类型排布与量化.html" class=""><span class="doc-type">📘📕</span>1.2 数据类型、排布与量化</a></li><li><a href="01-基础概念-1.3-五分钟跑通第一个算子.html" class=""><span class="doc-type">📗</span>1.3 五分钟跑通第一个算子</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第2章 硬件与编程模型</span><ul class="article-list"><li><a href="02-硬件与编程模型-2.1-A5硬件架构.html" class=""><span class="doc-type">📘</span>2.1 A5 硬件架构</a></li><li><a href="02-硬件与编程模型-2.2-编程模型概述.html" class=""><span class="doc-type">📘</span>2.2 编程模型概述</a></li><li><a href="02-硬件与编程模型-2.3-算子结构与直调开发.html" class="active"><span class="doc-type">📘📗</span>2.3 算子结构与直调开发</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第3章 核心开发</span><ul class="article-list"><li><a href="03-核心开发-3.1-Tiling设计.html" class=""><span class="doc-type">📘</span>3.1 Tiling 设计</a></li><li><a href="03-核心开发-3.2-内存管理与数据搬运.html" class=""><span class="doc-type">📘📕</span>3.2 内存管理与数据搬运</a></li><li><a href="03-核心开发-3.3-Vector计算.html" class=""><span class="doc-type">📘📕</span>3.3 Vector 计算</a></li><li><a href="03-核心开发-3.4-Cube计算.html" class=""><span class="doc-type">📘📕</span>3.4 Cube 计算</a></li><li><a href="03-核心开发-3.5-同步与流水线.html" class=""><span class="doc-type">📘</span>3.5 同步与流水线</a></li><li><a href="03-核心开发-3.6-实战-从零实现一个完整算子.html" class=""><span class="doc-type">📗</span>3.6 实战：从零实现一个完整算子</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第4章 调试与优化</span><ul class="article-list"><li><a href="04-调试与优化-4.1-精度不对怎么办.html" class=""><span class="doc-type">📙</span>4.1 精度不对怎么办</a></li><li><a href="04-调试与优化-4.2-性能不达标怎么办.html" class=""><span class="doc-type">📙</span>4.2 性能不达标怎么办</a></li><li><a href="04-调试与优化-4.3-算子精度标准.html" class=""><span class="doc-type">📕</span>4.3 算子精度标准</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第5章 进阶</span><ul class="article-list"><li><a href="05-进阶-5.1-常见踩坑与最佳实践.html" class=""><span class="doc-type">📙</span>5.1 常见踩坑与最佳实践</a></li><li><a href="05-进阶-5.2-进阶主题.html" class=""><span class="doc-type">📘</span>5.2 进阶主题</a></li></ul></li><li class="chapter-group"><span class="chapter-title">附录</span><ul class="article-list"><li><a href="附录-A-数据类型速查表.html" class=""><span class="doc-type">📕</span>A. 数据类型速查表</a></li><li><a href="附录-B-对齐规则速查.html" class=""><span class="doc-type">📕</span>B. 对齐规则速查</a></li><li><a href="附录-C-错误码速查.html" class=""><span class="doc-type">📕</span>C. 错误码速查</a></li></ul></li></ul></nav>
+<main class="main">
+<div class="content">
+<div class="meta-bar">
+<span class="doc-badge badge-explanation">📘📗 Explanation + Tutorial</span>
+<a href="../index.html">← 返回目录</a>
+</div>
+<h2>2.3.1 算子的两层结构</h2>
+<p>一个 Ascend C 算子由两层代码组成：<strong>Host 侧</strong>运行在 CPU 上，<strong>Kernel 侧</strong>运行在 NPU 的 AI Core 上。</p>
+<p>可以用丑团外卖来理解：Host 是你在 APP 上下单（准备参数、选好地址、确认支付），Kernel 是骑手（接到单后去店里取餐、送到你手上）。你不需要知道骑手走哪条路，只需要把订单信息准备好就行。</p>
+<pre class="ascii-art"><code>┌─────────────────────────────────────┐
+│  Host 侧代码 (CPU 上运行)           │
+│  - 准备输入数据                      │
+│  - 计算 Tiling 策略（怎么切分数据）   │
+│  - 启动 Kernel                      │
+├─────────────────────────────────────┤
+│  Kernel 侧代码 (NPU AI Core 上运行) │
+│  - 接收 Tiling 参数和 GM 地址        │
+│  - 从 GM 搬数据到本地 Buffer         │
+│  - 执行计算                          │
+│  - 将结果搬回 GM                    │
+└─────────────────────────────────────┘</code></pre>
+<p>在 ops-blas 仓中，这两层代码分别放在不同的文件里。以 sswap 算子（arch35）为例，文件结构如下：</p>
+<pre class="ascii-art"><code>blas/swap/sswap/
+└── arch35/
+    ├── sswap_host.cpp          # Host 侧：参数校验、Tiling 计算、启动 Kernel
+    ├── sswap_kernel.cpp        # Kernel 侧：AI Core 上的数据搬运逻辑
+    └── sswap_tiling_data.h     # TilingData 结构体（Host 和 Kernel 共用）</code></pre>
+<p><code>sswap_tiling_data.h</code> 是 Host 和 Kernel 之间的"通信协议"——Host 侧把计算好的 Tiling 参数填入这个结构体，Kernel 侧从 GM 中读取并解析它。</p>
+<h2>2.3.2 Kernel 函数</h2>
+<p>Kernel 是运行在 AI Core 上的核函数，由 Host 侧通过 <code><<<>>></code> 语法启动。</p>
+<h3>Kernel 函数签名</h3>
+<pre class=""><code>extern &quot;C&quot; __global__ __aicore__ void my_op_kernel(
+    GM_ADDR x,          // 输入数据的 GM 地址
+    GM_ADDR y,          // 输出数据的 GM 地址
+    GM_ADDR workspace,  // 工作空间
+    GM_ADDR tiling      // Tiling 参数
+)</code></pre>
+<p>这个签名中有几个关键修饰符：</p>
+<ul>
+<li><code>extern "C"</code> — 使用 C 链接，防止 C++ 的 name mangling（名称修饰）。如果不加，C++ 编译器会把函数名改成一串包含参数类型的编码，导致 Host 侧找不到这个函数。</li>
+<li><code>__global__</code> — 标记这是一个可以从 Host 侧启动的全局核函数。</li>
+<li><code>__aicore__</code> — 标记这个函数运行在 AI Core 上，编译器会用昇腾的指令集来编译它。</li>
+<li><code>GM_ADDR</code> — 全局内存地址指针，指向 HBM 上的数据。Kernel 通过它来访问 Host 侧传入的输入、输出、工作空间和 Tiling 参数。</li>
+</ul>
+<p>以 sswap 为例，它的 Kernel 签名如下：</p>
+<pre class=""><code>extern &quot;C&quot; __global__ __aicore__ void sswap_kernel(
+    GM_ADDR x, GM_ADDR y, GM_ADDR workSpace, GM_ADDR tilingGm)
+{
+    KERNEL_TASK_TYPE_DEFAULT(KERNEL_TYPE_AIV_ONLY);
+    TPipe pipe;
+    SswapAIV op;
+    op.Init(x, y, tilingGm, &amp;pipe);
+    op.Process();
+}</code></pre>
+<p><code>KERNEL_TASK_TYPE_DEFAULT(KERNEL_TYPE_AIV_ONLY)</code> 告诉硬件只启动 AIV（AI Vector）核，不启动 AIC（AI Cube）核。这是因为 sswap 只做数据搬运，不需要矩阵乘能力。<code>SswapAIV</code> 是算子的核心类，<code>Init</code> 负责初始化（解析 Tiling、设置 GM 地址、分配 Buffer），<code>Process</code> 负责执行搬入和搬出。</p>
+<h3>Kernel 内部流程</h3>
+<p>一个典型的 Kernel 内部流程如下：</p>
+<pre class="ascii-art"><code>{
+    // 1. 获取当前核编号
+    auto blockIdx = AscendC::GetBlockIdx();
+
+    // 2. 解析 Tiling 数据（使用框架宏）
+    GET_TILING_DATA(tilingData, tiling);
+
+    // 3. 计算当前核负责的数据范围
+    uint32_t offset = blockIdx * tilingData.tileSize;
+
+    // 4. 搬入 → 计算 → 搬出
+    // ...（后续章节详细讲解）
+}</code></pre>
+<div class="warning-callout"><p>上面的 <code>GET_TILING_DATA(tilingData, tiling)</code> 是<strong>使用框架宏的写法</strong>，适用于 aclnn 框架托管的算子。sswap 使用直调方式，实际通过手动 <code>reinterpret_cast</code> 解析 Tiling 数据：</p></div>
+<blockquote><p>```cpp</p></blockquote>
+<blockquote><p>__gm__ SswapTilingData<em> tilingPtr = reinterpret_cast<__gm__ SswapTilingData</em>>(tilingGm);</p></blockquote>
+<blockquote><p>tiling_.totalN = tilingPtr->totalN;</p></blockquote>
+<blockquote><p>```</p></blockquote>
+<p>每个 AI Core 通过 <code>GetBlockIdx()</code> 知道自己的编号，再结合 Tiling 数据算出自己该处理哪段数据。这就是 SPMD 模型在 Kernel 内部的具体体现。</p>
+<h2>2.3.3 Tiling 函数</h2>
+<p>Tiling 是数据切分策略——决定总共多少数据、分给多少个核、每个核处理多少。它在 Host 侧计算，通过 GM 传递给 Device 侧。</p>
+<p>你可以把 Tiling 理解为雪王奶茶的分单策略：公司团建点了 totalN 杯奶茶，有 coreNum 家门店来分（核数），每家分 perCoreN 杯，最后可能剩下 remainder 杯分给某几家门店多喝几杯。</p>
+<h3>Tiling 数据结构</h3>
+<p>以 sswap 为例，它的 TilingData 结构体定义在 <code>sswap_tiling_data.h</code> 中：</p>
+<pre class=""><code>struct SswapTilingData {
+    uint32_t totalN;     // 向量总元素数
+    uint32_t perCoreN;   // 每个核处理的基础元素数
+    uint32_t remainder;  // 余数（totalN % coreNum）
+    uint32_t tileSize;   // 每次迭代搬运的元素数（受 UB 容量限制）
+};</code></pre>
+<p>同时定义了一个常量：</p>
+<pre class=""><code>constexpr uint32_t ELEMENTS_PER_BLOCK = 32 / sizeof(float);</code></pre>
+<p><code>ELEMENTS_PER_BLOCK</code> 是 32 Bytes 对齐要求下的最小搬运单位——对于 float（4 Bytes），每次至少搬 8 个元素。</p>
+<h3>Tiling 函数</h3>
+<p>Tiling 函数在 Host 侧执行，根据输入规模和硬件资源计算切分方案。下面是一个 <strong>aclnn 框架下的 Tiling 函数示例</strong>（通过框架提供的 <code>context</code> 对象获取核数和输入 shape）：</p>
+<pre class=""><code>// aclnn 框架下的 Tiling 函数示例
+void my_op_tiling(const MyOpTilingContext* context, MyOpTilingData* tilingData)
+{
+    uint32_t coreNum = context-&gt;GetCoreNumAiv();
+    tilingData-&gt;totalLength = context-&gt;GetInputShape(0)[0];
+    tilingData-&gt;tileSize = ceil(tilingData-&gt;totalLength / coreNum);
+    tilingData-&gt;tileNum = coreNum;
+}</code></pre>
+<div class="warning-callout"><p>sswap 使用<strong>直调方式</strong>，不依赖 aclnn 框架的 Tiling 上下文，而是通过自定义函数（如 <code>GetVectorCoreCount()</code>）直接获取核数，由 Host 侧代码自行计算所有 Tiling 参数。</p></div>
+<p>在 sswap 的 Host 侧代码中，Tiling 计算逻辑大致如下：先通过 <code>GetVectorCoreCount()</code> 获取可用的 Vector 核数，然后将 n 个元素均分给各个核（<code>perCoreN = n / coreNum</code>），余数 <code>remainder = n % coreNum</code> 分配给前几个核多处理一个元素。<code>tileSize</code> 则根据 UB 容量计算，确保每次迭代的数据量不超过 UB 的承载能力。</p>
+<h2>2.3.4 直调方式：最简单的开发入口</h2>
+<p>直调（Direct Call）是最简单的算子调用方式——直接从 Host 侧调用 Kernel 函数，不经过 aclnn 框架的封装。</p>
+<p>直调适合学习和快速验证。你不需要理解 aclnn 的两段式接口（先获取 workspace 大小、再执行计算），只需要准备好数据、算好 Tiling、启动 Kernel 就行。生产环境最终需要对接 aclnn 框架，但入门时先掌握直调可以让你更快理解算子的运行机制。</p>
+<h3>直调 vs aclnn</h3>
+<table><thead><tr><th>维度</th><th>直调</th><th>aclnn</th></tr></thead><tbody><tr><td>复杂度</td><td>低</td><td>高</td></tr><tr><td>灵活性</td><td>高</td><td>中</td></tr><tr><td>框架对接</td><td>需要自己处理</td><td>框架自动调度</td></tr><tr><td>适用场景</td><td>学习、验证</td><td>生产环境</td></tr></tbody></table>
+<h3>直调的 Host 侧代码</h3>
+<p>以 sswap 为例，它的 Host 侧入口函数是 <code>aclblasSswap</code>，整体流程如下：</p>
+<pre class=""><code>#include &quot;acl/acl.h&quot;
+
+int main() {
+    // 1. 初始化 ACL
+    aclInit(nullptr);
+    aclrtSetDevice(0);
+
+    // 2. 准备输入数据（在 GM 上分配内存）
+    size_t size = n * sizeof(float);
+    void* devX = nullptr;
+    void* devY = nullptr;
+    aclrtMalloc(&amp;devX, size, ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(&amp;devY, size, ACL_MEM_MALLOC_HUGE_FIRST);
+
+    // 3. 拷贝数据到 GM
+    aclrtMemcpy(devX, size, hostX, size, ACL_MEMCPY_HOST_TO_DEVICE);
+
+    // 4. 启动 Kernel
+    my_op_kernel&lt;&lt;&lt;coreNum, stream&gt;&gt;&gt;(devX, devY, workspace, tiling);
+
+    // 5. 拷贝结果回 CPU
+    aclrtMemcpy(hostY, size, devY, size, ACL_MEMCPY_DEVICE_TO_HOST);
+
+    // 6. 清理
+    aclrtFree(devX);
+    aclrtFree(devY);
+    aclrtResetDevice(0);
+    aclFinalize();
+}</code></pre>
+<p>流程非常直观：初始化设备 → 分配 GM 内存 → 拷入数据 → 启动 Kernel → 拷出结果 → 清理资源。<code><<<coreNum, stream>>></code> 是 Ascend C 的 Kernel 启动语法，<code>coreNum</code> 指定启动多少个 AI Core，<code>stream</code> 是执行流（类似 CUDA 的 stream）。</p>
+<p>sswap 的 Host 侧还封装了一个 C 风格的启动函数：</p>
+<pre class=""><code>void sswap_kernel_do(GM_ADDR x, GM_ADDR y, GM_ADDR workSpace,
+                     GM_ADDR tilingGm, uint32_t numBlocks, void* stream)
+{
+    sswap_kernel&lt;&lt;&lt;numBlocks, nullptr, stream&gt;&gt;&gt;(x, y, nullptr, tilingGm);
+}</code></pre>
+<p>这个函数把 Kernel 启动的细节封装起来，Host 侧的 <code>aclblasSswap</code> 只需要传入参数和核数就可以启动算子。</p>
+<h2>2.3.5 完整算子文件结构</h2>
+<p>在 ops-blas 仓中，算子按家族（family）、算子名（operator）和架构（arch）组织：</p>
+<pre class="ascii-art"><code>blas/{family}/
+└── {operator_name}/
+    └── archXX/
+        ├── {operator_name}_host.cpp       # Host 侧：参数校验、Tiling、直调 Kernel
+        ├── {operator_name}_kernel.cpp     # Kernel 侧：AscendC 类 + Kernel 入口
+        └── {operator_name}_tiling_data.h  # TilingData 结构体（Host/Kernel 共用）</code></pre>
+<p>以 sswap 为例：</p>
+<pre class="ascii-art"><code>blas/swap/sswap/
+└── arch35/
+    ├── sswap_host.cpp
+    ├── sswap_kernel.cpp
+    └── sswap_tiling_data.h</code></pre>
+<p>三个文件各司其职：<code>tiling_data.h</code> 定义通信协议，<code>kernel.cpp</code> 实现 AI Core 上的计算逻辑，<code>host.cpp</code> 负责参数校验、Tiling 计算和 Kernel 启动。</p>
+<h2>2.3.6 动手试试：写一个最简 Kernel</h2>
+<p>这是 Tutorial 部分，让我们跟着写一个最简单的 Kernel 骨架，把前面讲的概念串起来。</p>
+<pre class=""><code>// kernel/add_kernel.cpp
+#include &quot;kernel_operator.h&quot;
+
+extern &quot;C&quot; __global__ __aicore__ void add_kernel(
+    GM_ADDR a, GM_ADDR b, GM_ADDR c,
+    GM_ADDR workspace, GM_ADDR tiling)
+{
+    // 获取 tiling 数据
+    GET_TILING_DATA(tilingData, tiling);
+    auto blockIdx = AscendC::GetBlockIdx();
+
+    // 计算当前核的数据范围
+    uint32_t offset = blockIdx * tilingData.tileSize;
+    uint32_t length = tilingData.tileSize;
+
+    // 声明 UB Buffer
+    AscendC::TPipe pipe;
+    AscendC::TQue&lt;AscendC::QuePosition::VECIN, 1&gt; queIn;
+    AscendC::TQue&lt;AscendC::QuePosition::VECOUT, 1&gt; queOut;
+
+    // 初始化 Buffer
+    pipe.InitBuffer(queIn, 2, length * sizeof(float));
+    pipe.InitBuffer(queOut, 1, length * sizeof(float));
+
+    // 搬入
+    auto inA = queIn.AllocTensor&lt;float&gt;();
+    auto inB = queIn.AllocTensor&lt;float&gt;();
+    AscendC::DataCopy(inA, a + offset, length);
+    AscendC::DataCopy(inB, b + offset, length);
+    queIn.EnQue(inA);
+    queIn.EnQue(inB);
+
+    // 计算
+    auto valA = queIn.DeQue&lt;float&gt;();
+    auto valB = queIn.DeQue&lt;float&gt;();
+    auto valC = queOut.AllocTensor&lt;float&gt;();
+    AscendC::Add(valC, valA, valB, length);
+    queOut.EnQue(valC);
+
+    // 搬出
+    auto outC = queOut.DeQue&lt;float&gt;();
+    AscendC::DataCopy(c + offset, outC, length);
+
+    // 释放
+    queIn.FreeTensor(valA);
+    queIn.FreeTensor(valB);
+    queOut.FreeTensor(outC);
+}</code></pre>
+<p>这段代码展示了 Kernel 的基本骨架：<strong>搬入 → 计算 → 搬出</strong>。</p>
+<p><code>TPipe</code> 是流水线管理器，负责分配和管理 UB 空间。<code>TQue</code> 是队列，用来组织 UB 中的 Buffer——<code>VECIN</code> 队列存放搬入的数据，<code>VECOUT</code> 队列存放待搬出的结果。<code>AllocTensor</code> 从队列中分配一块 Buffer，<code>EnQue</code> 将填好数据的 Buffer 入队（表示"我写完了，可以给别人用了"），<code>DeQue</code> 从队列中取出一块 Buffer（表示"我要开始读了"），<code>FreeTensor</code> 释放 Buffer。</p>
+<p>这套 EnQue/DeQue 机制实现了流水线的同步：搬入线程把数据 EnQue 到 VECIN，计算线程从 VECIN DeQue 出来做计算，算完 EnQue 到 VECOUT，搬出线程再从 VECOUT DeQue 搬回 GM。</p>
+<div class="sswap-callout"><p>sswap 的 Kernel 结构与此类似，但更简单——它没有"计算"步骤，只有"搬入"和"搬出"。sswap 使用 <code>TQueBind<QuePosition::VECIN, QuePosition::VECOUT, 1></code> 而不是分开的 VECIN 和 VECOUT 队列，因为同一块 Buffer 既用于搬入也用于搬出。sswap 的巧妙之处在于<strong>交叉写回</strong>：</p></div>
+<p>></p>
+<blockquote><p>```</p></blockquote>
+<blockquote><p>CopyIn:  xGM → inQueueX (UB)    CopyOut:  inQueueX (UB) → yGM  (x 的数据写到 y 的位置)</p></blockquote>
+<blockquote><p>         yGM → inQueueY (UB)              inQueueY (UB) → xGM  (y 的数据写到 x 的位置)</p></blockquote>
+<blockquote><p>```</p></blockquote>
+<p>></p>
+<blockquote><p>搬入时，x 的数据进入 <code>inQueueX_</code>，y 的数据进入 <code>inQueueY_</code>。搬出时，<code>inQueueX_</code> 的内容写到 yGM（y 的 GM 地址），<code>inQueueY_</code> 的内容写到 xGM（x 的 GM 地址）。这样就完成了两个向量的元素交换，全程不需要任何算术运算。</p></blockquote>
+<p>现在你只需要理解整体流程，不用纠结每个 API 的细节。后续章节会逐一讲解 TPipe、TQue、DataCopy 等 API 的详细用法。</p>
+<h2>参考链接</h2>
+<ul>
+<li><a href="https://hiascend.com/document/redirect/CannCommunityOpdevAscendC">Ascend C 编程指南 — 算子开发</a></li>
+<li><a href="https://www.hiascend.com/zh/developer/techArticles/20240523-1">Ascend C 算子的调用方式</a></li>
+<li><a href="https://www.hiascend.com/zh/developer/techArticles/20230830-2">Ascend C 快速入门</a></li>
+<li><a href="https://gitcode.com/cann/cann-samples">cann-samples Vector Add 样例</a>（<code>Samples/0_Introduction/vector_add/</code>）</li>
+<li><a href="https://gitcode.com/cann/asc-devkit.git">asc-devkit 高性能模板</a>（<code>examples/04_best_practices/00_add_doublebuffer/</code>）</li>
+<li><a href="https://gitcode.com/cann/opbase">opbase 基础框架</a></li>
+</ul>
+<div class="page-nav"><a href="02-硬件与编程模型-2.2-编程模型概述.html" class="nav-prev"><span class="nav-label">← 上一篇</span><span class="nav-title">2.2 编程模型概述</span></a><a href="03-核心开发-3.1-Tiling设计.html" class="nav-next"><span class="nav-label">下一篇 →</span><span class="nav-title">3.1 Tiling 设计</span></a></div>
+</div>
+</main>
+</body>
+</html>

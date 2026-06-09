@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4.2 性能不达标怎么办 - AscendC Guide</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<nav class="sidebar"><div class="sidebar-header"><h2>AscendC Guide</h2><p>算子开发从入门到精通</p></div><ul class="sidebar-nav"><li class="chapter-group"><span class="chapter-title">第1章 基础概念</span><ul class="article-list"><li><a href="01-基础概念-1.1-什么是算子与AscendC.html" class=""><span class="doc-type">📘</span>1.1 什么是算子与 Ascend C</a></li><li><a href="01-基础概念-1.2-数据类型排布与量化.html" class=""><span class="doc-type">📘📕</span>1.2 数据类型、排布与量化</a></li><li><a href="01-基础概念-1.3-五分钟跑通第一个算子.html" class=""><span class="doc-type">📗</span>1.3 五分钟跑通第一个算子</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第2章 硬件与编程模型</span><ul class="article-list"><li><a href="02-硬件与编程模型-2.1-A5硬件架构.html" class=""><span class="doc-type">📘</span>2.1 A5 硬件架构</a></li><li><a href="02-硬件与编程模型-2.2-编程模型概述.html" class=""><span class="doc-type">📘</span>2.2 编程模型概述</a></li><li><a href="02-硬件与编程模型-2.3-算子结构与直调开发.html" class=""><span class="doc-type">📘📗</span>2.3 算子结构与直调开发</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第3章 核心开发</span><ul class="article-list"><li><a href="03-核心开发-3.1-Tiling设计.html" class=""><span class="doc-type">📘</span>3.1 Tiling 设计</a></li><li><a href="03-核心开发-3.2-内存管理与数据搬运.html" class=""><span class="doc-type">📘📕</span>3.2 内存管理与数据搬运</a></li><li><a href="03-核心开发-3.3-Vector计算.html" class=""><span class="doc-type">📘📕</span>3.3 Vector 计算</a></li><li><a href="03-核心开发-3.4-Cube计算.html" class=""><span class="doc-type">📘📕</span>3.4 Cube 计算</a></li><li><a href="03-核心开发-3.5-同步与流水线.html" class=""><span class="doc-type">📘</span>3.5 同步与流水线</a></li><li><a href="03-核心开发-3.6-实战-从零实现一个完整算子.html" class=""><span class="doc-type">📗</span>3.6 实战：从零实现一个完整算子</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第4章 调试与优化</span><ul class="article-list"><li><a href="04-调试与优化-4.1-精度不对怎么办.html" class=""><span class="doc-type">📙</span>4.1 精度不对怎么办</a></li><li><a href="04-调试与优化-4.2-性能不达标怎么办.html" class="active"><span class="doc-type">📙</span>4.2 性能不达标怎么办</a></li><li><a href="04-调试与优化-4.3-算子精度标准.html" class=""><span class="doc-type">📕</span>4.3 算子精度标准</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第5章 进阶</span><ul class="article-list"><li><a href="05-进阶-5.1-常见踩坑与最佳实践.html" class=""><span class="doc-type">📙</span>5.1 常见踩坑与最佳实践</a></li><li><a href="05-进阶-5.2-进阶主题.html" class=""><span class="doc-type">📘</span>5.2 进阶主题</a></li></ul></li><li class="chapter-group"><span class="chapter-title">附录</span><ul class="article-list"><li><a href="附录-A-数据类型速查表.html" class=""><span class="doc-type">📕</span>A. 数据类型速查表</a></li><li><a href="附录-B-对齐规则速查.html" class=""><span class="doc-type">📕</span>B. 对齐规则速查</a></li><li><a href="附录-C-错误码速查.html" class=""><span class="doc-type">📕</span>C. 错误码速查</a></li></ul></li></ul></nav>
+<main class="main">
+<div class="content">
+<div class="meta-bar">
+<span class="doc-badge badge-howto">📙 How-to Guide</span>
+<a href="../index.html">← 返回目录</a>
+</div>
+<h2>4.2.1 先搞清楚你的算子是什么类型</h2>
+<p>优化之前，先想清楚一个根本问题：你的算子是 <strong>计算密集型</strong> 还是 <strong>访存密集型</strong>？</p>
+<p>打个比方：计算密集型就像王者里的法师，团战时疯狂放技能（计算多，搬运少），优化方向是堆法强（算力）；访存密集型就像辅助，全图跑做视野插眼（搬运多，计算少），优化方向是堆移速（带宽）。两者优化方向完全不同。</p>
+<blockquote><p><strong>sswap 的例子</strong>：sswap 是典型的 <strong>memory-bound（访存密集）</strong> 算子。它只做数据交换，没有任何算术运算。每次交换一对元素，需要 4 次 GM 访问：读 x、读 y、写回 x（原来 y 的值）、写回 y（原来 x 的值）。性能瓶颈 100% 在数据搬运上，跟计算单元没关系。</p></blockquote>
+<p>理解这一点很重要——如果你对着 sswap 去优化 Vector 利用率，那就是方向搞反了。</p>
+<h2>4.2.2 性能分析工具</h2>
+<h3>msprof</h3>
+<p>msprof 是昇腾平台的性能分析工具，地位类似于 NVIDIA 的 Nsight。它可以采集算子的执行时间、各 Pipe（Vector/Cube/MTE/Scalar）的利用率、搬运延迟等关键指标。</p>
+<p>使用方式很简单：在你的测试程序外面套一层 <code>msprof</code> 命令，它就会自动采集性能数据，输出 trace 文件和统计报告。</p>
+<h3>Perfetto</h3>
+<p>Perfetto 是一个开源的 trace 可视化工具。配合 msprof 输出的 trace 文件，你可以在浏览器中可视化查看算子执行的完整时间线——哪个 Pipe 在什么时间做了什么操作，一目了然。</p>
+<p>在线查看：<a href="https://ui.perfetto.dev/">https://ui.perfetto.dev/</a></p>
+<p>把 msprof 生成的 <code>.pftrace</code> 文件拖进去，就能看到类似甘特图的执行时间线。</p>
+<h2>4.2.3 性能瓶颈定位流程</h2>
+<pre class="ascii-art"><code>性能不达标
+  ├── 1. 采集 profiling 数据（msprof）
+  ├── 2. 用 Perfetto 可视化时间线
+  ├── 3. 判断瓶颈类型
+  │     ├── 计算瓶颈 → 4.2.4
+  │     ├── 搬运瓶颈 → 4.2.5
+  │     └── 调度瓶颈 → 4.2.6
+  └── 4. 针对性优化</code></pre>
+<p><strong>判断方法</strong>：看 Perfetto 时间线中，哪个 Pipe 占用的时间最长。如果 Vector/Cube 满载但总时间长，是计算瓶颈；如果 MTE（搬运单元）占用时间比例高，是搬运瓶颈；如果各 Pipe 都有大量空闲，是调度瓶颈。</p>
+<h2>4.2.4 计算瓶颈</h2>
+<p><strong>现象</strong>：Vector/Cube 利用率高，但总时间长。</p>
+<p><strong>优化手段</strong>：</p>
+<ul>
+<li><strong>指令融合</strong>：将多个计算步骤融合为一条指令。比如原来先做 Add 再做 Mul，可以融合成 FusedAddMul，减少中间结果的读写。</li>
+<li><strong>A5 上使用 RegBase 模式</strong>：中间结果存在寄存器里而不是写回 UB，减少 UB 带宽压力。这对 A5 架构特别有效，因为 A5 的寄存器文件比前代更大。</li>
+<li><strong>Vector Function</strong>：将复杂计算封装为 VF 函数，利用硬件的向量函数单元加速。</li>
+</ul>
+<blockquote><p>这些手段对 sswap 没有意义——sswap 根本不涉及计算。但如果你开发的是 GEMM、Softmax 这类计算密集算子，这些就是核心优化方向。</p></blockquote>
+<h2>4.2.5 搬运瓶颈</h2>
+<p><strong>现象</strong>：MTE 占用时间比例高。</p>
+<p><strong>优化手段</strong>：</p>
+<ul>
+<li><strong>双 Buffer / N-Buffer</strong>：这是最常用的优化。原理很简单——搬运和计算重叠执行。当计算单元在处理 Buffer A 的数据时，MTE 同时把下一批数据搬到 Buffer B。就像流水线作业，前一道工序做完，后一道工序马上接上，不用等。</li>
+<li><strong>MTE2 预取</strong>：提前将下一轮数据从 GM 搬到 L1/UB，进一步隐藏搬运延迟。</li>
+<li><strong>数据对齐</strong>：确保搬运长度和地址 32B 对齐。不对齐的搬运会触发额外的对齐操作，浪费带宽。</li>
+<li><strong>Full Load</strong>：一次性将整个 Tile 的数据搬入 UB，减少搬运次数。</li>
+</ul>
+<blockquote><p><strong>sswap 的搬运优化</strong>：sswap 有 4 次 GM 访问（2 读 + 2 写），是典型的搬运瓶颈。优化方向是让 CopyIn 和 CopyOut 尽可能重叠——当 x 的数据正在写回 GM 时，下一批 y 的数据可以同时从 GM 读入。双 Buffer 在这里非常有效。</p></blockquote>
+<h2>4.2.6 调度瓶颈</h2>
+<p><strong>现象</strong>：各 Pipe 利用率都不高，有大量空闲时间。说明各单元之间的协调不好，互相等待。</p>
+<p><strong>优化手段</strong>：</p>
+<ul>
+<li><strong>优化同步策略</strong>：减少不必要的 SetFlag/WaitFlag。过多的同步点会让流水线频繁停顿。</li>
+<li><strong>增加流水线并行度</strong>：使用更多 Buffer，让搬运和计算有更多重叠空间。</li>
+<li><strong>A5 上使用 BufferID 同步</strong>：A5 架构支持基于 BufferID 的自动同步机制，可以大幅简化同步代码，减少手动 SetFlag/WaitFlag 的开销。</li>
+</ul>
+<h2>4.2.7 系统级优化</h2>
+<p>当单核内的优化已经做到极致，还可以从多核调度的角度进一步优化。</p>
+<h3>尾块均衡（Tail Rebalance）</h3>
+<p>多核切分时，数据通常按核数均分。但如果数据总量不能被核数整除，最后一个核（尾块）分到的数据量可能远小于其他核。其他核都干完了，尾块还在慢悠悠地处理最后几个元素——或者说，其他核早就闲了，只有尾块在干活。</p>
+<p>尾块均衡的思路是：重新分配工作量，让每个核的负载更均匀。</p>
+<h3>StreamK</h3>
+<p>传统的切分方式是按行或按列固定分配，每个核负责一块连续的数据。StreamK 换了一种思路：将工作量切成很多小的基本块，每个核处理固定数量的基本块。这样即使数据分布不均匀，每个核的工作量也是均衡的。</p>
+<h3>L1 Bank 冲突消除</h3>
+<p>L1 Cache 被分成多个 Bank，如果多个核同时访问同一个 Bank，就会产生冲突，导致访问延迟。通过错位访问策略（让不同核访问不同的 Bank 偏移），可以避免这种冲突。</p>
+<h2>参考链接</h2>
+<ul>
+<li><a href="https://hiascend.com/document/redirect/CannCommunityAscendCBestPractice">Ascend C 实践参考</a></li>
+<li><a href="https://www.hiascend.com/zh/developer/techArticles/20240819-1">性能优化实用技巧01 — 流水优化</a></li>
+<li><a href="https://www.hiascend.com/zh/developer/techArticles/20240823-1">性能优化实用技巧02 — 内存优化</a></li>
+<li><a href="https://www.hiascend.com/zh/developer/techArticles/20240906-1">性能优化实用技巧03 — 搬运优化</a></li>
+<li><a href="https://www.hiascend.com/zh/developer/techArticles/20240920-1">性能优化实用技巧04 — Tiling优化</a></li>
+<li><a href="https://www.hiascend.com/zh/developer/techArticles/20241107-1">性能优化实用技巧05 — API使用优化</a></li>
+<li><a href="https://www.hiascend.com/zh/developer/techArticles/20240816-1">基于Ascend C的Matmul算子性能优化最佳实践</a></li>
+<li><a href="https://www.hiascend.com/zh/developer/techArticles/20240607-1">基于Ascend C的FlashAttention算子性能优化最佳实践</a></li>
+<li><a href="https://gitcode.com/cann/cann-samples">cann-samples 性能实战</a>（<code>Samples/2_Performance/</code>）</li>
+</ul>
+<div class="page-nav"><a href="04-调试与优化-4.1-精度不对怎么办.html" class="nav-prev"><span class="nav-label">← 上一篇</span><span class="nav-title">4.1 精度不对怎么办</span></a><a href="04-调试与优化-4.3-算子精度标准.html" class="nav-next"><span class="nav-label">下一篇 →</span><span class="nav-title">4.3 算子精度标准</span></a></div>
+</div>
+</main>
+</body>
+</html>

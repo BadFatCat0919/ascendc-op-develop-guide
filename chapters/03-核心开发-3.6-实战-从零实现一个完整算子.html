@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3.6 实战：从零实现一个完整算子 - AscendC Guide</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<nav class="sidebar"><div class="sidebar-header"><h2>AscendC Guide</h2><p>算子开发从入门到精通</p></div><ul class="sidebar-nav"><li class="chapter-group"><span class="chapter-title">第1章 基础概念</span><ul class="article-list"><li><a href="01-基础概念-1.1-什么是算子与AscendC.html" class=""><span class="doc-type">📘</span>1.1 什么是算子与 Ascend C</a></li><li><a href="01-基础概念-1.2-数据类型排布与量化.html" class=""><span class="doc-type">📘📕</span>1.2 数据类型、排布与量化</a></li><li><a href="01-基础概念-1.3-五分钟跑通第一个算子.html" class=""><span class="doc-type">📗</span>1.3 五分钟跑通第一个算子</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第2章 硬件与编程模型</span><ul class="article-list"><li><a href="02-硬件与编程模型-2.1-A5硬件架构.html" class=""><span class="doc-type">📘</span>2.1 A5 硬件架构</a></li><li><a href="02-硬件与编程模型-2.2-编程模型概述.html" class=""><span class="doc-type">📘</span>2.2 编程模型概述</a></li><li><a href="02-硬件与编程模型-2.3-算子结构与直调开发.html" class=""><span class="doc-type">📘📗</span>2.3 算子结构与直调开发</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第3章 核心开发</span><ul class="article-list"><li><a href="03-核心开发-3.1-Tiling设计.html" class=""><span class="doc-type">📘</span>3.1 Tiling 设计</a></li><li><a href="03-核心开发-3.2-内存管理与数据搬运.html" class=""><span class="doc-type">📘📕</span>3.2 内存管理与数据搬运</a></li><li><a href="03-核心开发-3.3-Vector计算.html" class=""><span class="doc-type">📘📕</span>3.3 Vector 计算</a></li><li><a href="03-核心开发-3.4-Cube计算.html" class=""><span class="doc-type">📘📕</span>3.4 Cube 计算</a></li><li><a href="03-核心开发-3.5-同步与流水线.html" class=""><span class="doc-type">📘</span>3.5 同步与流水线</a></li><li><a href="03-核心开发-3.6-实战-从零实现一个完整算子.html" class="active"><span class="doc-type">📗</span>3.6 实战：从零实现一个完整算子</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第4章 调试与优化</span><ul class="article-list"><li><a href="04-调试与优化-4.1-精度不对怎么办.html" class=""><span class="doc-type">📙</span>4.1 精度不对怎么办</a></li><li><a href="04-调试与优化-4.2-性能不达标怎么办.html" class=""><span class="doc-type">📙</span>4.2 性能不达标怎么办</a></li><li><a href="04-调试与优化-4.3-算子精度标准.html" class=""><span class="doc-type">📕</span>4.3 算子精度标准</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第5章 进阶</span><ul class="article-list"><li><a href="05-进阶-5.1-常见踩坑与最佳实践.html" class=""><span class="doc-type">📙</span>5.1 常见踩坑与最佳实践</a></li><li><a href="05-进阶-5.2-进阶主题.html" class=""><span class="doc-type">📘</span>5.2 进阶主题</a></li></ul></li><li class="chapter-group"><span class="chapter-title">附录</span><ul class="article-list"><li><a href="附录-A-数据类型速查表.html" class=""><span class="doc-type">📕</span>A. 数据类型速查表</a></li><li><a href="附录-B-对齐规则速查.html" class=""><span class="doc-type">📕</span>B. 对齐规则速查</a></li><li><a href="附录-C-错误码速查.html" class=""><span class="doc-type">📕</span>C. 错误码速查</a></li></ul></li></ul></nav>
+<main class="main">
+<div class="content">
+<div class="meta-bar">
+<span class="doc-badge badge-tutorial">📗 Tutorial</span>
+<a href="../index.html">← 返回目录</a>
+</div>
+<h2>3.6.1 实战目标</h2>
+<p>本文以 ops-blas 仓中的 <strong>sswap 算子（arch35）</strong> 为例，完整走通一个 Ascend C 算子的开发全流程。</p>
+<p>sswap 是 BLAS Level-1 接口，功能是交换两个向量的对应元素：</p>
+<pre class=""><code>x[i] ↔ y[i]，对所有 i ∈ [0, N)</code></pre>
+<p>它的计算特征非常鲜明：<strong>纯数据搬运，不涉及任何算术运算</strong>。从 GM 把 x 和 y 搬到 UB，然后把 x 的内容写回 y 的 GM 地址、y 的内容写回 x 的 GM 地址。正因为逻辑简单，sswap 是理解 Ascend C 算子开发框架的最佳入门案例——你可以把全部注意力集中在 Tiling、搬运、队列、同步这些框架机制上，而不用被复杂的计算逻辑分心。</p>
+<p>关键设计选择：</p>
+<ul>
+<li>使用 Vector 单元（纯搬运，不用 Cube）</li>
+<li>单 Buffer（无计算阶段，双 Buffer 无额外收益）</li>
+<li>精度位精确（数据搬运不产生精度误差）</li>
+<li>目标架构：arch35（A5 芯片）</li>
+</ul>
+<h2>3.6.2 需求分析</h2>
+<p><strong>输入</strong>：两个长度为 N 的 FP32 向量 x 和 y，存储在 GM 中。</p>
+<p><strong>输出</strong>：交换后的 x 和 y（原地修改，不分配额外输出空间）。</p>
+<p><strong>计算类型</strong>：纯数据搬运。不涉及 Vector 算术运算，不涉及 Cube 矩阵乘。</p>
+<p><strong>精度要求</strong>：精确。数据搬运不改变任何值，输出必须与输入完全一致（只是 x 和 y 互换了位置）。</p>
+<p><strong>硬件目标</strong>：A5 (950PR)，arch35。每核 UB 248KB，Vector 核数通过运行时接口获取。</p>
+<p><strong>对齐约束</strong>：DataCopy 要求搬运长度按 32B 对齐，FP32 下即 8 个元素的倍数。</p>
+<h2>3.6.3 Tiling 设计</h2>
+<h3>多核切分</h3>
+<p>sswap 是逐元素算子，每个元素的交换互不依赖，所以按元素数量均分给所有 Vector Core 即可。</p>
+<p>切分时需要满足 32B 对齐约束，所以每核处理量要向下对齐到 <code>ELEMENTS_PER_BLOCK = 8</code>：</p>
+<pre class=""><code>uint32_t rawPerCore = n / coreNum;
+tiling.perCoreN = (rawPerCore / alignUnit) * alignUnit;</code></pre>
+<p>对齐后剩余的元素全部交给最后一个核：</p>
+<pre class=""><code>tiling.remainder = n - tiling.perCoreN * coreNum;</code></pre>
+<h3>UB 切分</h3>
+<p>sswap 需要两个 Buffer（xBuffer 和 yBuffer），UB 空间平分给它们：</p>
+<pre class=""><code>constexpr uint32_t ubSize = 248 * 1024;
+constexpr uint32_t bufferCount = 2;
+uint32_t maxElements = ubSize / (bufferCount * sizeof(float));
+tiling.tileSize = (maxElements / alignUnit) * alignUnit;</code></pre>
+<p>248KB 平分给两个 Buffer，每个 Buffer 约 124KB，可以装约 31K 个 FP32 元素。对齐到 8 的倍数后得到 <code>tileSize</code>。</p>
+<h3>Tiling 数据结构</h3>
+<pre class=""><code>struct SswapTilingData {
+    uint32_t totalN;     // 总元素个数
+    uint32_t perCoreN;   // 每核处理量（已对齐到 ELEMENTS_PER_BLOCK）
+    uint32_t remainder;  // 尾块大小，分配给最后一个核
+    uint32_t tileSize;   // UB 单轮处理量（已对齐到 ELEMENTS_PER_BLOCK）
+};</code></pre>
+<p>四个字段的设计理由：</p>
+<ul>
+<li><code>totalN</code>：Kernel 需要知道总长度来设置 <code>SetGlobalBuffer</code> 的边界。</li>
+<li><code>perCoreN</code>：每个核的基础工作量，用于计算数据起始偏移。</li>
+<li><code>remainder</code>：最后一个核的额外工作量。</li>
+<li><code>tileSize</code>：控制内层循环的轮数。</li>
+</ul>
+<h3>完整的 Tiling 计算函数</h3>
+<pre class=""><code>static SswapTilingData CalSswapTilingData(uint32_t n, uint32_t coreNum)
+{
+    SswapTilingData tiling;
+    tiling.totalN = n;
+    constexpr uint32_t alignUnit = ELEMENTS_PER_BLOCK;
+    uint32_t rawPerCore = n / coreNum;
+    tiling.perCoreN = (rawPerCore / alignUnit) * alignUnit;
+    tiling.remainder = n - tiling.perCoreN * coreNum;
+    constexpr uint32_t ubSize = 248 * 1024;
+    constexpr uint32_t bufferCount = 2;
+    uint32_t maxElements = ubSize / (bufferCount * sizeof(float));
+    tiling.tileSize = (maxElements / alignUnit) * alignUnit;
+    return tiling;
+}</code></pre>
+<h2>3.6.4 Kernel 编码</h2>
+<p>Kernel 是运行在 AI Core 上的核函数，负责实际的数据搬运和交换。sswap 的 Kernel 包含三个核心方法：<code>Init</code>（初始化）、<code>SingleIteration</code>（单轮交换）、<code>Process</code>（主循环）。</p>
+<h3>Kernel 入口</h3>
+<p>Kernel 入口函数是 <code>__global__ __aicore__</code> 修饰的全局函数，接收 GM 指针作为参数：</p>
+<pre class=""><code>extern &quot;C&quot; __global__ __aicore__ void sswap_kernel(GM_ADDR x, GM_ADDR y, GM_ADDR workSpace, GM_ADDR tilingGm)
+{
+    KERNEL_TASK_TYPE_DEFAULT(KERNEL_TYPE_AIV_ONLY);
+    TPipe pipe;
+    SswapAIV op;
+    op.Init(x, y, tilingGm, &amp;pipe);
+    op.Process();
+}</code></pre>
+<p>入口函数非常简洁：声明任务类型、创建 Pipe 和 Kernel 类实例，调用 Init 初始化，调用 Process 执行主循环。</p>
+<ul>
+<li><code>KERNEL_TASK_TYPE_DEFAULT(KERNEL_TYPE_AIV_ONLY)</code> 声明当前 Kernel 仅使用 AIV（AI Vector）单元，不使用 AIC（AI Cube）单元。sswap 是纯搬运算子，不涉及矩阵乘，所以只需要 AIV。</li>
+<li>变量名使用 <code>op</code> 而非 <code>aiV</code>，与 ops-blas 仓内其他算子保持一致的命名风格。</li>
+</ul>
+<h3>Init：初始化阶段</h3>
+<p>Init 负责三件事：解析 Tiling 数据、计算当前核的数据范围、初始化 Queue 和 Buffer。</p>
+<pre class=""><code>__aicore__ inline void SswapAIV::Init(GM_ADDR x, GM_ADDR y, GM_ADDR tilingGm, TPipe* pipe)
+{
+    pipe_ = pipe;
+    blockIdx_ = GetBlockIdx();
+    ParseTilingData(tilingGm);
+    myOffset_ = blockIdx_ * tiling_.perCoreN;
+    myCount_ = tiling_.perCoreN;
+    if (blockIdx_ == GetBlockNum() - 1) {
+        myCount_ += tiling_.remainder;
+    }
+    xGM_.SetGlobalBuffer((__gm__ float*)x, tiling_.totalN);
+    yGM_.SetGlobalBuffer((__gm__ float*)y, tiling_.totalN);
+    uint32_t bufSize = tiling_.tileSize * sizeof(float);
+    pipe_-&gt;InitBuffer(inQueueX_, BUFFER_NUM, bufSize);
+    pipe_-&gt;InitBuffer(inQueueY_, BUFFER_NUM, bufSize);
+}</code></pre>
+<p>逐行解读：</p>
+<ol>
+<li><code>GetBlockIdx()</code> 获取当前核的编号（0, 1, 2, ...）。</li>
+<li><code>ParseTilingData</code> 从 GM 中读出 Tiling 结构体。</li>
+<li><code>myOffset_ = blockIdx_ * perCoreN</code> 计算当前核负责的数据起始位置。</li>
+<li><code>myCount_</code> 计算当前核要处理的元素总数。最后一个核额外加上 <code>remainder</code>。</li>
+<li><code>SetGlobalBuffer</code> 把 GM 指针包装成 <code>GlobalTensor</code>，后续可以用偏移量访问。</li>
+<li><code>InitBuffer</code> 为 x 和 y 各初始化一个队列，<code>BUFFER_NUM = 1</code>（单 Buffer）。</li>
+</ol>
+<h3>队列类型：TQueBind</h3>
+<p>sswap 使用的队列类型是 <code>TQueBind<QuePosition::VECIN, QuePosition::VECOUT, 1></code>，而不是普通的 <code>TQue</code>。两者的关键区别：</p>
+<ul>
+<li><strong><code>TQue</code></strong>：标准的单方向队列，数据从 MTE2 搬入 UB，经 Vector 计算后，再由 MTE3 从 UB 搬出到 GM。入队/出队各自独立。</li>
+<li><strong><code>TQueBind</code></strong>：绑定输入（VECIN）和输出（VECOUT）的共用队列。数据从 MTE2 搬入后，可以<strong>直通</strong>到 MTE3 搬出，不需要额外的计算阶段介入。</li>
+</ul>
+<p>sswap 是纯搬运算子，不涉及任何 Vector 计算，所以使用 <code>TQueBind</code> 让数据从搬入直接流转到搬出，是最自然的选择。队列声明如下：</p>
+<pre class=""><code>TQueBind&lt;QuePosition::VECIN, QuePosition::VECOUT, 1&gt; inQueueX_;
+TQueBind&lt;QuePosition::VECIN, QuePosition::VECOUT, 1&gt; inQueueY_;</code></pre>
+<p>模板参数 <code><QuePosition::VECIN, QuePosition::VECOUT, 1></code> 的含义：输入端绑定到 VECIN（MTE2 搬入），输出端绑定到 VECOUT（MTE3 搬出），队列深度为 1（单 Buffer）。</p>
+<h3>SingleIteration：单轮交换</h3>
+<p>这是 sswap 的核心逻辑：把一轮数据从 GM 搬到 UB，交换后写回 GM。</p>
+<pre class=""><code>__aicore__ inline void SswapAIV::SingleIteration(uint32_t curOffset, uint32_t dataCount)
+{
+    uint32_t alignedCount = (dataCount / ELEMENTS_PER_BLOCK) * ELEMENTS_PER_BLOCK;
+    uint32_t tailCount = dataCount - alignedCount;</code></pre>
+<p>首先把 <code>dataCount</code> 分成两部分：<code>alignedCount</code>（32B 对齐的主体）和 <code>tailCount</code>（不足 32B 的尾部）。</p>
+<p><strong>搬入阶段</strong>：</p>
+<pre class=""><code>    LocalTensor&lt;float&gt; xLocal = inQueueX_.AllocTensor&lt;float&gt;();
+    LocalTensor&lt;float&gt; yLocal = inQueueY_.AllocTensor&lt;float&gt;();
+    if (alignedCount &gt; 0) {
+        DataCopy(xLocal, xGM_[curOffset], alignedCount);
+        DataCopy(yLocal, yGM_[curOffset], alignedCount);
+    }
+    if (tailCount &gt; 0) {
+        uint8_t paddingNum = ELEMENTS_PER_BLOCK - tailCount;
+        DataCopyExtParams copyParams{1, static_cast&lt;uint32_t&gt;(tailCount * sizeof(float)), 0, 0, 0};
+        DataCopyPadExtParams&lt;float&gt; padParams{true, 0, paddingNum, 0.0f};
+        DataCopyPad(xLocal[alignedCount], xGM_[curOffset + alignedCount], copyParams, padParams);
+        DataCopyPad(yLocal[alignedCount], yGM_[curOffset + alignedCount], copyParams, padParams);
+    }</code></pre>
+<p>主体部分用普通 DataCopy 搬运（长度已对齐）。尾部用 DataCopyPad 搬运，自动填充不足 32B 的部分。</p>
+<p><strong>入队 + 出队</strong>：</p>
+<pre class=""><code>    inQueueX_.EnQue&lt;float&gt;(xLocal);
+    inQueueY_.EnQue&lt;float&gt;(yLocal);
+    LocalTensor&lt;float&gt; xIn = inQueueX_.DeQue&lt;float&gt;();
+    LocalTensor&lt;float&gt; yIn = inQueueY_.DeQue&lt;float&gt;();</code></pre>
+<p>EnQue 表示"数据已经搬入完毕"，DeQue 表示"我要开始使用这些数据了"。在 A5 上，这对操作隐含了 MTE2→MTE3 的同步语义。</p>
+<p><strong>搬出阶段（交叉写回）</strong>：</p>
+<pre class=""><code>    if (alignedCount &gt; 0) {
+        DataCopy(yGM_[curOffset], xIn, alignedCount);
+        DataCopy(xGM_[curOffset], yIn, alignedCount);
+    }
+    if (tailCount &gt; 0) {
+        DataCopyExtParams copyParams{1, static_cast&lt;uint32_t&gt;(tailCount * sizeof(float)), 0, 0, 0};
+        DataCopyPad(yGM_[curOffset + alignedCount], xIn[alignedCount], copyParams);
+        DataCopyPad(xGM_[curOffset + alignedCount], yIn[alignedCount], copyParams);
+    }</code></pre>
+<p>注意这里的"交叉写回"：x 的内容写到 y 的 GM 地址，y 的内容写到 x 的 GM 地址。这就是 swap 的本质——不需要临时变量，直接交叉赋值。</p>
+<p><strong>释放 Buffer</strong>：</p>
+<pre class=""><code>    inQueueX_.FreeTensor(xIn);
+    inQueueY_.FreeTensor(yIn);
+}</code></pre>
+<p>FreeTensor 归还 Buffer，供下一轮使用。</p>
+<h3>Process：主循环</h3>
+<p>Process 控制多轮 SingleIteration 的执行：</p>
+<pre class=""><code>__aicore__ inline void SswapAIV::Process()
+{
+    if (myCount_ == 0) return;
+    uint32_t tileLoop = myCount_ / tiling_.tileSize;
+    uint32_t tileTail = myCount_ % tiling_.tileSize;
+    uint32_t curOffset = myOffset_;
+    for (uint32_t i = 0; i &lt; tileLoop; i++) {
+        SingleIteration(curOffset, tiling_.tileSize);
+        curOffset += tiling_.tileSize;
+    }
+    if (tileTail &gt; 0) {
+        SingleIteration(curOffset, tileTail);
+    }
+}</code></pre>
+<p>逻辑非常清晰：先算完整轮数 <code>tileLoop</code> 和最后一轮的元素数 <code>tileTail</code>。完整轮每轮处理 <code>tileSize</code> 个元素，最后一轮处理剩余的 <code>tileTail</code> 个。</p>
+<h2>3.6.5 Host 侧代码</h2>
+<p>Host 侧代码运行在 CPU 上，负责四件事：参数校验、动态获取核数、Tiling 计算、调用 Kernel。</p>
+<h3>参数校验</h3>
+<p>Host 侧在调用 Kernel 之前需要校验输入参数：</p>
+<ul>
+<li>N 必须大于 0</li>
+<li>x 和 y 的指针不能为空</li>
+<li>x 和 y 的数据类型必须一致</li>
+</ul>
+<h3>动态获取核数</h3>
+<p>Vector Core 的数量不能硬编码，必须通过运行时接口动态获取，以适配不同型号的芯片：</p>
+<pre class=""><code>int32_t aivCoreNum = 0;
+aclrtGetDeviceInfo(deviceId, ACL_DEV_ATTR_VECTOR_CORE_NUM, &amp;aivCoreNum, sizeof(int32_t));</code></pre>
+<p>获取到核数后，还需要处理<strong>小 N 场景</strong>——当数据量很小时，不需要启动所有核，否则大量核会空跑浪费资源：</p>
+<pre class=""><code>uint32_t numBlocks = (totalN &lt; aivCoreNum) ? totalN : aivCoreNum;</code></pre>
+<p>这样当 N 小于核数时，只启动 N 个核（每个核处理 1 个对齐块）；当 N 足够大时，才使用全部 Vector Core。</p>
+<h3>Tiling 计算</h3>
+<p>Host 侧调用 <code>CalSswapTilingData</code> 计算切分方案（代码见 3.6.3 节），然后通过 <code>aclrtMalloc</code> + <code>aclrtMemcpy</code> 把 Tiling 数据写入 GM，供 Kernel 读取。</p>
+<h3>Kernel 调用</h3>
+<p>Host 侧通过 <code>sswap_kernel_do</code> 包装函数调用 Kernel，该函数封装了 <code><<<>>></code> 直调语法和 stream 管理：</p>
+<pre class=""><code>sswap_kernel_do(xDev, yDev, workspaceDev, tilingDev, numBlocks, stream);</code></pre>
+<p><code>sswap_kernel_do</code> 内部通过 <code><<<>>></code> 语法启动 Kernel：</p>
+<pre class=""><code>sswap_kernel&lt;&lt;&lt;numBlocks, stream&gt;&gt;&gt;(xDev, yDev, workspaceDev, tilingDev);</code></pre>
+<p>其中 <code>numBlocks</code> 是实际使用的 AI Core 数量（经过小 N 处理后的值），<code>stream</code> 是执行流。使用包装函数的好处是可以统一管理 stream 同步、错误处理等逻辑，避免在每个调用点重复编写。</p>
+<h2>3.6.6 编译</h2>
+<p>ops-blas 使用统一的构建系统。编译 sswap 算子：</p>
+<pre class=""><code>bash build.sh --ops=sswap --soc=ascend950</code></pre>
+<p>构建系统会自动处理 arch35 目录下的源文件，生成 Kernel 二进制和 Host 侧动态库。</p>
+<p>如果编译报错，常见原因有：</p>
+<ul>
+<li><strong>头文件找不到</strong>：检查 CANN Toolkit 环境变量是否正确配置。</li>
+<li><strong>SOC_VERSION 不匹配</strong>：确认 <code>--soc</code> 参数与目标芯片一致。</li>
+<li><strong>语法错误</strong>：Ascend C 的 <code>__gm__</code>、<code>__aicore__</code> 等关键字需要特定的编译器支持，确保使用 CANN 提供的编译器。</li>
+</ul>
+<h2>3.6.7 仿真验证</h2>
+<p>在没有 NPU 硬件的开发环境中，可以使用 CANN Simulator 进行功能验证：</p>
+<ol>
+<li>准备 CPU golden 数据：在 CPU 上实现 sswap 的参考逻辑，生成期望输出。</li>
+<li>运行仿真：用 Simulator 执行 Kernel，得到 NPU 侧的输出。</li>
+<li>对比结果：逐元素比较 NPU 输出和 CPU golden，确认完全一致。</li>
+</ol>
+<p>sswap 是精确算子，输出必须与 golden 完全一致（atol = 0, rtol = 0），任何差异都说明实现有 bug。</p>
+<h2>3.6.8 上板测试</h2>
+<p>在真实 NPU 上运行 ST（System Test）用例，验证算子的功能正确性：</p>
+<pre class=""><code>bash build.sh --ops=sswap --soc=ascend950
+# 运行 ST 用例
+./build/sswap_test</code></pre>
+<p>ST 用例会自动生成多种规模的测试数据（小、中、大、边界），调用算子并与 golden 结果比对。全部通过才算验证成功。</p>
+<h2>3.6.9 常见问题排查</h2>
+<p><strong>精度不对</strong>：sswap 是精确算子，如果出现精度问题，大概率是 DataCopy 对齐错误或 Buffer 越界。检查 <code>ELEMENTS_PER_BLOCK</code> 的计算是否正确，DataCopyPad 的填充参数是否匹配。详见 <a href="../04-调试与优化/4.1-精度不对怎么办.md">4.1 精度不对怎么办</a>。</p>
+<p><strong>性能不好</strong>：sswap 是纯搬运算子，性能瓶颈在 GM 带宽。检查多核切分是否均匀（<code>remainder</code> 是否过大），<code>tileSize</code> 是否充分利用了 UB 空间。详见 <a href="../04-调试与优化/4.2-性能不达标怎么办.md">4.2 性能不达标怎么办</a>。</p>
+<p><strong>编译报错</strong>：检查 CANN 环境变量、SOC_VERSION 配置、头文件路径。常见的 <code>__gm__</code> 相关报错通常是因为没有使用 CANN 提供的编译器。</p>
+<p><strong>运行时崩溃</strong>：检查 GM 指针是否为空、N 是否为 0、Tiling 数据是否正确写入 GM。可以通过 plog 日志定位具体的崩溃位置。</p>
+<h2>参考链接</h2>
+<ul>
+<li><a href="https://www.hiascend.com/zh/developer/techArticles/20230830-2">Ascend C 快速入门</a></li>
+<li><a href="https://gitcode.com/cann/cann-samples">cann-samples Vector Add 完整样例</a>（<code>Samples/0_Introduction/vector_add/</code>）</li>
+<li><a href="https://gitcode.com/cann/asc-devkit.git">asc-devkit 高性能 Add 模板</a>（<code>examples/04_best_practices/00_add_doublebuffer/</code>）</li>
+<li><a href="https://gitcode.com/cann/asc-devkit.git">asc-devkit Add 基础示例</a>（<code>examples/00_introduction/01_add/</code>）</li>
+<li><a href="https://www.hiascend.com/developer/courses/detail/1691696509765107713">Ascend C 系列教程（入门）</a></li>
+</ul>
+<div class="page-nav"><a href="03-核心开发-3.5-同步与流水线.html" class="nav-prev"><span class="nav-label">← 上一篇</span><span class="nav-title">3.5 同步与流水线</span></a><a href="04-调试与优化-4.1-精度不对怎么办.html" class="nav-next"><span class="nav-label">下一篇 →</span><span class="nav-title">4.1 精度不对怎么办</span></a></div>
+</div>
+</main>
+</body>
+</html>

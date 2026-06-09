@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2.1 A5 硬件架构 - AscendC Guide</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<nav class="sidebar"><div class="sidebar-header"><h2>AscendC Guide</h2><p>算子开发从入门到精通</p></div><ul class="sidebar-nav"><li class="chapter-group"><span class="chapter-title">第1章 基础概念</span><ul class="article-list"><li><a href="01-基础概念-1.1-什么是算子与AscendC.html" class=""><span class="doc-type">📘</span>1.1 什么是算子与 Ascend C</a></li><li><a href="01-基础概念-1.2-数据类型排布与量化.html" class=""><span class="doc-type">📘📕</span>1.2 数据类型、排布与量化</a></li><li><a href="01-基础概念-1.3-五分钟跑通第一个算子.html" class=""><span class="doc-type">📗</span>1.3 五分钟跑通第一个算子</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第2章 硬件与编程模型</span><ul class="article-list"><li><a href="02-硬件与编程模型-2.1-A5硬件架构.html" class="active"><span class="doc-type">📘</span>2.1 A5 硬件架构</a></li><li><a href="02-硬件与编程模型-2.2-编程模型概述.html" class=""><span class="doc-type">📘</span>2.2 编程模型概述</a></li><li><a href="02-硬件与编程模型-2.3-算子结构与直调开发.html" class=""><span class="doc-type">📘📗</span>2.3 算子结构与直调开发</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第3章 核心开发</span><ul class="article-list"><li><a href="03-核心开发-3.1-Tiling设计.html" class=""><span class="doc-type">📘</span>3.1 Tiling 设计</a></li><li><a href="03-核心开发-3.2-内存管理与数据搬运.html" class=""><span class="doc-type">📘📕</span>3.2 内存管理与数据搬运</a></li><li><a href="03-核心开发-3.3-Vector计算.html" class=""><span class="doc-type">📘📕</span>3.3 Vector 计算</a></li><li><a href="03-核心开发-3.4-Cube计算.html" class=""><span class="doc-type">📘📕</span>3.4 Cube 计算</a></li><li><a href="03-核心开发-3.5-同步与流水线.html" class=""><span class="doc-type">📘</span>3.5 同步与流水线</a></li><li><a href="03-核心开发-3.6-实战-从零实现一个完整算子.html" class=""><span class="doc-type">📗</span>3.6 实战：从零实现一个完整算子</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第4章 调试与优化</span><ul class="article-list"><li><a href="04-调试与优化-4.1-精度不对怎么办.html" class=""><span class="doc-type">📙</span>4.1 精度不对怎么办</a></li><li><a href="04-调试与优化-4.2-性能不达标怎么办.html" class=""><span class="doc-type">📙</span>4.2 性能不达标怎么办</a></li><li><a href="04-调试与优化-4.3-算子精度标准.html" class=""><span class="doc-type">📕</span>4.3 算子精度标准</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第5章 进阶</span><ul class="article-list"><li><a href="05-进阶-5.1-常见踩坑与最佳实践.html" class=""><span class="doc-type">📙</span>5.1 常见踩坑与最佳实践</a></li><li><a href="05-进阶-5.2-进阶主题.html" class=""><span class="doc-type">📘</span>5.2 进阶主题</a></li></ul></li><li class="chapter-group"><span class="chapter-title">附录</span><ul class="article-list"><li><a href="附录-A-数据类型速查表.html" class=""><span class="doc-type">📕</span>A. 数据类型速查表</a></li><li><a href="附录-B-对齐规则速查.html" class=""><span class="doc-type">📕</span>B. 对齐规则速查</a></li><li><a href="附录-C-错误码速查.html" class=""><span class="doc-type">📕</span>C. 错误码速查</a></li></ul></li></ul></nav>
+<main class="main">
+<div class="content">
+<div class="meta-bar">
+<span class="doc-badge badge-explanation">📘 Explanation</span>
+<a href="../index.html">← 返回目录</a>
+</div>
+<h2>2.1.1 昇腾芯片概览</h2>
+<p>昇腾（Ascend）是华为自研的 AI 处理器系列，从训练到推理覆盖了多种场景。在算子开发中，我们最关心的是芯片的 <strong>NpuArch 架构代号</strong>，因为它直接决定了我们能使用哪些指令和编程模型。</p>
+<table><thead><tr><th>代号</th><th>NpuArch</th><th>芯片型号</th><th>说明</th></tr></thead><tbody><tr><td>A2</td><td>DAV_2201</td><td>Ascend910B1~B4</td><td>训练/推理芯片</td></tr><tr><td>A3</td><td>DAV_2201</td><td>Ascend910_93</td><td>训练/推理芯片</td></tr><tr><td><strong>A5</strong></td><td><strong>DAV_3510</strong></td><td><strong>Ascend950DT/PR</strong></td><td><strong>新一代推理芯片（本文核心）</strong></td></tr></tbody></table>
+<p>A2 和 A3 共用 DAV_2201 架构，因此算子代码基本兼容——同一份 arch22 目录下的代码通常可以在这两代芯片上直接运行。A5 则采用全新的 DAV_3510 架构，新增了 SIMT 编程模型、RegBase 向量计算、多种低精度数据类型等重要特性，这些是 A2/A3 所不具备的。</p>
+<p>在 ops-blas 算子仓中，不同架构的实现按目录区分：arch22 目录存放 A2/A3 的实现，arch35 目录存放 A5 的实现。本文以 sswap 算子的 arch35 版本为贯穿示例，它正是运行在 A5 芯片上的实现。</p>
+<h2>2.1.2 AI Core：Da Vinci 核</h2>
+<p>AI Core 是昇腾 NPU 的基本计算单元，地位类似 GPU 中的 SM（Streaming Multiprocessor）。每个 AI Core 内部集成了三种计算单元，可以把它想象成一把王者荣耀里的团战阵容：Cube 是坦克（扛伤害，做最重的矩阵乘），Vector 是射手（持续输出，做逐元素运算），Scalar 是辅助（指挥走位，做控制流和地址计算）。</p>
+<h3>三大计算单元</h3>
+<table><thead><tr><th>计算单元</th><th>类比</th><th>擅长场景</th><th>算力 (A5 Server)</th></tr></thead><tbody><tr><td><strong>Cube</strong></td><td>吕布大招（一刀劈一片）</td><td>矩阵乘加（16×16×16 MAC 阵列）</td><td>432T (BF16)</td></tr><tr><td><strong>Vector</strong></td><td>流水线工人</td><td>逐元素运算、归约、类型转换</td><td>54T (FP16)</td></tr><tr><td><strong>Scalar</strong></td><td>管理员</td><td>控制流、地址计算</td><td>-</td></tr></tbody></table>
+<p><strong>Cube</strong> 是算力担当，专门做矩阵乘法。它内部是一个 16×16×16 的 MAC（乘累加）阵列，每个时钟周期可以完成一次 16×16 的矩阵乘运算。对于 FP8 精度，阵列扩大为 16×32×16，算力翻倍；对于 MXFP4 精度，阵列进一步扩大为 16×64×16，算力再翻倍。</p>
+<p><strong>Vector</strong> 是通用计算单元，宽度为 128 bit，每次可以处理 256 Bytes 的数据（对于 float 就是 64 个元素，对于 half 就是 128 个元素）。当数据总量超过一次处理的宽度时，Vector 通过 repeat（重复执行）和 mask（掩码选择）机制来处理任意长度的向量。</p>
+<p><strong>Scalar</strong> 负责控制流和地址计算等标量操作，不参与大规模数据计算。</p>
+<div class="sswap-callout"><p>sswap 是纯数据搬运算子（交换两个向量的元素），只做 CopyIn 和 CopyOut，不涉及加减乘除。因此它只使用 <strong>Vector</strong> 单元来驱动数据搬运（MTE2 搬入、MTE3 搬出），完全不需要 Cube 单元。这也是为什么 sswap 的 kernel 入口使用 <code>KERNEL_TASK_TYPE_DEFAULT(KERNEL_TYPE_AIV_ONLY)</code>——只启动 AIV（AI Vector）核，不启动 AIC（AI Cube）核。</p></div>
+<h3>Cube 单元详解</h3>
+<p>Cube 的核心是一个脉动阵列（Systolic Array），在 FP16/BF16 精度下规模为 16×16×16。你可以把它理解为王者里吕布的大招：蓄力（数据从 L0A/L0B 送入）→ 一刀劈下去（16×16 的矩阵乘一步完成）→ 范围内的敌人全被打到（结果写入 L0C）。每个时钟周期，阵列中的每个乘加单元都在做一次乘法和一次累加，数据像波浪一样从一端流向另一端。</p>
+<p>FP8 精度下阵列规模变为 16×32×16（K 维度翻倍），MXFP4 下变为 16×64×16（K 维度再翻倍），精度越低、吞吐越高。</p>
+<h3>Vector 单元详解</h3>
+<p>Vector 单元的物理宽度是 128 bit，但一次指令操作的数据量由 VL（Vector Length）决定，最大为 256 Bytes。以 float（4 Bytes）为例，一次可以处理 64 个元素；以 half（2 Bytes）为例，一次可以处理 128 个元素。</p>
+<p>当向量长度超过单次处理能力时，Vector 通过 <strong>repeat</strong> 参数指定重复执行次数，通过 <strong>mask</strong> 参数指定每次执行时哪些元素有效。这套机制让 Vector 能够处理任意长度的向量，而不需要程序员手写循环。</p>
+<h2>2.1.3 存储层次</h2>
+<p>昇腾的存储层次类似 CPU 的 L1/L2/L3 cache，但有一个关键区别：<strong>缓存由程序员显式管理</strong>。CPU 的 cache 对程序员透明，由硬件自动替换；而昇腾的各级 Buffer 需要程序员通过 API 显式搬运数据。</p>
+<p>把 AI Core 想象成一家雪王奶茶的门店：GM 是城市郊区的总仓库——东西多到堆成山（64GB），但叫个货拉拉过来得等半天。L1 是门店后厨的冷库——容量还行（512KB），走两步就到。L0A/L0B 是吧台上的原料盒——容量小但伸手就够着。UB 是调饮师面前的操作台——所有调配动作都在这里完成。你的工作就是合理安排"什么时候从总仓进货、什么提前备到冷库、什么摆在吧台上"，让调饮师（Vector 单元）不用等料就能连续出杯。</p>
+<pre class="ascii-art"><code>┌──────────────────────────────────┐
+│        Global Memory (GM)        │  片外 HBM，容量大，延迟高
+├──────────────────────────────────┤
+│           L2 Cache               │  跨核共享
+├──────────────────────────────────┤
+│           L1 Buffer              │  每核 512KB，Cube 输入缓存
+├──────────┬──────────┬────────────┤
+│  L0A     │  L0B     │   L0C      │  Cube 操作数/输出
+│  64KB    │  64KB    │ 128~256KB  │
+├──────────┴──────────┴────────────┤
+│      Unified Buffer (UB)         │  每核 192~248KB，Vector 工作区
+└──────────────────────────────────┘</code></pre>
+<h3>各层存储容量</h3>
+<table><thead><tr><th>Buffer</th><th>A2 (910B2)</th><th>A5 (950PR)</th><th>用途</th></tr></thead><tbody><tr><td>GM</td><td>64 GB</td><td>112~128 GB</td><td>全局存储</td></tr><tr><td>L2</td><td>192 MB</td><td>112~128 MB</td><td>跨核共享</td></tr><tr><td>L1</td><td>512 KB</td><td>512 KB</td><td>Cube 输入缓存</td></tr><tr><td>L0A</td><td>64 KB</td><td>64 KB</td><td>Cube 左矩阵</td></tr><tr><td>L0B</td><td>64 KB</td><td>64 KB</td><td>Cube 右矩阵</td></tr><tr><td>L0C</td><td>128 KB</td><td><strong>256 KB</strong></td><td>Cube 输出（A5 翻倍）</td></tr><tr><td>UB</td><td>192 KB</td><td><strong>248 KB</strong></td><td>Vector 工作区</td></tr><tr><td>BT</td><td>1 KB</td><td><strong>4 KB</strong></td><td>FixPipe Bias</td></tr></tbody></table>
+<p>注意 A5 相比 A2 有两处显著增大：L0C 从 128 KB 翻倍到 256 KB（Cube 输出缓冲区更大，减少写回次数），UB 从 192 KB 增加到 248 KB（Vector 工作区更大，可以放更多中间数据）。</p>
+<p>运行时必须通过 <code>GetMemSizeInBytes</code> 等接口获取实际容量，禁止硬编码具体数值。不同芯片版本的容量可能不同，硬编码会导致移植时出错。</p>
+<div class="sswap-callout"><p>sswap 的工作区就是 UB。它从 GM 把 x 和 y 的数据分别搬入 UB 中的两个队列（<code>inQueueX_</code> 和 <code>inQueueY_</code>），然后交叉写回 GM——x 的数据写到 y 的位置，y 的数据写到 x 的位置。整个过程不经过 L1/L0A/L0B/L0C，因为 sswap 不使用 Cube 单元。</p></div>
+<h2>2.1.4 MTE 数据搬运引擎</h2>
+<p>MTE（Memory Transfer Engine）是昇腾芯片中专门负责数据搬运的硬件引擎。你可以把它理解为狗西购物的物流系统——它不做任何加工，只负责把包裹从一个地方搬到另一个地方。MTE2 是干线运输（从总仓 GM 到城市分拣中心 UB），MTE3 是派送（从门店 UB 送到顾客手里 GM），MTE1 是店内调拨（从冷库 L1 到吧台 L0A/L0B）。</p>
+<table><thead><tr><th>引擎</th><th>搬运路径</th><th>说明</th></tr></thead><tbody><tr><td>MTE1</td><td>L1 ↔ L0A/B/C, L1 ↔ UB</td><td>核内搬运</td></tr><tr><td>MTE2</td><td>GM → L1 / UB</td><td>从全局搬入</td></tr><tr><td>MTE3</td><td>UB → GM / L1</td><td>搬出到全局</td></tr></tbody></table>
+<p>三个引擎各司其职：MTE2 负责"进货"（从 GM 搬数据到核内），MTE3 负责"出货"（从核内搬数据回 GM），MTE1 负责核内各级 Buffer 之间的内部调拨。三者可以并行工作，这就是为什么在 Ascend C 中可以实现"搬入-计算-搬出"的流水线重叠。</p>
+<div class="sswap-callout"><p>sswap 的数据流非常清晰——CopyIn 阶段通过 MTE2 将 x 和 y 从 GM 搬入 UB（<code>inQueueX_</code> 和 <code>inQueueY_</code>），CopyOut 阶段通过 MTE3 将 UB 中的数据交叉写回 GM（<code>inQueueX_</code> 的内容写到 yGM，<code>inQueueY_</code> 的内容写到 xGM）。</p></div>
+<h2>2.1.5 A5 相比 A2/A3 的关键差异</h2>
+<p>A5 是昇腾架构的一次重大升级，引入了多项新特性。下面逐一介绍这些变化，它们直接影响算子的写法和性能上限。</p>
+<h3>新增数据通路</h3>
+<p>A5 新增了几条重要的数据通路，大幅提升了核内数据流转的灵活性：</p>
+<ul>
+<li><strong>L0C → UB</strong>：Cube 的计算结果可以直接送到 Vector 单元做后处理（如激活函数、类型转换），不再需要先写回 GM 再由 Vector 读回来。这对 FlashAttention / FIA 类融合算子意义重大，可以消除 workspace 的 GM 读写，显著降低延迟。</li>
+<li><strong>UB ↔ L1</strong>：Vector 与 Cube 之间建立了双向直连通道，数据可以在两个计算单元之间自由流动。</li>
+<li><strong>SSBuffer 消息通路</strong>：核间细粒度同步机制，允许多个 AI Core 之间通过消息传递进行协作，而不需要经过 GM 中转。</li>
+</ul>
+<h3>新增编程模型</h3>
+<p>A5 引入了两种全新的编程模型，给算子开发者提供了更多选择：</p>
+<ul>
+<li><strong>SIMT 编程模型</strong>：类似 CUDA 的线程级并行方式，每个线程处理一个或少量数据元素，适合离散访问（Gather/Scatter）、排序、Hash 等场景。</li>
+<li><strong>SIMD-RegBase</strong>：中间计算结果保存在寄存器中而非 UB，减少 UB 读写次数，特别适合多步融合计算（如 Gelu+Cast）。</li>
+<li><strong>NDDMA</strong>：高维 DMA 指令，支持多维张量的直接搬运，不需要拆成一维循环。</li>
+</ul>
+<p>这些编程模型在 <a href="./2.2-编程模型概述.md">2.2 编程模型概述</a> 中有详细讲解。</p>
+<h3>新增数据类型</h3>
+<p>A5 新增了一系列低精度数据类型，以支持大模型推理中的量化需求：</p>
+<ul>
+<li><strong>FP8</strong>：E5M2 和 E4M3 两种格式，分别适合梯度和权重/激活。</li>
+<li><strong>MXFP8 / MXFP4</strong>：微缩浮点格式，通过共享指数位进一步压缩数据。</li>
+<li><strong>HiF8</strong>：华为自定义的 8 位浮点格式。</li>
+</ul>
+<p>详见 <a href="../01-基础概念/1.2-数据类型排布与量化.md">1.2 数据类型</a> 中的 A5 特有类型章节。</p>
+<h3>同步机制变化</h3>
+<p>A2/A3 上，多流水并行时需要严格配对使用 <code>SetFlag</code> / <code>WaitFlag</code> 来做同步——一个流水段 Set 了某个 flag，另一个流水段必须 Wait 同一个 flag，配对关系不能乱。A5 引入了 <strong>BufferID 同步机制</strong>，每个 Buffer 自带独立的同步标识，硬件自动管理依赖关系，消除了手动配对的需求，大幅简化了多流水算子的同步代码。</p>
+<h3>不再支持的特性</h3>
+<p>A5 在引入新特性的同时，也移除了一些 A2/A3 上的特性：</p>
+<ul>
+<li><strong>4:2 稀疏矩阵计算</strong>不再支持。</li>
+<li><strong>L1→GM 和 GM→L0A/L0B 的数据通路已删除</strong>，如果之前依赖这些路径，需要改用替代路径（例如先搬到 UB 再转出）。</li>
+</ul>
+<h2>参考链接</h2>
+<ul>
+<li><a href="https://hiascend.com/document/redirect/CannCommunityOpdevAscendC">Ascend C 编程指南 — 硬件架构</a></li>
+<li><a href="https://www.hiascend.com/zh/developer/techArticles/20230807-1">深度理解多核并行/流水计算/double buffer技术</a></li>
+<li><a href="https://www.hiascend.com/document/redirect/CannCommunityProductForm">CANN 产品形态说明</a></li>
+<li><a href="https://gitcode.com/cann/cann-samples">cann-samples 入门样例</a>（<code>Samples/0_Introduction/</code>）</li>
+</ul>
+<div class="page-nav"><a href="01-基础概念-1.3-五分钟跑通第一个算子.html" class="nav-prev"><span class="nav-label">← 上一篇</span><span class="nav-title">1.3 五分钟跑通第一个算子</span></a><a href="02-硬件与编程模型-2.2-编程模型概述.html" class="nav-next"><span class="nav-label">下一篇 →</span><span class="nav-title">2.2 编程模型概述</span></a></div>
+</div>
+</main>
+</body>
+</html>
