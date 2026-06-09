@@ -105,10 +105,10 @@ renderQuiz('quiz', [
     explanation: "sswap 是典型的 memory-bound 算子，每次交换需要 4 次 GM 访问（读 x、读 y、写回 x、写回 y），性能瓶颈 100% 在数据搬运上。"
   },
   {
-    question: "msprof 在昇腾平台上的地位类似于 NVIDIA 的什么工具？",
-    options: ["CUDA Debugger", "Nsight", "cuDNN", "TensorRT"],
+    question: "msprof 是什么工具？",
+    options: ["代码编辑器", "性能分析工具", "编译器", "调试器"],
     answer: 1,
-    explanation: "msprof 是昇腾平台的性能分析工具，地位类似于 NVIDIA 的 Nsight，可以采集执行时间、各 Pipe 利用率、搬运延迟等关键指标。"
+    explanation: "msprof 是昇腾平台的性能分析工具，可以采集执行时间、各 Pipe 利用率、搬运延迟等关键指标。"
   },
   {
     question: "双 Buffer 优化的核心原理是什么？",

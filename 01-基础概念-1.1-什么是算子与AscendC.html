@@ -22,13 +22,13 @@
 <table><thead><tr><th>概念</th><th>视角</th><th>举例</th></tr></thead><tbody><tr><td><strong>函数</strong></td><td>编程概念</td><td><code>add(a, b)</code> 是一个 C++ 函数</td></tr><tr><td><strong>层（Layer）</strong></td><td>网络结构概念</td><td>"卷积层"是网络架构图里的一个方框</td></tr><tr><td><strong>算子（Operator）</strong></td><td>硬件执行概念</td><td>Conv2D 算子是 NPU 上实际运行的一段 Kernel 代码</td></tr></tbody></table>
 <p>一个"层"往往包含多个算子。比如一个典型的"卷积层"实际上由三个算子串联而成：Conv2D（卷积计算）→ BiasAdd（加偏置）→ ReLU（激活函数）。框架在调度时，会把它们拆成独立的算子节点依次执行。</p>
 <h3>算子在框架中的角色</h3>
-<p>当你在 PyTorch 或 MindSpore 里写模型代码时，框架会在内部构建一张<strong>计算图（Compute Graph）</strong>——图中的每个节点就是一个算子，边代表数据的流向。</p>
+<p>当你在 PyTorch 里写模型代码时，框架会在内部构建一张<strong>计算图（Compute Graph）</strong>——图中的每个节点就是一个算子，边代表数据的流向。</p>
 <ul>
 <li><strong>前向传播</strong>：框架按拓扑序依次执行每个算子，从输入数据算出预测结果。</li>
 <li><strong>反向传播</strong>：框架执行每个算子的"梯度算子"，从损失函数倒推出每个参数的梯度。</li>
 </ul>
 <p>整个调用链条从上到下大致是这样的：</p>
-<pre class="ascii-art"><code>用户代码 (PyTorch / MindSpore)
+<pre class="ascii-art"><code>用户代码 (PyTorch)
     ↓
 框架算子调度层
     ↓
@@ -50,17 +50,16 @@ Kernel（NPU 上实际执行的核函数）</code></pre>
 <li><strong>算子融合</strong>：把多个小算子融合成一个大算子，减少数据在显存和片上缓存之间的来回搬运，显著提升效率。</li>
 </ol>
 <h2>1.1.2 Ascend C 是什么</h2>
-<p>Ascend C 是华为昇腾 NPU 上的<strong>算子开发框架</strong>——它提供了一套 C++ API，让你可以用接近写普通 C++ 的方式来编写运行在 NPU 上的核函数（Kernel）。</p>
-<p>类比一下：就像 CUDA 之于 NVIDIA GPU，Ascend C 之于昇腾 NPU。如果你之前接触过 CUDA 编程，会发现两者的思路非常相似——都是"在 CPU 上准备数据、启动核函数、回收结果，在加速器上执行计算密集的部分"。</p>
-<h3>与 CUDA 的类比</h3>
-<table><thead><tr><th>概念</th><th>CUDA (NVIDIA GPU)</th><th>Ascend C (昇腾 NPU)</th></tr></thead><tbody><tr><td>硬件计算单元</td><td>GPU SM（流多处理器）</td><td>AI Core</td></tr><tr><td>编程语言</td><td>CUDA C/C++</td><td>Ascend C (C++)</td></tr><tr><td>软件栈</td><td>CUDA Toolkit</td><td>CANN Toolkit</td></tr><tr><td>核函数标记</td><td><code>__global__</code></td><td><code>__global__ __aicore__</code></td></tr><tr><td>核索引</td><td>threadIdx / blockIdx</td><td>block_idx</td></tr><tr><td>片上共享内存</td><td>Shared Memory</td><td>Unified Buffer (UB)</td></tr><tr><td>全局内存</td><td>Global Memory</td><td>Global Memory (GM)</td></tr></tbody></table>
-<p>两者的核心区别在于硬件架构：GPU 的 SM 擅长大量线程并行做简单运算；昇腾 NPU 的 AI Core 则集成了专用的 Cube（矩阵乘）和 Vector（向量）计算单元，对矩阵运算有硬件级加速。</p>
+<p>Ascend C 是华为昇腾 NPU 上的<strong>算子开发框架</strong>——它提供了一套 C++ API，让你可以用接近写普通 C++ 的方式来编写运行在 NPU 上的核函数（Kernel）。整个开发思路很直观：在 CPU 上准备数据、启动核函数、回收结果，在 NPU 上执行计算密集的部分。</p>
+<h3>Ascend C 的核心概念</h3>
+<table><thead><tr><th>概念</th><th>说明</th></tr></thead><tbody><tr><td>硬件计算单元</td><td>AI Core</td></tr><tr><td>编程语言</td><td>Ascend C (C++)</td></tr><tr><td>软件栈</td><td>CANN Toolkit</td></tr><tr><td>核函数标记</td><td><code>__global__ __aicore__</code></td></tr><tr><td>核索引</td><td>block_idx</td></tr><tr><td>片上共享内存</td><td>Unified Buffer (UB)</td></tr><tr><td>全局内存</td><td>Global Memory (GM)</td></tr></tbody></table>
+<p>昇腾 NPU 的 AI Core 集成了专用的 Cube（矩阵乘）和 Vector（向量）计算单元，对矩阵运算有硬件级加速。</p>
 <h3>CANN 软件栈</h3>
 <p>CANN 全称 <strong>Compute Architecture for Neural Networks</strong>，是昇腾的统一计算架构。你可以把它理解为"NPU 世界的操作系统 + 开发工具包"。</p>
 <p><img src="https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/8.0.0.alpha001/opdevg/ascendcopdevg/atlas_ascendc_10_0009_0.png" alt="CANN 软件栈层次图"></p>
 <p>从用户代码到硬件，整个软件栈的分层如下：</p>
 <pre class="ascii-art"><code>┌─────────────────────────────────────┐
-│  应用框架 (PyTorch / MindSpore)      │
+│  应用框架 (PyTorch)                   │
 ├─────────────────────────────────────┤
 │  算子接口层 (aclnn / 直调)           │
 ├─────────────────────────────────────┤
@@ -74,7 +73,7 @@ Kernel（NPU 上实际执行的核函数）</code></pre>
 │  昇腾 NPU 硬件                      │
 └─────────────────────────────────────┘</code></pre>
 <ul>
-<li><strong>应用框架层</strong>：PyTorch、MindSpore 这些你熟悉的框架，它们通过算子接口层调用底层算子。</li>
+<li><strong>应用框架层</strong>：PyTorch 这些你熟悉的框架，它们通过算子接口层调用底层算子。</li>
 <li><strong>算子接口层</strong>：提供统一的 C 接口（aclnn 前缀），框架通过它来调用具体的算子实现。</li>
 <li><strong>Ascend C 算子库</strong>：这就是我们要开发算子的地方。算子库按功能域分成多个仓库。</li>
 <li><strong>opbase 基础框架</strong>：所有算子仓库共同依赖的底层库，提供公共头文件、调度框架、内存管理等基础设施。</li>
@@ -128,14 +127,14 @@ renderQuiz('quiz', [
     explanation: "算子（Operator）是硬件执行概念——它是 NPU 上实际运行的一段 Kernel 代码。函数是编程概念（C++ 函数），层是网络结构概念（网络架构图里的一个方框）。一个层往往包含多个算子，比如卷积层 = Conv2D + BiasAdd + ReLU。"
   },
   {
-    question: "在 CUDA 与 Ascend C 的对比中，CUDA 的 Shared Memory 对应 Ascend C 中的什么？",
-    options: ["Global Memory (GM)", "Unified Buffer (UB)", "AI Core", "TPipe"],
+    question: "在 Ascend C 中，Unified Buffer (UB) 的作用是什么？",
+    options: ["存储全局数据，类似 CPU 的主存", "片上高速缓存，用于在计算单元附近暂存数据", "存储模型参数，类似 GPU 的显存", "存储编译后的二进制代码"],
     answer: 1,
-    explanation: "CUDA 的 Shared Memory 对应 Ascend C 的 Unified Buffer (UB)——都是片上高速缓存，用于在计算单元附近暂存数据。GM 对应的是 Global Memory（全局显存），AI Core 对应的是 GPU SM（流多处理器）。"
+    explanation: "Unified Buffer (UB) 是 Ascend C 中的片上高速缓存，用于在计算单元附近暂存数据。它的作用类似于其他加速器架构中的共享内存概念，但 UB 是 Ascend C 特有的术语。GM 对应的是 Global Memory（全局显存）。"
   },
   {
     question: "在 CANN 软件栈的分层中，opbase 基础框架的角色是什么？",
-    options: ["最顶层的应用框架，如 PyTorch / MindSpore", "算子接口层，提供 aclnn 前缀的统一 C 接口", "所有算子仓库共同依赖的底层库，提供公共头文件、调度框架、内存管理等基础设施", "最底层的 NPU 硬件驱动"],
+    options: ["最顶层的应用框架，如 PyTorch", "算子接口层，提供 aclnn 前缀的统一 C 接口", "所有算子仓库共同依赖的底层库，提供公共头文件、调度框架、内存管理等基础设施", "最底层的 NPU 硬件驱动"],
     answer: 2,
     explanation: "opbase 是所有算子仓库的「标准库」——它提供公共头文件、调度框架、内存管理等基础设施。所有算子仓库（ops-blas、ops-nn、ops-math 等）都依赖它。它位于 Ascend C 算子库和 CANN Toolkit 之间。"
   },

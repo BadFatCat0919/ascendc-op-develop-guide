@@ -39,7 +39,7 @@
 <p>这段代码的含义是：从 UB 加载两个 128 元素的向量到寄存器，做逐元素加法，结果写回 UB。整个过程都在寄存器上完成，没有中间的 UB 读写。</p>
 <p>sswap 不使用 RegBase，因为它是纯搬运算子，没有 Vector 计算阶段。RegBase 的价值在于<strong>计算密集型算子</strong>——比如 GEMM 的内核循环、Reduce 的归约树等。</p>
 <h2>5.2.2 SIMT 混合编程</h2>
-<p>传统的 Ascend C 算子使用 <strong>SIMD</strong> 模式——一个核内的所有计算单元（Vector、Scalar、MTE）协同处理同一份数据。A5 引入了 <strong>SIMT</strong>（Single Instruction Multiple Threads）模式，让你可以像写 CUDA 一样用线程并行处理数据。</p>
+<p>传统的 Ascend C 算子使用 <strong>SIMD</strong> 模式——一个核内的所有计算单元（Vector、Scalar、MTE）协同处理同一份数据。A5 引入了 <strong>SIMT</strong>（Single Instruction Multiple Threads）模式，让你可以用线程并行处理数据。</p>
 <p>更强大的是，A5 支持在同一个 Kernel 中<strong>混合使用 SIMT 和 SIMD</strong>：</p>
 <ul>
 <li><strong>SIMT 部分</strong>适合处理离散内存访问（如 Gather/Scatter）和分支密集的逻辑。</li>
@@ -106,7 +106,6 @@ if (npuArch == NpuArch::DAV_3510) {
 <p>算子开发完成后，需要注册到 CANN 框架才能被上层应用调用。常见的对接方式包括：</p>
 <p><strong>CANN 框架直调。</strong> 通过 <code>aclblas</code> 接口直接调用，就像 sswap 的 <code>aclblasSswap</code> 一样。这是最直接的方式，适合 C/C++ 应用。</p>
 <p><strong>PyTorch 自定义算子。</strong> 通过 torch-npu 的自定义算子注册机制，将 Ascend C 算子包装成 PyTorch 的 <code>torch.ops</code> 调用。</p>
-<p><strong>MindSpore 算子对接。</strong> 通过 MindSpore 的自定义算子框架，将 Ascend C 算子注册为 MindSpore 的 Primitive。</p>
 <p>具体的对接方式取决于你的目标框架，这里不展开讨论。核心要点是：无论对接哪个框架，底层的 Ascend C Kernel 代码都是一样的，变的只是 Host 侧的封装层。</p>
 <h2>参考链接</h2>
 <ul>

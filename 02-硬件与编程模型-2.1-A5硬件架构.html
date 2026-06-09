@@ -70,7 +70,7 @@
 <h3>新增编程模型</h3>
 <p>A5 引入了两种全新的编程模型，给算子开发者提供了更多选择：</p>
 <ul>
-<li><strong>SIMT 编程模型</strong>：类似 CUDA 的线程级并行方式，每个线程处理一个或少量数据元素，适合离散访问（Gather/Scatter）、排序、Hash 等场景。</li>
+<li><strong>SIMT 编程模型</strong>：线程级并行方式，每个线程处理一个或少量数据元素，适合离散访问（Gather/Scatter）、排序、Hash 等场景。</li>
 <li><strong>SIMD-RegBase</strong>：中间计算结果保存在寄存器中而非 UB，减少 UB 读写次数，特别适合多步融合计算（如 Gelu+Cast）。</li>
 <li><strong>NDDMA</strong>：高维 DMA 指令，支持多维张量的直接搬运，不需要拆成一维循环。</li>
 </ul>

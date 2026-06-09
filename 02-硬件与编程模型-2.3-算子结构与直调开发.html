@@ -146,7 +146,7 @@ int main() {
     aclrtResetDevice(0);
     aclFinalize();
 }</code></pre>
-<p>流程非常直观：初始化设备 → 分配 GM 内存 → 拷入数据 → 启动 Kernel → 拷出结果 → 清理资源。<code><<<coreNum, stream>>></code> 是 Ascend C 的 Kernel 启动语法，<code>coreNum</code> 指定启动多少个 AI Core，<code>stream</code> 是执行流（类似 CUDA 的 stream）。</p>
+<p>流程非常直观：初始化设备 → 分配 GM 内存 → 拷入数据 → 启动 Kernel → 拷出结果 → 清理资源。<code><<<coreNum, stream>>></code> 是 Ascend C 的 Kernel 启动语法，<code>coreNum</code> 指定启动多少个 AI Core，<code>stream</code> 是执行流。</p>
 <p>sswap 的 Host 侧还封装了一个 C 风格的启动函数：</p>
 <pre class=""><code>void sswap_kernel_do(GM_ADDR x, GM_ADDR y, GM_ADDR workSpace,
                      GM_ADDR tilingGm, uint32_t numBlocks, void* stream)

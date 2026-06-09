@@ -63,8 +63,8 @@ extern &quot;C&quot; __global__ __aicore__ void sswap_kernel(
 }</code></pre>
 <p>几个关键标记：</p>
 <ul>
-<li><code>__global__ __aicore__</code>：标记这是一个 NPU 核函数，类似 CUDA 的 <code>__global__</code>。</li>
-<li><code>GM_ADDR</code>：全局内存地址，指向 NPU 显存中的数据。类似 CUDA 中的设备指针。</li>
+<li><code>__global__ __aicore__</code>：标记这是一个 NPU 核函数，告诉编译器这段代码要在 NPU 的 AI Core 上执行。</li>
+<li><code>GM_ADDR</code>：全局内存地址，指向 NPU 显存中的数据。</li>
 <li><code>TPipe</code>：流水线管理对象，负责协调数据搬运和计算的并行。</li>
 </ul>
 <p>sswap 的核心逻辑非常直观：从 GM 把 x 和 y 的数据分别搬到 UB 的两块缓冲区，然后<strong>交叉搬回</strong>——把 x 缓冲区的数据写回 y 的 GM 位置，把 y 缓冲区的数据写回 x 的 GM 位置。这样就完成了交换。</p>
@@ -109,7 +109,7 @@ constexpr uint32_t ELEMENTS_PER_BLOCK = 32 / sizeof(float);</code></pre>
 <h2>1.3.7 恭喜你</h2>
 <p>你已经跑通了第一个 Ascend C 算子！虽然代码细节还没完全展开，但你已经掌握了几个核心概念：</p>
 <ul>
-<li><strong>Kernel 代码在 NPU 上执行，Host 代码在 CPU 上执行</strong>——这是 Ascend C（以及 CUDA）的基本分工。</li>
+<li><strong>Kernel 代码在 NPU 上执行，Host 代码在 CPU 上执行</strong>——这是 Ascend C 的基本分工。</li>
 <li><strong>数据通过 GM_ADDR 在 CPU 和 NPU 之间传递</strong>——Host 侧准备好数据地址，Kernel 侧通过 GM_ADDR 访问显存。</li>
 <li><strong>Tiling 参数决定每个核处理多少数据</strong>——这是 Ascend C 特有的设计，让同一个算子可以灵活地适配不同大小的输入。</li>
 <li><strong>编译时需要指定目标芯片</strong>——不同芯片的 AI Core 架构不同，编译出的二进制也不同。</li>
@@ -150,9 +150,9 @@ renderQuiz('quiz', [
   },
   {
     question: "在 Kernel 代码中，__global__ __aicore__ 这两个标记的作用是什么？",
-    options: ["标记这是一个 CPU 上的普通函数", "标记这是一个 NPU 核函数，类似 CUDA 的 __global__", "标记这是一个只能在仿真器上运行的函数", "标记这是一个 Host 侧的参数校验函数"],
+    options: ["标记这是一个 CPU 上的普通函数", "标记这是一个 NPU 核函数，告诉编译器这段代码要在 AI Core 上执行", "标记这是一个只能在仿真器上运行的函数", "标记这是一个 Host 侧的参数校验函数"],
     answer: 1,
-    explanation: "__global__ __aicore__ 标记这是一个 NPU 核函数，类似 CUDA 的 __global__。它告诉编译器这段代码要在 NPU 的 AI Core 上执行，而不是在 CPU 上。__aicore__ 是 Ascend C 特有的标记，表示函数运行在 AI Core 计算单元上。"
+    explanation: "__global__ __aicore__ 标记这是一个 NPU 核函数。__global__ 表示这是一个全局可见的核函数，__aicore__ 是 Ascend C 特有的标记，表示函数运行在 AI Core 计算单元上，而不是在 CPU 上。"
   },
   {
     question: "sswap 的核心逻辑是「交叉写回」——以下哪个描述最准确？",
