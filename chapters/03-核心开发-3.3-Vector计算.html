@@ -45,6 +45,20 @@ Muls(dst, src, scalar, length, repeatTimes, repeatParams);</code></pre>
 <h3>repeat + mask 组合</h3>
 <p>实际使用中，repeat 和 mask 经常配合使用。前 N-1 次 repeat 用满 mask（每次处理完整的 256B），最后一次 repeat 用部分 mask（只处理剩余的尾部数据）。</p>
 <p>这种组合在 Tiling 设计中非常重要：如果你的 <code>tileSize</code> 恰好是 256B 的倍数，就不需要 mask，效率最高；如果有余数，就需要用 mask 处理尾部，会有一点额外开销。</p>
+<blockquote>
+<p><strong>Q：repeat 机制会比拆分成多条指令更快吗？</strong></p>
+<p>A：是的，repeat 通常比拆分成多条指令更快。核心原因有三个：</p>
+<p><strong>1. 减少指令调度开销。</strong>一条 <code>repeatTimes=N</code> 的指令只需要一次取指→译码→发射，而拆成 N 条指令每条都要走一遍这个流程。Scalar 单元（负责指令调度）的压力会小很多。</p>
+<p><strong>2. 流水线更饱满。</strong>repeat 让 Vector 单元可以连续执行 N 轮，中间没有指令切换的空泡（bubble）。拆成多条指令的话，每条指令之间可能有流水线停顿。</p>
+<p><strong>3. 指令缓存压力更小。</strong>1 条指令 vs N 条指令，对指令缓存（I-Cache）的占用完全不同。</p>
+<p>但也有例外情况：</p>
+<ul>
+<li><strong>repeat 上限是 255</strong>，超过的部分必须拆分</li>
+<li><strong>尾部数据不足一轮</strong>时，需要用 mask 单独处理，这时候拆一条出来反而更清晰</li>
+<li><strong>如果中间需要穿插其他操作</strong>（比如每轮 repeat 之间要做一次同步），那就不能简单用 repeat</li>
+</ul>
+<p>所以实际开发中的最佳实践是：<strong>能用 repeat 就用 repeat，不够的部分用 mask 处理尾部</strong>。</p>
+</blockquote>
 <h2>3.3.4 归约运算（Reduction）</h2>
 <p>归约运算是沿某个维度聚合数据，把多个元素"压缩"成一个或几个结果。比如求和（ReduceSum）把所有元素加起来，求最大值（ReduceMax）找出最大的那个。</p>
 <h3>常用归约 API</h3>
