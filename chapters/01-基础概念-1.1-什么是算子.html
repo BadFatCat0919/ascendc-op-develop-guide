@@ -15,7 +15,7 @@
 <h2>1.1.1 算子是什么</h2>
 <p>想象你在用丑图秀秀修图。一张自拍从导入到导出，要经过好几步操作：美颜、瘦脸、大眼、加滤镜。每一步操作就是一个<strong>算子（Operator）</strong>——它接收上一步的图像（数据），处理一下，传给下一步。你写的 PyTorch 模型就是那张修图流程图，框架就是丑图秀秀的引擎，而算子就是每一个实际执行的修图步骤。<code>torch.add(a, b)</code> 就是"调亮度"，<code>torch.matmul(A, B)</code> 就是"应用滤镜矩阵"。</p>
 <p>用更正式的话说：<strong>算子是对张量（多维数组）执行的一种数学运算，它是深度学习框架中最小的计算单元</strong>。你在 PyTorch 里写 <code>torch.add(a, b)</code>，这个 <code>add</code> 就是一个算子；写 <code>torch.matmul(A, B)</code>，这个 <code>matmul</code> 也是一个算子。</p>
-<p><strong>重要澄清</strong>：算子不只是一段 Kernel 代码。一个完整的算子包含 <strong>Host 侧代码</strong>（运行在 CPU 上，负责参数校验、数据切分、启动 Kernel）和 <strong>Kernel 侧代码</strong>（运行在 NPU 上，负责实际计算）。算子的核心职责是<strong>调度 NPU 完成一段数学计算</strong>，而不是简单地执行一段代码。</p>
+
 <h3>1.1.1.1 算子 vs 函数 vs 层</h3>
 <p>这三个词经常混用，但它们的视角不同：</p>
 <table><thead><tr><th>概念</th><th>视角</th><th>举例</th></tr></thead><tbody><tr><td><strong>函数</strong></td><td>编程概念</td><td><code>add(a, b)</code> 是一个 C++ 函数</td></tr><tr><td><strong>层（Layer）</strong></td><td>网络结构概念</td><td>"卷积层"是网络架构图里的一个方框</td></tr><tr><td><strong>算子（Operator）</strong></td><td>硬件执行概念</td><td>Conv2D 算子是 NPU 上实际运行的一段 Kernel 代码</td></tr></tbody></table>
