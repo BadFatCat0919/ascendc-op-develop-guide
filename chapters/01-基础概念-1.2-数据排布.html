@@ -13,7 +13,6 @@
 <div class="content">
 <div class="meta-bar"><a href="../index.html">← 返回目录</a></div>
 <h1>1.2 数据排布</h1>
-<h3>1.2.1 为什么数据排布很重要</h3>
 <p>无论数据在逻辑上分几维（1 维向量、2 维矩阵、4 维张量……），最终在内存中都是<strong>连续排布的一维数组</strong>。就像爬黄山，无论多少家庭、多少旅行团，最后到了"一线天"那个狭窄的通道，都得一个个地过。数据排布格式就是规定大家按什么顺序压缩成一条线通过。</p>
 <p>同样的一批数据，在内存中可以按不同的顺序排列。就像你刷大绿书，同样一堆帖子，按"最新"排和按"最热"排，你刷到想看内容的效率完全不同。数据排布格式决定了 NPU 访问内存时的效率——如果排布方式和硬件的计算模式匹配，就能连续读取、一次搬完；不匹配就会产生大量碎片化的随机访问，效率大打折扣。</p>
 <p>在算子开发中，数据排布格式直接影响两件事：</p>
@@ -21,11 +20,11 @@
 <li><strong>搬运效率</strong>：NPU 的 MTE（Memory Transfer Engine）喜欢连续的大块数据搬运，碎片化的数据会让它反复启动，浪费时间。</li>
 <li><strong>计算效率</strong>：Cube 单元（矩阵乘单元）一次计算一个固定大小的矩阵块（如 16×16），如果数据已经按计算块排好，就能直接喂进去；否则需要额外的重排操作。</li>
 </ul>
-<h3>1.2.2 张量与维度基础</h3>
+<h3>1.2.1 张量与维度基础</h3>
 <p>在深度学习中，数据的基本组织形式是<strong>张量（Tensor）</strong>——一个多维数组。你可以把张量理解为"数组的数组的数组……"，维度的数量决定了张量的"阶"：</p>
 <table><thead><tr><th>维度数</th><th>名称</th><th>形状示例</th><th>深度学习中的对应</th></tr></thead><tbody><tr><td>0 维</td><td>标量（Scalar）</td><td>()</td><td>一个损失值</td></tr><tr><td>1 维</td><td>向量（Vector）</td><td>(N,)</td><td>一个特征向量</td></tr><tr><td>2 维</td><td>矩阵（Matrix）</td><td>(M, N)</td><td>全连接层权重</td></tr><tr><td>3 维</td><td>3 阶张量</td><td>(C, H, W)</td><td>一张彩色图片</td></tr><tr><td>4 维</td><td>4 阶张量</td><td>(N, C, H, W)</td><td>一批彩色图片（Batch）</td></tr><tr><td>5 维</td><td>5 阶张量</td><td>(N, C, D, H, W)</td><td>一批 3D 医学影像</td></tr></tbody></table>
 <p>维度的<strong>顺序</strong>很重要。同样一张 3×224×224 的图片，按 (C, H, W) 排列和按 (H, W, C) 排列，在内存中的存放顺序完全不同——前者是先放完整个红色通道、再放绿色通道、最后放蓝色通道；后者是每个像素点的 RGB 三个值紧挨着放。这就是"数据排布格式"要解决的问题。</p>
-<h3>1.2.3 统一的数据排布格式</h3>
+<h3>1.2.2 统一的数据排布格式</h3>
 <table><thead><tr><th>格式</th><th>维度顺序 / 说明</th><th>用途</th><th>备注</th></tr></thead><tbody><tr><td><strong>ND</strong></td><td>任意维度，Row-major（行优先）</td><td>最通用的格式，Ascend C 中最常用</td><td>类似 C 语言数组存储</td></tr><tr><td><strong>NCHW</strong></td><td>Batch-Channel-Height-Width</td><td>卷积、图像处理</td><td>PyTorch 默认格式</td></tr><tr><td><strong>NHWC</strong></td><td>Batch-Height-Width-Channel</td><td>卷积、图像处理</td><td>TensorFlow 默认格式</td></tr><tr><td><strong>NCDHW</strong></td><td>Batch-Channel-Depth-Height-Width</td><td>3D 卷积场景</td><td></td></tr><tr><td><strong>NC1HWC0 (5HD)</strong></td><td>将 Channel 维拆为 C1（外层）+ C0（内层），C0=16</td><td>卷积输入特征图</td><td>昇腾专用，匹配 Cube 的 16×16 计算粒度</td></tr><tr><td><strong>FracZ</strong></td><td>按 Cube 计算分块重新排列</td><td>全连接层权重</td><td>昇腾专用</td></tr><tr><td><strong>FracNZ</strong></td><td>FracZ 的改进版，支持双维分块</td><td>Transformer QKV 权重</td><td>昇腾专用</td></tr></tbody></table>
 <p><strong>ND 格式</strong>是 Ascend C 开发中最常用的格式。它不限制维度数和维度含义，数据按行优先（Row-major）顺序连续存放——就像 C 语言中二维数组 <code>a[i][j]</code> 的存储方式：第 0 行所有元素、第 1 行所有元素……依次排列。</p>
 <p>表中标注"昇腾专用"的格式是为了匹配 Cube 单元（矩阵乘单元）的硬件计算需求而设计的。Cube 单元一次计算的是一个固定大小的矩阵块（如 16×16），如果数据按 ND 格式存放，每次取一个矩阵块就需要跨行跳跃读取，效率低。专用格式把数据预先按 Cube 的计算块重排，让硬件可以连续读取。</p>
@@ -64,7 +63,7 @@
 </svg>
 </div>
 <p>格式转换本身是有开销的（需要搬运和重排数据），所以好的算子设计应尽量减少不必要的格式转换。如果一个算子的输入已经是 5HD 格式，就没必要先转回 ND 再处理。</p>
-<h3>1.2.4 大语言模型中的排布格式</h3>
+<h3>1.2.3 大语言模型中的排布格式</h3>
 <p>在大语言模型（LLM）中，注意力机制（Attention）涉及多维张量的复杂变换，因此衍生了一系列专用的排布格式。这些格式的核心区别在于 <strong>Batch（B）、Sequence（S）、Num Heads（N）、Head Dim（D）</strong> 四个维度的排列顺序。</p>
 <table>
 <thead><tr><th>格式</th><th>维度顺序</th><th>说明</th><th>典型场景</th></tr></thead>
@@ -81,7 +80,7 @@
 <p><strong>Q：为什么 Attention 要用 BSND 而不是 BSH？</strong></p>
 <p>A：因为 Multi-Head Attention 需要把输入拆成多个 Head 分别计算。BSH 格式把 NumHeads 和 HeadDim 合并成了 Hidden 维，无法区分不同的 Head。BSND 格式显式地保留了 NumHeads 维，让 Kernel 可以按 Head 并行处理——每个 AI Core 处理一个或几个 Head，实现多核并行。</p>
 </blockquote>
-<h3>1.2.5 对齐要求</h3>
+<h3>1.2.4 对齐要求</h3>
 <p>昇腾 NPU 的内存访问有一个硬性要求：<strong>数据必须 32 字节（32B）对齐</strong>。这意味着每次从 Global Memory 搬运数据到 UB 时，搬运的起始地址和数据长度都必须是 32B 的整数倍。</p>
 <p>为什么是 32B？因为 NPU 的 MTE（Memory Transfer Engine）一次搬运的最小粒度就是 32 字节——就像你在狗西购物凑满减，满 199 减 30，你购物车里 198 块的东西得硬凑个 1 块钱的数据线才能享受优惠。MTE 也一样，不够 32 字节的数据得用"填充物"补齐才能发车。</p>
 <p>对齐粒度的计算方式：</p>
