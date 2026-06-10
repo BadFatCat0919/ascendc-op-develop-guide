@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>9.2 swap 算子开发 - AscendC Guide</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<div class="top-header"><a href="index.html" class="logo"><span class="logo-icon">A</span>AscendC Guide</a><span class="header-subtitle">CANN 算子开发手册</span></div>
+<nav class="sidebar"><div class="sidebar-header"><h2><a href="../index.html" style="color:inherit;text-decoration:none">AscendC Guide</a></h2><p>算子开发从入门到精通</p></div><ul class="sidebar-nav"><li class="chapter-group"><span class="chapter-title">第1章 基础概念</span><ul class="article-list"><li><a href="01-基础概念-1.1-什么是算子.html">1.1 什么是算子</a></li><li><a href="01-基础概念-1.2-数据排布格式.html">1.2 数据排布格式</a></li><li><a href="01-基础概念-1.3-数据类型.html">1.3 数据类型</a></li><li><a href="01-基础概念-1.4-量化与反量化.html">1.4 量化与反量化</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第2章 编程语言</span><ul class="article-list"><li><a href="02-编程语言-2.1-昇腾编程语言.html">2.1 昇腾编程语言</a></li><li><a href="02-编程语言-2.2-编程模型.html">2.2 编程模型</a></li><li><a href="02-编程语言-2.3-Ascend软件栈.html">2.3 Ascend 软件栈</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第3章 昇腾硬件</span><ul class="article-list"><li><a href="03-昇腾硬件-3.1-A5通用架构.html">3.1 A5 通用架构</a></li><li><a href="03-昇腾硬件-3.2-A5新特性.html">3.2 A5 新特性</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第5章 核心开发</span><ul class="article-list"><li><a href="05-核心开发-5.1-Tiling设计.html">5.1 Tiling 设计</a></li><li><a href="05-核心开发-5.2-内存管理与数据搬运.html">5.2 内存管理与数据搬运</a></li><li><a href="05-核心开发-5.3-Vector计算.html">5.3 Vector 计算</a></li><li><a href="05-核心开发-5.4-Cube计算.html">5.4 Cube 计算</a></li><li><a href="05-核心开发-5.5-同步与流水线.html">5.5 同步与流水线</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第6章 API 参考</span><ul class="article-list"><li><a href="06-API参考-6.1-AscendC常用API概览.html">6.1 Ascend C 常用 API 概览</a></li><li><a href="06-API参考-6.2-数据搬运API详解.html">6.2 数据搬运 API 详解</a></li><li><a href="06-API参考-6.3-计算API详解.html">6.3 计算 API 详解</a></li><li><a href="06-API参考-6.4-ACL运行时API.html">6.4 ACL 运行时 API</a></li><li><a href="06-API参考-6.5-同步与队列API详解.html">6.5 同步与队列 API 详解</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第7章 调试与优化</span><ul class="article-list"><li><a href="07-调试与优化-7.1-精度不对怎么办.html">7.1 精度不对怎么办</a></li><li><a href="07-调试与优化-7.2-性能不达标怎么办.html">7.2 性能不达标怎么办</a></li><li><a href="07-调试与优化-7.3-算子精度标准.html">7.3 算子精度标准</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第8章 进阶</span><ul class="article-list"><li><a href="08-进阶-8.1-常见踩坑与最佳实践.html">8.1 常见踩坑与最佳实践</a></li><li><a href="08-进阶-8.2-RegBase编程模型.html">8.2 RegBase 编程模型</a></li><li><a href="08-进阶-8.3-SIMT混合编程.html">8.3 SIMT 混合编程</a></li><li><a href="08-进阶-8.4-NDDMA高维搬运.html">8.4 NDDMA 高维搬运</a></li><li><a href="08-进阶-8.5-CCU通算融合.html">8.5 CCU 通算融合</a></li><li><a href="08-进阶-8.6-跨架构兼容.html">8.6 跨架构兼容</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第9章 实战演练</span><ul class="article-list"><li><a href="09-实战演练-9.1-五分钟跑通一个算子.html">9.1 五分钟跑通一个算子</a></li><li><a href="09-实战演练-9.2-swap算子开发.html" class="active">9.2 swap 算子开发</a></li><li><a href="09-实战演练-9.3-add算子开发.html">9.3 add 算子开发</a></li></ul></li><li class="chapter-group"><span class="chapter-title">附录</span><ul class="article-list"><li><a href="附录-A-数据类型速查表.html">A. 数据类型速查表</a></li></ul></li></ul></nav>
+<main class="main">
+<div class="content">
+<div class="meta-bar"><a href="../index.html">&larr; 返回目录</a></div>
+
+<h1>9.2 swap 算子开发（直调方式）</h1>
+
+<p>本章以 BLAS Level 1 的 <code>sswap</code> 算子为例，从零开始讲解一个完整算子的开发过程。swap 使用<strong>直调（direct-call）</strong>方式，即 Host 侧直接通过 <code>&lt;&lt;&lt;&gt;&gt;&gt;</code> 语法启动 Kernel，无需经过 aclnn 框架注册。这是 ops-blas 仓中 Level 1 算子的标准做法。</p>
+
+<h2>功能说明</h2>
+
+<p>BLAS <code>sswap</code> 的功能是交换两个单精度浮点向量的对应元素：</p>
+
+<pre><code class="language-text">输入:  x = [x0, x1, x2, ..., x_{n-1}]
+       y = [y0, y1, y2, ..., y_{n-1}]
+输出:  x' = [y0, y1, y2, ..., y_{n-1}]
+       y' = [x0, x1, x2, ..., x_{n-1}]</code></pre>
+
+<p>BLAS 接口签名为：</p>
+
+<pre><code class="language-cpp">void sswap(int n, float* x, int incx, float* y, int incy);</code></pre>
+
+<p>其中 <code>incx</code> 和 <code>incy</code> 是步长（stride）。本实现限定 <code>incx = incy = 1</code>（连续存储），这是最常见的场景。</p>
+
+<svg viewBox="0 0 660 180" xmlns="http://www.w3.org/2000/svg" style="max-width:660px;display:block;margin:1.5rem auto">
+  <defs>
+    <marker id="swapArr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#e53935"/></marker>
+    <marker id="swapArr2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#1e88e5"/></marker>
+  </defs>
+  <text x="30" y="30" font-size="14" font-weight="bold" fill="#37474f">swap 操作示意</text>
+  <rect x="30" y="45" width="60" height="30" rx="4" fill="#e3f2fd" stroke="#1e88e5" stroke-width="1.5"/>
+  <text x="60" y="65" text-anchor="middle" font-size="12" fill="#1565c0">x[0]</text>
+  <rect x="95" y="45" width="60" height="30" rx="4" fill="#e3f2fd" stroke="#1e88e5" stroke-width="1.5"/>
+  <text x="125" y="65" text-anchor="middle" font-size="12" fill="#1565c0">x[1]</text>
+  <rect x="160" y="45" width="60" height="30" rx="4" fill="#e3f2fd" stroke="#1e88e5" stroke-width="1.5"/>
+  <text x="190" y="65" text-anchor="middle" font-size="12" fill="#1565c0">x[2]</text>
+  <text x="240" y="65" font-size="14" fill="#78909c">...</text>
+  <rect x="30" y="105" width="60" height="30" rx="4" fill="#fce4ec" stroke="#e53935" stroke-width="1.5"/>
+  <text x="60" y="125" text-anchor="middle" font-size="12" fill="#c62828">y[0]</text>
+  <rect x="95" y="105" width="60" height="30" rx="4" fill="#fce4ec" stroke="#e53935" stroke-width="1.5"/>
+  <text x="125" y="125" text-anchor="middle" font-size="12" fill="#c62828">y[1]</text>
+  <rect x="160" y="105" width="60" height="30" rx="4" fill="#fce4ec" stroke="#e53935" stroke-width="1.5"/>
+  <text x="190" y="125" text-anchor="middle" font-size="12" fill="#c62828">y[2]</text>
+  <text x="240" y="125" font-size="14" fill="#78909c">...</text>
+  <path d="M90 78 C90 90, 90 95, 90 102" stroke="#1e88e5" stroke-width="1.5" fill="none" marker-end="url(#swapArr2)"/>
+  <path d="M60 102 C60 95, 60 90, 60 78" stroke="#e53935" stroke-width="1.5" fill="none" marker-end="url(#swapArr)"/>
+  <path d="M155 78 C155 90, 155 95, 155 102" stroke="#1e88e5" stroke-width="1.5" fill="none" marker-end="url(#swapArr2)"/>
+  <path d="M125 102 C125 95, 125 90, 125 78" stroke="#e53935" stroke-width="1.5" fill="none" marker-end="url(#swapArr)"/>
+  <path d="M220 78 C220 90, 220 95, 220 102" stroke="#1e88e5" stroke-width="1.5" fill="none" marker-end="url(#swapArr2)"/>
+  <path d="M190 102 C190 95, 190 90, 190 78" stroke="#e53935" stroke-width="1.5" fill="none" marker-end="url(#swapArr)"/>
+  <text x="340" y="80" font-size="13" fill="#37474f">每个 AI Core 负责一段连续元素</text>
+  <text x="340" y="100" font-size="13" fill="#37474f">从 GM 读入 x, y &rarr; 交叉写回</text>
+  <text x="340" y="120" font-size="13" fill="#37474f">x 的数据写到 y 的位置</text>
+  <text x="340" y="140" font-size="13" fill="#37474f">y 的数据写到 x 的位置</text>
+</svg>
+
+<h2>文件结构</h2>
+
+<p>在 ops-blas 仓中，sswap 的 arch35 实现由 3 个文件组成：</p>
+
+<pre class="ascii-art"><code>blas/swap/sswap/arch35/
+├── sswap_tiling_data.h   # TilingData 结构体（Host/Kernel 共用）
+├── sswap_kernel.cpp       # Kernel 侧：AscendC 类 + 入口函数
+└── sswap_host.cpp         # Host 侧：参数校验 + Tiling + Kernel 启动</code></pre>
+
+<table>
+<thead><tr><th>文件</th><th>职责</th><th>运行位置</th></tr></thead>
+<tbody>
+<tr><td><code>sswap_tiling_data.h</code></td><td>定义 Host 和 Kernel 共享的 Tiling 参数结构体</td><td>编译期</td></tr>
+<tr><td><code>sswap_kernel.cpp</code></td><td>AscendC Kernel 类，实现数据搬运和交换逻辑</td><td>AI Core（Device）</td></tr>
+<tr><td><code>sswap_host.cpp</code></td><td>参数校验、Tiling 计算、内存管理、Kernel 启动</td><td>CPU（Host）</td></tr>
+</tbody>
+</table>
+
+<h2>TilingData 设计</h2>
+
+<p>TilingData 是 Host 和 Kernel 之间的通信契约。Host 侧计算好切分参数，通过 GM 传递给 Kernel。</p>
+
+<pre><code class="language-cpp">#ifndef SSWAP_TILING_DATA_H
+#define SSWAP_TILING_DATA_H
+
+#include &lt;cstdint&gt;
+
+struct SswapTilingData {
+    uint32_t totalN;
+    uint32_t perCoreN;
+    uint32_t remainder;
+    uint32_t tileSize;
+};
+
+constexpr uint32_t ELEMENTS_PER_BLOCK = 32 / sizeof(float);
+
+#endif</code></pre>
+
+<p>各字段含义：</p>
+
+<table>
+<thead><tr><th>字段</th><th>含义</th><th>示例（n=10000, 4核）</th></tr></thead>
+<tbody>
+<tr><td><code>totalN</code></td><td>总元素个数</td><td>10000</td></tr>
+<tr><td><code>perCoreN</code></td><td>每个核分配的元素数（向下对齐到 ELEMENTS_PER_BLOCK）</td><td>2496</td></tr>
+<tr><td><code>remainder</code></td><td>尾部剩余元素，由最后一个核处理</td><td>16</td></tr>
+<tr><td><code>tileSize</code></td><td>UB 中单次迭代能处理的元素数（对齐到 ELEMENTS_PER_BLOCK）</td><td>31744</td></tr>
+</tbody>
+</table>
+
+<p><code>ELEMENTS_PER_BLOCK = 32 / sizeof(float) = 8</code>，因为 Ascend C 的 DataCopy 要求地址和长度都按 32 字节对齐。</p>
+
+<svg viewBox="0 0 660 200" xmlns="http://www.w3.org/2000/svg" style="max-width:660px;display:block;margin:1.5rem auto">
+  <text x="10" y="20" font-size="13" font-weight="bold" fill="#37474f">多核切分示意（n=10000, 4 核）</text>
+  <rect x="10" y="35" width="150" height="30" rx="4" fill="#e3f2fd" stroke="#1e88e5" stroke-width="1.5"/>
+  <text x="85" y="55" text-anchor="middle" font-size="11" fill="#1565c0">Core 0: 2496 元素</text>
+  <rect x="165" y="35" width="150" height="30" rx="4" fill="#e8f5e9" stroke="#43a047" stroke-width="1.5"/>
+  <text x="240" y="55" text-anchor="middle" font-size="11" fill="#2e7d32">Core 1: 2496 元素</text>
+  <rect x="320" y="35" width="150" height="30" rx="4" fill="#fff3e0" stroke="#fb8c00" stroke-width="1.5"/>
+  <text x="395" y="55" text-anchor="middle" font-size="11" fill="#e65100">Core 2: 2496 元素</text>
+  <rect x="475" y="35" width="175" height="30" rx="4" fill="#fce4ec" stroke="#e53935" stroke-width="1.5"/>
+  <text x="562" y="55" text-anchor="middle" font-size="11" fill="#c62828">Core 3: 2496 + 16 元素</text>
+  <text x="10" y="95" font-size="12" fill="#546e7a">perCoreN = (10000 / 4 / 8) * 8 = 2496</text>
+  <text x="10" y="115" font-size="12" fill="#546e7a">remainder = 10000 - 2496 * 4 = 16</text>
+  <text x="10" y="135" font-size="12" fill="#546e7a">最后一个核处理 perCoreN + remainder = 2512 个元素</text>
+  <rect x="10" y="155" width="640" height="30" rx="4" fill="#eceff1" stroke="#90a4ae" stroke-width="1"/>
+  <text x="330" y="175" text-anchor="middle" font-size="12" fill="#546e7a">GM 中的连续向量 x[0..9999]</text>
+</svg>
+
+<h2>Kernel 实现</h2>
+
+<p>Kernel 侧的代码运行在 AI Core 上。核心思路是：每个核从 GM 读入自己负责的那段 x 和 y 到 UB，然后<strong>交叉写回</strong>&mdash;&mdash;x 的数据写到 y 的位置，y 的数据写到 x 的位置。</p>
+
+<h3>类定义</h3>
+
+<pre><code class="language-cpp">class SswapAIV {
+public:
+    __aicore__ inline SswapAIV() {}
+    __aicore__ inline void Init(GM_ADDR x, GM_ADDR y, GM_ADDR tilingGm, TPipe* pipe);
+    __aicore__ inline void Process();
+
+private:
+    __aicore__ inline void ParseTilingData(GM_ADDR tilingGm);
+    __aicore__ inline void SingleIteration(uint32_t curOffset, uint32_t dataCount);
+
+    TPipe* pipe_;
+    GlobalTensor&lt;float&gt; xGM_;
+    GlobalTensor&lt;float&gt; yGM_;
+    TQueBind&lt;QuePosition::VECIN, QuePosition::VECOUT, 1&gt; inQueueX_;
+    TQueBind&lt;QuePosition::VECIN, QuePosition::VECOUT, 1&gt; inQueueY_;
+    SswapTilingData tiling_;
+    uint32_t blockIdx_;
+    uint32_t myOffset_;
+    uint32_t myCount_;
+};</code></pre>
+
+<p>关键成员说明：</p>
+
+<ul>
+<li><code>TPipe*</code> &mdash; 流水线管理器，负责 Buffer 分配（参见 <a href="05-核心开发-5.2-内存管理与数据搬运.html">5.2 内存管理</a>）</li>
+<li><code>GlobalTensor&lt;float&gt;</code> &mdash; GM 上的全局张量，提供 <code>operator[]</code> 偏移访问</li>
+<li><code>TQueBind&lt;VECIN, VECOUT, 1&gt;</code> &mdash; 绑定输入和输出位置的队列，提供隐式同步（参见 <a href="05-核心开发-5.5-同步与流水线.html">5.5 同步与流水线</a>）</li>
+</ul>
+
+<h3>Init：初始化</h3>
+
+<pre><code class="language-cpp">__aicore__ inline void SswapAIV::Init(GM_ADDR x, GM_ADDR y, GM_ADDR tilingGm, TPipe* pipe)
+{
+    pipe_ = pipe;
+    blockIdx_ = GetBlockIdx();
+    ParseTilingData(tilingGm);
+
+    myOffset_ = blockIdx_ * tiling_.perCoreN;
+    myCount_ = tiling_.perCoreN;
+    if (blockIdx_ == GetBlockNum() - 1) {
+        myCount_ += tiling_.remainder;
+    }
+
+    xGM_.SetGlobalBuffer((__gm__ float*)x, tiling_.totalN);
+    yGM_.SetGlobalBuffer((__gm__ float*)y, tiling_.totalN);
+
+    uint32_t bufSize = tiling_.tileSize * sizeof(float);
+    pipe_-&gt;InitBuffer(inQueueX_, BUFFER_NUM, bufSize);
+    pipe_-&gt;InitBuffer(inQueueY_, BUFFER_NUM, bufSize);
+}</code></pre>
+
+<p>Init 做了三件事：</p>
+<ol>
+<li><strong>解析 Tiling 数据</strong> &mdash; 从 GM 读取 Host 传来的切分参数</li>
+<li><strong>计算本核的数据范围</strong> &mdash; <code>myOffset_</code> 和 <code>myCount_</code>，最后一个核吸收余量</li>
+<li><strong>初始化 Buffer</strong> &mdash; 通过 TPipe 为 x 和 y 各分配一块 UB Buffer</li>
+</ol>
+
+<h3>SingleIteration：单次迭代</h3>
+
+<p>这是 swap 的核心逻辑。每次迭代处理一个 tile 大小的数据：</p>
+
+<pre><code class="language-cpp">__aicore__ inline void SswapAIV::SingleIteration(uint32_t curOffset, uint32_t dataCount)
+{
+    uint32_t alignedCount = (dataCount / ELEMENTS_PER_BLOCK) * ELEMENTS_PER_BLOCK;
+    uint32_t tailCount = dataCount - alignedCount;
+
+    LocalTensor&lt;float&gt; xLocal = inQueueX_.AllocTensor&lt;float&gt;();
+    LocalTensor&lt;float&gt; yLocal = inQueueY_.AllocTensor&lt;float&gt;();
+
+    if (alignedCount &gt; 0) {
+        DataCopy(xLocal, xGM_[curOffset], alignedCount);
+        DataCopy(yLocal, yGM_[curOffset], alignedCount);
+    }
+
+    if (tailCount &gt; 0) {
+        uint8_t paddingNum = ELEMENTS_PER_BLOCK - tailCount;
+        DataCopyExtParams copyParams{1, static_cast&lt;uint32_t&gt;(tailCount * sizeof(float)), 0, 0, 0};
+        DataCopyPadExtParams&lt;float&gt; padParams{true, 0, paddingNum, 0.0f};
+        DataCopyPad(xLocal[alignedCount], xGM_[curOffset + alignedCount], copyParams, padParams);
+        DataCopyPad(yLocal[alignedCount], yGM_[curOffset + alignedCount], copyParams, padParams);
+    }
+
+    inQueueX_.EnQue&lt;float&gt;(xLocal);
+    inQueueY_.EnQue&lt;float&gt;(yLocal);
+
+    LocalTensor&lt;float&gt; xIn = inQueueX_.DeQue&lt;float&gt;();
+    LocalTensor&lt;float&gt; yIn = inQueueY_.DeQue&lt;float&gt;();
+
+    if (alignedCount &gt; 0) {
+        DataCopy(yGM_[curOffset], xIn, alignedCount);
+        DataCopy(xGM_[curOffset], yIn, alignedCount);
+    }
+
+    if (tailCount &gt; 0) {
+        DataCopyExtParams copyParams{1, static_cast&lt;uint32_t&gt;(tailCount * sizeof(float)), 0, 0, 0};
+        DataCopyPad(yGM_[curOffset + alignedCount], xIn[alignedCount], copyParams);
+        DataCopyPad(xGM_[curOffset + alignedCount], yIn[alignedCount], copyParams);
+    }
+
+    inQueueX_.FreeTensor(xIn);
+    inQueueY_.FreeTensor(yIn);
+}</code></pre>
+
+<p>代码分为四个阶段：</p>
+
+<svg viewBox="0 0 660 240" xmlns="http://www.w3.org/2000/svg" style="max-width:660px;display:block;margin:1.5rem auto">
+  <defs>
+    <linearGradient id="mte2g" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#e3f2fd"/><stop offset="100%" stop-color="#bbdefb"/></linearGradient>
+    <linearGradient id="mte3g" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#fce4ec"/><stop offset="100%" stop-color="#f8bbd0"/></linearGradient>
+  </defs>
+  <text x="330" y="20" text-anchor="middle" font-size="14" font-weight="bold" fill="#37474f">SingleIteration 数据流</text>
+  <rect x="10" y="35" width="150" height="80" rx="8" fill="#e8eaf6" stroke="#7986cb" stroke-width="1.5"/>
+  <text x="85" y="55" text-anchor="middle" font-size="12" font-weight="bold" fill="#283593">GM</text>
+  <text x="85" y="75" text-anchor="middle" font-size="11" fill="#3949ab">x[curOffset..]</text>
+  <text x="85" y="95" text-anchor="middle" font-size="11" fill="#3949ab">y[curOffset..]</text>
+  <rect x="255" y="35" width="150" height="80" rx="8" fill="#e8f5e9" stroke="#66bb6a" stroke-width="1.5"/>
+  <text x="330" y="55" text-anchor="middle" font-size="12" font-weight="bold" fill="#2e7d32">UB (Local)</text>
+  <text x="330" y="75" text-anchor="middle" font-size="11" fill="#388e3c">xLocal</text>
+  <text x="330" y="95" text-anchor="middle" font-size="11" fill="#388e3c">yLocal</text>
+  <rect x="500" y="35" width="150" height="80" rx="8" fill="#e8eaf6" stroke="#7986cb" stroke-width="1.5"/>
+  <text x="575" y="55" text-anchor="middle" font-size="12" font-weight="bold" fill="#283593">GM (交叉写回)</text>
+  <text x="575" y="75" text-anchor="middle" font-size="11" fill="#3949ab">y[curOffset..] &larr; xIn</text>
+  <text x="575" y="95" text-anchor="middle" font-size="11" fill="#3949ab">x[curOffset..] &larr; yIn</text>
+  <line x1="160" y1="65" x2="250" y2="65" stroke="#1e88e5" stroke-width="2"/>
+  <text x="205" y="58" text-anchor="middle" font-size="10" fill="#1565c0">MTE2</text>
+  <text x="205" y="82" text-anchor="middle" font-size="10" fill="#1565c0">DataCopy</text>
+  <line x1="405" y1="65" x2="495" y2="65" stroke="#e53935" stroke-width="2"/>
+  <text x="450" y="58" text-anchor="middle" font-size="10" fill="#c62828">MTE3</text>
+  <text x="450" y="82" text-anchor="middle" font-size="10" fill="#c62828">DataCopy</text>
+  <rect x="235" y="130" width="190" height="30" rx="5" fill="#fff9c4" stroke="#f9a825" stroke-width="1"/>
+  <text x="330" y="150" text-anchor="middle" font-size="11" fill="#f57f17">EnQue / DeQue (隐式同步)</text>
+  <rect x="60" y="180" width="540" height="45" rx="8" fill="#f3e5f5" stroke="#ab47bc" stroke-width="1"/>
+  <text x="330" y="200" text-anchor="middle" font-size="12" font-weight="bold" fill="#6a1b9a">为什么不需要 Vector 计算？</text>
+  <text x="330" y="216" text-anchor="middle" font-size="11" fill="#7b1fa2">swap 只做数据交换，不做算术运算，因此 AIV 模式下只需 MTE2 + MTE3</text>
+</svg>
+
+<h3>Process：主循环</h3>
+
+<pre><code class="language-cpp">__aicore__ inline void SswapAIV::Process()
+{
+    if (myCount_ == 0) {
+        return;
+    }
+
+    uint32_t tileLoop = myCount_ / tiling_.tileSize;
+    uint32_t tileTail = myCount_ % tiling_.tileSize;
+    uint32_t curOffset = myOffset_;
+
+    for (uint32_t i = 0; i &lt; tileLoop; i++) {
+        SingleIteration(curOffset, tiling_.tileSize);
+        curOffset += tiling_.tileSize;
+    }
+
+    if (tileTail &gt; 0) {
+        SingleIteration(curOffset, tileTail);
+    }
+}</code></pre>
+
+<p>Process 将本核的数据按 tileSize 切分为多个迭代，每次调用 SingleIteration 处理一个 tile。最后处理尾部不足一个 tile 的数据。</p>
+
+<h3>Kernel 入口</h3>
+
+<pre><code class="language-cpp">extern "C" __global__ __aicore__ void sswap_kernel(
+    GM_ADDR x, GM_ADDR y, GM_ADDR workSpace, GM_ADDR tilingGm)
+{
+    KERNEL_TASK_TYPE_DEFAULT(KERNEL_TYPE_AIV_ONLY);
+    TPipe pipe;
+    SswapAIV op;
+    op.Init(x, y, tilingGm, &amp;pipe);
+    op.Process();
+}
+
+void sswap_kernel_do(
+    GM_ADDR x, GM_ADDR y, GM_ADDR workSpace,
+    GM_ADDR tilingGm, uint32_t numBlocks, void* stream)
+{
+    sswap_kernel&lt;&lt;&lt;numBlocks, nullptr, stream&gt;&gt;&gt;(x, y, nullptr, tilingGm);
+}</code></pre>
+
+<p>注意两个关键点：</p>
+<ul>
+<li><code>TPipe</code> 在入口函数中创建，作为指针传给类的 Init 方法（而非作为类成员），这是 Ascend C 的规范要求</li>
+<li><code>KERNEL_TYPE_AIV_ONLY</code> 表示只使用 AIV（Vector 核），不使用 AIC（Cube 核），因为 swap 没有矩阵计算</li>
+</ul>
+
+<h2>Host 侧实现</h2>
+
+<p>Host 侧代码运行在 CPU 上，负责参数校验、Tiling 计算和 Kernel 启动。</p>
+
+<h3>参数校验</h3>
+
+<pre><code class="language-cpp">static aclblasStatus_t ValidateSswapParams(
+    const float* x, const float* y, int incx, int incy)
+{
+    if (x == nullptr || y == nullptr) {
+        OP_LOGE("aclblasSswap", "x/y must not be nullptr");
+        return ACLBLAS_STATUS_INVALID_VALUE;
+    }
+    if (incx == 0 || incy == 0) {
+        OP_LOGE("aclblasSswap", "incx and incy must not be zero");
+        return ACLBLAS_STATUS_INVALID_VALUE;
+    }
+    if (incx != 1 || incy != 1) {
+        OP_LOGE("aclblasSswap", "incx and incy must be 1, got incx=%d, incy=%d", incx, incy);
+        return ACLBLAS_STATUS_INVALID_VALUE;
+    }
+    return ACLBLAS_STATUS_SUCCESS;
+}</code></pre>
+
+<h3>Tiling 计算</h3>
+
+<pre><code class="language-cpp">static SswapTilingData CalSswapTilingData(uint32_t n, uint32_t coreNum)
+{
+    SswapTilingData tiling;
+    tiling.totalN = n;
+
+    constexpr uint32_t alignUnit = ELEMENTS_PER_BLOCK;
+    uint32_t rawPerCore = n / coreNum;
+    tiling.perCoreN = (rawPerCore / alignUnit) * alignUnit;
+    tiling.remainder = n - tiling.perCoreN * coreNum;
+
+    constexpr uint32_t ubSize = 248 * 1024;
+    constexpr uint32_t bufferCount = 2;
+    uint32_t maxElements = ubSize / (bufferCount * sizeof(float));
+    tiling.tileSize = (maxElements / alignUnit) * alignUnit;
+
+    return tiling;
+}</code></pre>
+
+<p>Tiling 计算的核心逻辑：</p>
+<ol>
+<li><strong>多核切分</strong>：将 n 个元素均分给 coreNum 个核，perCoreN 向下对齐到 8 的倍数</li>
+<li><strong>余量处理</strong>：remainder 由最后一个核吸收</li>
+<li><strong>UB 切分</strong>：248KB UB 空间分给 x 和 y 两块 Buffer，每块 tileSize 个元素</li>
+</ol>
+
+<h3>Kernel 启动</h3>
+
+<pre><code class="language-cpp">aclblasStatus_t aclblasSswap(
+    aclblasHandle_t handle, int n, float* x, int incx, float* y, int incy)
+{
+    if (n &lt;= 0) {
+        return ACLBLAS_STATUS_SUCCESS;
+    }
+
+    aclblasStatus_t st = ValidateSswapParams(x, y, incx, incy);
+    if (st != ACLBLAS_STATUS_SUCCESS) {
+        return st;
+    }
+
+    uint32_t aivCoreNum = GetVectorCoreCount();
+    uint32_t totalN = static_cast&lt;uint32_t&gt;(n);
+    uint32_t numBlocks = (totalN &lt; aivCoreNum) ? totalN : aivCoreNum;
+
+    SswapTilingData tiling = CalSswapTilingData(totalN, numBlocks);
+
+    uint8_t* tilingDevice = nullptr;
+    aclrtMalloc(reinterpret_cast&lt;void**&gt;(&amp;tilingDevice),
+                sizeof(SswapTilingData), ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMemcpy(tilingDevice, sizeof(SswapTilingData),
+                &amp;tiling, sizeof(SswapTilingData), ACL_MEMCPY_HOST_TO_DEVICE);
+
+    sswap_kernel_do(
+        reinterpret_cast&lt;GM_ADDR&gt;(x), reinterpret_cast&lt;GM_ADDR&gt;(y),
+        nullptr, tilingDevice, numBlocks, useStream);
+
+    aclrtFree(tilingDevice);
+    return ACLBLAS_STATUS_SUCCESS;
+}</code></pre>
+
+<p>Host 侧的完整流程：</p>
+
+<svg viewBox="0 0 660 180" xmlns="http://www.w3.org/2000/svg" style="max-width:660px;display:block;margin:1.5rem auto">
+  <defs>
+    <marker id="hArr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#546e7a"/></marker>
+  </defs>
+  <rect x="10" y="15" width="120" height="40" rx="6" fill="#e8eaf6" stroke="#7986cb" stroke-width="1.5"/>
+  <text x="70" y="40" text-anchor="middle" font-size="11" fill="#283593">参数校验</text>
+  <line x1="130" y1="35" x2="155" y2="35" stroke="#546e7a" stroke-width="1.5" marker-end="url(#hArr)"/>
+  <rect x="160" y="15" width="120" height="40" rx="6" fill="#e8f5e9" stroke="#66bb6a" stroke-width="1.5"/>
+  <text x="220" y="40" text-anchor="middle" font-size="11" fill="#2e7d32">获取核数</text>
+  <line x1="280" y1="35" x2="305" y2="35" stroke="#546e7a" stroke-width="1.5" marker-end="url(#hArr)"/>
+  <rect x="310" y="15" width="120" height="40" rx="6" fill="#fff3e0" stroke="#ffa726" stroke-width="1.5"/>
+  <text x="370" y="40" text-anchor="middle" font-size="11" fill="#e65100">计算 Tiling</text>
+  <line x1="430" y1="35" x2="455" y2="35" stroke="#546e7a" stroke-width="1.5" marker-end="url(#hArr)"/>
+  <rect x="460" y="15" width="185" height="40" rx="6" fill="#fce4ec" stroke="#ef5350" stroke-width="1.5"/>
+  <text x="552" y="40" text-anchor="middle" font-size="11" fill="#c62828">aclrtMalloc + aclrtMemcpy</text>
+  <rect x="460" y="70" width="185" height="40" rx="6" fill="#f3e5f5" stroke="#ab47bc" stroke-width="1.5"/>
+  <text x="552" y="95" text-anchor="middle" font-size="11" fill="#6a1b9a">Kernel &lt;&lt;&lt;&gt;&gt;&gt; 启动</text>
+  <line x1="552" y1="55" x2="552" y2="67" stroke="#546e7a" stroke-width="1.5" marker-end="url(#hArr)"/>
+  <rect x="460" y="125" width="185" height="40" rx="6" fill="#e0f2f1" stroke="#4db6ac" stroke-width="1.5"/>
+  <text x="552" y="150" text-anchor="middle" font-size="11" fill="#004d40">aclrtFree 释放 Tiling</text>
+  <line x1="552" y1="110" x2="552" y2="122" stroke="#546e7a" stroke-width="1.5" marker-end="url(#hArr)"/>
+</svg>
+
+<h2>编译与测试</h2>
+
+<pre><code class="language-bash">bash build.sh --ops=swap --soc=ascend950 --run</code></pre>
+
+<p>测试框架会自动生成多种规模的测试用例（n=1, 8, 1024, 65536, 1048576 等），验证不同数据量下 swap 的正确性。</p>
+
+<h2>关键设计决策</h2>
+
+<h3>为什么用单 Buffer 而不是双 Buffer（ping-pong）？</h3>
+
+<p>双 Buffer（ping-pong）的目的是让搬运和计算重叠执行：当 Vector 单元在处理 ping Buffer 的数据时，MTE 同时向 pong Buffer 搬运下一批数据。</p>
+
+<p>但 swap 算子<strong>没有 Vector 计算阶段</strong>。它的整个流程只有 MTE2（GM&rarr;UB）和 MTE3（UB&rarr;GM），没有中间的 Vector 计算可以与搬运重叠。因此双 Buffer 没有任何收益，反而浪费一半的 UB 空间。使用单 Buffer 可以让 tileSize 更大，减少迭代次数。</p>
+
+<h3>为什么用交叉写回而不是临时变量？</h3>
+
+<p>一种直觉做法是：读入 x 和 y，在 UB 中交换，然后写回。但这需要额外的临时 Buffer 来暂存数据。交叉写回的技巧是：</p>
+
+<ul>
+<li>从 <code>xLocal</code>（UB 中存的 x 数据）写到 <code>yGM</code>（GM 中 y 的位置）</li>
+<li>从 <code>yLocal</code>（UB 中存的 y 数据）写到 <code>xGM</code>（GM 中 x 的位置）</li>
+</ul>
+
+<p>这样不需要任何临时存储，直接在写回阶段完成交换。</p>
+
+<svg viewBox="0 0 660 160" xmlns="http://www.w3.org/2000/svg" style="max-width:660px;display:block;margin:1.5rem auto">
+  <text x="165" y="20" text-anchor="middle" font-size="12" font-weight="bold" fill="#37474f">方案 A：临时变量</text>
+  <text x="495" y="20" text-anchor="middle" font-size="12" font-weight="bold" fill="#37474f">方案 B：交叉写回（实际采用）</text>
+  <rect x="30" y="35" width="100" height="25" rx="4" fill="#e3f2fd" stroke="#1e88e5" stroke-width="1"/>
+  <text x="80" y="52" text-anchor="middle" font-size="10" fill="#1565c0">UB: xLocal</text>
+  <rect x="140" y="35" width="100" height="25" rx="4" fill="#fce4ec" stroke="#e53935" stroke-width="1"/>
+  <text x="190" y="52" text-anchor="middle" font-size="10" fill="#c62828">UB: yLocal</text>
+  <rect x="30" y="70" width="100" height="25" rx="4" fill="#fff9c4" stroke="#f9a825" stroke-width="1"/>
+  <text x="80" y="87" text-anchor="middle" font-size="10" fill="#f57f17">UB: tmpX</text>
+  <rect x="140" y="70" width="100" height="25" rx="4" fill="#fff9c4" stroke="#f9a825" stroke-width="1"/>
+  <text x="190" y="87" text-anchor="middle" font-size="10" fill="#f57f17">UB: tmpY</text>
+  <text x="135" y="115" text-anchor="middle" font-size="10" fill="#78909c">需要 4 块 Buffer</text>
+  <text x="135" y="132" text-anchor="middle" font-size="10" fill="#78909c">UB 空间减半</text>
+  <rect x="370" y="35" width="100" height="25" rx="4" fill="#e3f2fd" stroke="#1e88e5" stroke-width="1"/>
+  <text x="420" y="52" text-anchor="middle" font-size="10" fill="#1565c0">UB: xLocal</text>
+  <rect x="500" y="35" width="100" height="25" rx="4" fill="#fce4ec" stroke="#e53935" stroke-width="1"/>
+  <text x="550" y="52" text-anchor="middle" font-size="10" fill="#c62828">UB: yLocal</text>
+  <text x="470" y="80" text-anchor="middle" font-size="11" fill="#43a047">xLocal &rarr; yGM</text>
+  <text x="470" y="97" text-anchor="middle" font-size="11" fill="#43a047">yLocal &rarr; xGM</text>
+  <text x="495" y="120" text-anchor="middle" font-size="10" fill="#2e7d32">只需 2 块 Buffer</text>
+  <text x="495" y="137" text-anchor="middle" font-size="10" fill="#2e7d32">UB 空间最大化</text>
+</svg>
+
+<h2>Q&amp;A</h2>
+
+<details><summary>Q: 为什么 perCoreN 要对齐到 ELEMENTS_PER_BLOCK？</summary>
+<p>DataCopy 要求搬运的元素数按 32 字节对齐（对于 float 就是 8 个元素）。如果 perCoreN 不对齐，每个核的起始偏移就不是 32 字节对齐的，会导致 DataCopy 报错或数据错误。</p>
+</details>
+
+<details><summary>Q: 如果 n 小于核数怎么办？</summary>
+<p>Host 侧会做 <code>numBlocks = min(n, aivCoreNum)</code> 的限制。当 n 很小时，只启动 n 个核，每个核处理 1 个元素。如果 n=0，直接返回成功，不启动 Kernel。</p>
+</details>
+
+<details><summary>Q: TilingData 为什么要通过 aclrtMalloc + aclrtMemcpy 传递？</summary>
+<p>Kernel 运行在 Device 侧，只能访问 GM（全局内存）。TilingData 在 Host 侧计算完成后，必须拷贝到 Device 的 GM 上，Kernel 才能通过 <code>GM_ADDR</code> 参数读取。</p>
+</details>
+
+<details><summary>Q: 为什么 swap 用直调而不用 aclnn 注册？</summary>
+<p>BLAS Level 1 算子（如 swap、scal、copy）接口简单，不需要 aclnn 框架提供的自动类型推导、Workspace 管理等高级功能。直调方式代码更简洁，启动开销更小。aclnn 注册更适合复杂算子（如 add、matmul），详见 <a href="09-实战演练-9.3-add算子开发.html">9.3 add 算子开发</a>。</p>
+</details>
+
+<div id="quiz"></div>
+<div class="page-nav"><a href="09-实战演练-9.1-五分钟跑通一个算子.html" class="nav-prev"><span class="nav-label">&larr; 上一篇</span><span class="nav-title">9.1 五分钟跑通一个算子</span></a><a href="09-实战演练-9.3-add算子开发.html" class="nav-next"><span class="nav-label">下一篇 &rarr;</span><span class="nav-title">9.3 add 算子开发</span></a></div>
+</div>
+</main>
+<script src="../js/quiz.js"></script>
+<script>
+renderQuiz('quiz', [
+  {
+    question: "swap 算子的 Kernel 中，为什么使用 TQueBind 而不是 TQue？",
+    options: ["TQue 不支持 float 类型", "TQueBind 同时绑定输入和输出位置，提供 MTE2→MTE3 的隐式同步", "TQueBind 性能更好", "没有区别，可以互换"],
+    answer: 1,
+    explanation: "swap 没有 Vector 计算阶段，数据从 MTE2 搬入后直接由 MTE3 搬出。TQueBind<VECIN, VECOUT, 1> 同时绑定了输入和输出位置，EnQue/DeQue 自动完成 MTE2→MTE3 的同步。"
+  },
+  {
+    question: "swap 算子为什么使用单 Buffer 而不是双 Buffer（ping-pong）？",
+    options: ["双 Buffer 代码太复杂", "swap 没有 Vector 计算阶段，双 Buffer 无法重叠计算与搬运", "单 Buffer 性能更好", "Ascend C 不支持双 Buffer"],
+    answer: 1,
+    explanation: "双 Buffer 的目的是让搬运和计算重叠执行。但 swap 只有 MTE2（搬入）和 MTE3（搬出），没有中间的 Vector 计算可以与搬运重叠，因此双 Buffer 没有收益反而浪费 UB 空间。"
+  },
+  {
+    question: "交叉写回技巧的含义是？",
+    options: ["在 UB 中交换 x 和 y 的数据", "将 xLocal 写到 yGM 的位置，yLocal 写到 xGM 的位置", "使用临时变量暂存数据", "同时读写同一个 Buffer"],
+    answer: 1,
+    explanation: "交叉写回是指：从 UB 中的 xLocal 写到 GM 中 y 的位置，从 UB 中的 yLocal 写到 GM 中 x 的位置。这样不需要额外的临时 Buffer，直接在写回阶段完成交换。"
+  },
+  {
+    question: "Host 侧计算 numBlocks 时，为什么要取 min(n, aivCoreNum)？",
+    options: ["避免启动太多核导致性能下降", "当 n 小于核数时，每个元素分配一个核就够了，多余的核没有数据可处理", "硬件限制最多只能启动 aivCoreNum 个核", "这是 BLAS 标准的要求"],
+    answer: 1,
+    explanation: "如果 n < aivCoreNum，启动 aivCoreNum 个核会导致部分核没有数据可处理（myCount_ = 0）。取 min(n, aivCoreNum) 确保每个启动的核都有数据可处理。"
+  },
+  {
+    question: "ELEMENTS_PER_BLOCK 的值是多少？为什么是这个值？",
+    options: ["4，因为 float 占 4 字节", "8，因为 DataCopy 要求 32 字节对齐，32/sizeof(float)=8", "16，因为 UB 的最小分配单元是 64 字节", "32，因为一个 burst 搬运 32 个元素"],
+    answer: 1,
+    explanation: "ELEMENTS_PER_BLOCK = 32 / sizeof(float) = 8。Ascend C 的 DataCopy 要求搬运地址和长度都按 32 字节（一个 block）对齐。对于 float（4 字节），每 8 个元素恰好占 32 字节。"
+  }
+]);
+</script>
+</body>
+</html>

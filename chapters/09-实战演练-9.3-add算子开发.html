@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>9.3 add 算子开发 - AscendC Guide</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<div class="top-header"><a href="index.html" class="logo"><span class="logo-icon">A</span>AscendC Guide</a><span class="header-subtitle">CANN 算子开发手册</span></div>
+<nav class="sidebar"><div class="sidebar-header"><h2><a href="../index.html" style="color:inherit;text-decoration:none">AscendC Guide</a></h2><p>算子开发从入门到精通</p></div><ul class="sidebar-nav"><li class="chapter-group"><span class="chapter-title">第1章 基础概念</span><ul class="article-list"><li><a href="01-基础概念-1.1-什么是算子.html">1.1 什么是算子</a></li><li><a href="01-基础概念-1.2-数据排布格式.html">1.2 数据排布格式</a></li><li><a href="01-基础概念-1.3-数据类型.html">1.3 数据类型</a></li><li><a href="01-基础概念-1.4-量化与反量化.html">1.4 量化与反量化</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第2章 编程语言</span><ul class="article-list"><li><a href="02-编程语言-2.1-昇腾编程语言.html">2.1 昇腾编程语言</a></li><li><a href="02-编程语言-2.2-编程模型.html">2.2 编程模型</a></li><li><a href="02-编程语言-2.3-Ascend软件栈.html">2.3 Ascend 软件栈</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第3章 昇腾硬件</span><ul class="article-list"><li><a href="03-昇腾硬件-3.1-A5通用架构.html">3.1 A5 通用架构</a></li><li><a href="03-昇腾硬件-3.2-A5新特性.html">3.2 A5 新特性</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第5章 核心开发</span><ul class="article-list"><li><a href="05-核心开发-5.1-Tiling设计.html">5.1 Tiling 设计</a></li><li><a href="05-核心开发-5.2-内存管理与数据搬运.html">5.2 内存管理与数据搬运</a></li><li><a href="05-核心开发-5.3-Vector计算.html">5.3 Vector 计算</a></li><li><a href="05-核心开发-5.4-Cube计算.html">5.4 Cube 计算</a></li><li><a href="05-核心开发-5.5-同步与流水线.html">5.5 同步与流水线</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第6章 API 参考</span><ul class="article-list"><li><a href="06-API参考-6.1-AscendC常用API概览.html">6.1 Ascend C 常用 API 概览</a></li><li><a href="06-API参考-6.2-数据搬运API详解.html">6.2 数据搬运 API 详解</a></li><li><a href="06-API参考-6.3-计算API详解.html">6.3 计算 API 详解</a></li><li><a href="06-API参考-6.4-ACL运行时API.html">6.4 ACL 运行时 API</a></li><li><a href="06-API参考-6.5-同步与队列API详解.html">6.5 同步与队列 API 详解</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第7章 调试与优化</span><ul class="article-list"><li><a href="07-调试与优化-7.1-精度不对怎么办.html">7.1 精度不对怎么办</a></li><li><a href="07-调试与优化-7.2-性能不达标怎么办.html">7.2 性能不达标怎么办</a></li><li><a href="07-调试与优化-7.3-算子精度标准.html">7.3 算子精度标准</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第8章 进阶</span><ul class="article-list"><li><a href="08-进阶-8.1-常见踩坑与最佳实践.html">8.1 常见踩坑与最佳实践</a></li><li><a href="08-进阶-8.2-RegBase编程模型.html">8.2 RegBase 编程模型</a></li><li><a href="08-进阶-8.3-SIMT混合编程.html">8.3 SIMT 混合编程</a></li><li><a href="08-进阶-8.4-NDDMA高维搬运.html">8.4 NDDMA 高维搬运</a></li><li><a href="08-进阶-8.5-CCU通算融合.html">8.5 CCU 通算融合</a></li><li><a href="08-进阶-8.6-跨架构兼容.html">8.6 跨架构兼容</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第9章 实战演练</span><ul class="article-list"><li><a href="09-实战演练-9.1-五分钟跑通一个算子.html">9.1 五分钟跑通一个算子</a></li><li><a href="09-实战演练-9.2-swap算子开发.html">9.2 swap 算子开发</a></li><li><a href="09-实战演练-9.3-add算子开发.html" class="active">9.3 add 算子开发</a></li></ul></li><li class="chapter-group"><span class="chapter-title">附录</span><ul class="article-list"><li><a href="附录-A-数据类型速查表.html">A. 数据类型速查表</a></li></ul></li></ul></nav>
+<main class="main">
+<div class="content">
+<div class="meta-bar"><a href="../index.html">&larr; 返回目录</a></div>
+
+<h1>9.3 add 算子开发（aclnn 注册方式）</h1>
+
+<p>本章以逐元素加法 <code>add</code> 算子为例，讲解通过 <strong>aclnn 框架注册</strong>方式开发算子的完整流程。与 <a href="09-实战演练-9.2-swap算子开发.html">9.2 swap 算子开发</a> 中的直调方式不同，aclnn 注册方式需要实现两段式接口（GetWorkspaceSize + Execute），并通过 CMakeLists 配置将算子注册到 CANN 框架中。</p>
+
+<h2>功能说明</h2>
+
+<p>add 算子执行逐元素加法：</p>
+
+<pre><code class="language-text">C[i] = A[i] + B[i],  i = 0, 1, ..., n-1</code></pre>
+
+<p>支持的数据类型包括 float16、float32、bfloat16、int32 等。本章以 float32 为例。</p>
+
+<svg viewBox="0 0 660 140" xmlns="http://www.w3.org/2000/svg" style="max-width:660px;display:block;margin:1.5rem auto">
+  <text x="330" y="20" text-anchor="middle" font-size="14" font-weight="bold" fill="#37474f">add 算子数据流</text>
+  <rect x="30" y="40" width="120" height="30" rx="5" fill="#e3f2fd" stroke="#1e88e5" stroke-width="1.5"/>
+  <text x="90" y="60" text-anchor="middle" font-size="12" fill="#1565c0">A (GM)</text>
+  <rect x="30" y="80" width="120" height="30" rx="5" fill="#fce4ec" stroke="#e53935" stroke-width="1.5"/>
+  <text x="90" y="100" text-anchor="middle" font-size="12" fill="#c62828">B (GM)</text>
+  <rect x="250" y="55" width="160" height="40" rx="8" fill="#e8f5e9" stroke="#43a047" stroke-width="2"/>
+  <text x="330" y="80" text-anchor="middle" font-size="13" font-weight="bold" fill="#2e7d32">Vector Add</text>
+  <rect x="510" y="55" width="120" height="40" rx="5" fill="#f3e5f5" stroke="#ab47bc" stroke-width="1.5"/>
+  <text x="570" y="80" text-anchor="middle" font-size="12" fill="#6a1b9a">C (GM)</text>
+  <line x1="150" y1="55" x2="245" y2="70" stroke="#1e88e5" stroke-width="1.5"/>
+  <line x1="150" y1="95" x2="245" y2="80" stroke="#e53935" stroke-width="1.5"/>
+  <line x1="410" y1="75" x2="505" y2="75" stroke="#43a047" stroke-width="1.5"/>
+</svg>
+
+<h2>aclnn 两段式接口</h2>
+
+<p>aclnn 框架要求算子实现两个接口：</p>
+
+<table>
+<thead><tr><th>接口</th><th>职责</th><th>运行位置</th></tr></thead>
+<tbody>
+<tr><td><code>aclnnXxxGetWorkspaceSize</code></td><td>根据输入 shape 计算 Workspace 大小和 Tiling 参数</td><td>Host（CPU）</td></tr>
+<tr><td><code>aclnnXxxExecute</code></td><td>使用 Tiling 参数启动 Kernel 执行</td><td>Host &rarr; Device</td></tr>
+</tbody>
+</table>
+
+<p>调用方（如 PyTorch 或 MindSpore）先调用 GetWorkspaceSize 获取所需的 Workspace 大小，分配好内存后再调用 Execute 执行算子。</p>
+
+<svg viewBox="0 0 660 160" xmlns="http://www.w3.org/2000/svg" style="max-width:660px;display:block;margin:1.5rem auto">
+  <defs>
+    <marker id="aclArr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#546e7a"/></marker>
+  </defs>
+  <rect x="10" y="20" width="140" height="50" rx="8" fill="#e8eaf6" stroke="#7986cb" stroke-width="1.5"/>
+  <text x="80" y="42" text-anchor="middle" font-size="11" fill="#283593">调用方</text>
+  <text x="80" y="58" text-anchor="middle" font-size="10" fill="#3949ab">(PyTorch/MindSpore)</text>
+  <line x1="150" y1="45" x2="175" y2="45" stroke="#546e7a" stroke-width="1.5" marker-end="url(#aclArr)"/>
+  <rect x="180" y="20" width="200" height="50" rx="8" fill="#fff3e0" stroke="#ffa726" stroke-width="1.5"/>
+  <text x="280" y="42" text-anchor="middle" font-size="11" fill="#e65100">GetWorkspaceSize</text>
+  <text x="280" y="58" text-anchor="middle" font-size="10" fill="#ef6c00">计算 workspace 大小 + Tiling</text>
+  <line x1="380" y1="45" x2="405" y2="45" stroke="#546e7a" stroke-width="1.5" marker-end="url(#aclArr)"/>
+  <rect x="410" y="20" width="110" height="50" rx="8" fill="#e0f2f1" stroke="#4db6ac" stroke-width="1.5"/>
+  <text x="465" y="42" text-anchor="middle" font-size="11" fill="#004d40">分配内存</text>
+  <text x="465" y="58" text-anchor="middle" font-size="10" fill="#00695c">aclrtMalloc</text>
+  <line x1="520" y1="45" x2="545" y2="45" stroke="#546e7a" stroke-width="1.5" marker-end="url(#aclArr)"/>
+  <rect x="550" y="20" width="100" height="50" rx="8" fill="#f3e5f5" stroke="#ab47bc" stroke-width="1.5"/>
+  <text x="600" y="42" text-anchor="middle" font-size="11" fill="#6a1b9a">Execute</text>
+  <text x="600" y="58" text-anchor="middle" font-size="10" fill="#7b1fa2">启动 Kernel</text>
+  <rect x="180" y="95" width="470" height="50" rx="8" fill="#fafafa" stroke="#bdbdbd" stroke-width="1"/>
+  <text x="415" y="115" text-anchor="middle" font-size="12" fill="#616161">以上流程由 CANN 运行时框架自动调度</text>
+  <text x="415" y="133" text-anchor="middle" font-size="11" fill="#9e9e9e">开发者只需实现 GetWorkspaceSize 和 Execute 两个函数</text>
+</svg>
+
+<h2>文件结构</h2>
+
+<p>ops-math 仓中 add 算子的目录结构如下：</p>
+
+<pre class="ascii-art"><code>op_plugin/ops/base_ops/aclops/AddCustom/
+├── op_host/
+│   ├── add_custom_aclnn.cpp        # aclnn 接口注册（两段式入口）
+│   └── add_custom_tiling.cpp       # Tiling 函数实现
+├── op_kernel/
+│   └── add_custom.cpp              # Kernel 实现（AscendC 类）
+├── op_tiling/
+│   └── add_custom_tiling.h         # TilingData 结构体定义
+└── CMakeLists.txt                  # 编译配置与算子注册</code></pre>
+
+<table>
+<thead><tr><th>目录</th><th>职责</th></tr></thead>
+<tbody>
+<tr><td><code>op_host/</code></td><td>Host 侧代码：aclnn 接口注册、参数校验、Tiling 计算</td></tr>
+<tr><td><code>op_kernel/</code></td><td>Device 侧代码：AscendC Kernel 类，实现计算逻辑</td></tr>
+<tr><td><code>op_tiling/</code></td><td>Host/Kernel 共享的 TilingData 结构体定义</td></tr>
+<tr><td><code>CMakeLists.txt</code></td><td>编译配置，将算子注册到 CANN 框架</td></tr>
+</tbody>
+</table>
+
+<h2>TilingData 设计</h2>
+
+<p>add 算子的 TilingData 需要描述数据切分方式和 Vector API 的 repeat/mask 参数：</p>
+
+<pre><code class="language-cpp">#ifndef ADD_CUSTOM_TILING_H
+#define ADD_CUSTOM_TILING_H
+
+#include &lt;cstdint&gt;
+
+struct AddCustomTilingData {
+    uint32_t totalLength;
+    uint32_t alignNum;
+    uint32_t tileMod;
+    uint32_t tileNumPerTime;
+    uint32_t tileCount;
+    uint32_t tileTail;
+    uint32_t coreCount;
+    uint32_t coreRemainder;
+};
+
+#endif</code></pre>
+
+<table>
+<thead><tr><th>字段</th><th>含义</th></tr></thead>
+<tbody>
+<tr><td><code>totalLength</code></td><td>总元素个数</td></tr>
+<tr><td><code>alignNum</code></td><td>对齐元素数（32 / sizeof(dtype)）</td></tr>
+<tr><td><code>tileMod</code></td><td>每次迭代处理的元素数（对齐后的 tile 大小）</td></tr>
+<tr><td><code>tileNumPerTime</code></td><td>每个 tile 内的 repeat 次数</td></tr>
+<tr><td><code>tileCount</code></td><td>完整 tile 的循环次数</td></tr>
+<tr><td><code>tileTail</code></td><td>尾部不足一个 tile 的元素数</td></tr>
+<tr><td><code>coreCount</code></td><td>每个核分配的元素数</td></tr>
+<tr><td><code>coreRemainder</code></td><td>最后一个核的余量</td></tr>
+</tbody>
+</table>
+
+<h2>Kernel 实现</h2>
+
+<p>与 swap 不同，add 算子有真正的 Vector 计算阶段。数据流为：MTE2 搬入 &rarr; Vector Add &rarr; MTE3 搬出。</p>
+
+<h3>类定义</h3>
+
+<pre><code class="language-cpp">class AddCustomKernel {
+public:
+    __aicore__ inline AddCustomKernel() {}
+    __aicore__ inline void Init(GM_ADDR a, GM_ADDR b, GM_ADDR c,
+                                GM_ADDR tilingGm);
+    __aicore__ inline void Process();
+
+private:
+    __aicore__ inline void ParseTilingData(GM_ADDR tilingGm);
+    __aicore__ inline void CopyIn(uint32_t offset, uint32_t len);
+    __aicore__ inline void Compute(uint32_t len);
+    __aicore__ inline void CopyOut(uint32_t offset, uint32_t len);
+
+    TPipe pipe_;
+    GlobalTensor&lt;float&gt; aGM_;
+    GlobalTensor&lt;float&gt; bGM_;
+    GlobalTensor&lt;float&gt; cGM_;
+    TQue&lt;TPosition::VECIN, 1&gt; queueA_;
+    TQue&lt;TPosition::VECIN, 1&gt; queueB_;
+    TQue&lt;TPosition::VECOUT, 1&gt; queueC_;
+    AddCustomTilingData tiling_;
+    uint32_t myOffset_;
+    uint32_t myCount_;
+};</code></pre>
+
+<p>注意与 swap 的区别：</p>
+<ul>
+<li>使用 <code>TQue&lt;VECIN, 1&gt;</code> 和 <code>TQue&lt;VECOUT, 1&gt;</code> 分开管理输入和输出队列，因为 add 有独立的 Vector 计算阶段</li>
+<li><code>TPipe</code> 作为类成员（而非外部传入），因为 add 的 Kernel 结构更简单</li>
+</ul>
+
+<h3>Init：初始化与 Buffer 分配</h3>
+
+<pre><code class="language-cpp">__aicore__ inline void AddCustomKernel::Init(
+    GM_ADDR a, GM_ADDR b, GM_ADDR c, GM_ADDR tilingGm)
+{
+    ParseTilingData(tilingGm);
+
+    uint32_t blockIdx = GetBlockIdx();
+    myOffset_ = blockIdx * tiling_.coreCount;
+    myCount_ = tiling_.coreCount;
+    if (blockIdx == GetBlockNum() - 1) {
+        myCount_ += tiling_.coreRemainder;
+    }
+
+    aGM_.SetGlobalBuffer((__gm__ float*)a, tiling_.totalLength);
+    bGM_.SetGlobalBuffer((__gm__ float*)b, tiling_.totalLength);
+    cGM_.SetGlobalBuffer((__gm__ float*)c, tiling_.totalLength);
+
+    pipe_.InitBuffer(queueA_, 2, tiling_.tileMod * sizeof(float));
+    pipe_.InitBuffer(queueB_, 2, tiling_.tileMod * sizeof(float));
+    pipe_.InitBuffer(queueC_, 2, tiling_.tileMod * sizeof(float));
+}</code></pre>
+
+<p>add 使用<strong>双 Buffer（ping-pong）</strong>，让 MTE2 搬运和 Vector 计算可以重叠执行。每个队列分配 2 个 Buffer。</p>
+
+<h3>CopyIn：数据搬入</h3>
+
+<pre><code class="language-cpp">__aicore__ inline void AddCustomKernel::CopyIn(uint32_t offset, uint32_t len)
+{
+    LocalTensor&lt;float&gt; aLocal = queueA_.AllocTensor&lt;float&gt;();
+    LocalTensor&lt;float&gt; bLocal = queueB_.AllocTensor&lt;float&gt;();
+
+    DataCopy(aLocal, aGM_[offset], len);
+    DataCopy(bLocal, bGM_[offset], len);
+
+    queueA_.EnQue(aLocal);
+    queueB_.EnQue(bLocal);
+}</code></pre>
+
+<h3>Compute：Vector 加法</h3>
+
+<p>这是 add 算子的核心计算逻辑，使用 Ascend C 的 <code>Add</code> API：</p>
+
+<pre><code class="language-cpp">__aicore__ inline void AddCustomKernel::Compute(uint32_t len)
+{
+    LocalTensor&lt;float&gt; aLocal = queueA_.DeQue&lt;float&gt;();
+    LocalTensor&lt;float&gt; bLocal = queueB_.DeQue&lt;float&gt;();
+    LocalTensor&lt;float&gt; cLocal = queueC_.AllocTensor&lt;float&gt;();
+
+    uint32_t repeatTimes = len / MASK_FULL;
+    uint32_t tailCount = len % MASK_FULL;
+
+    if (repeatTimes &gt; 0) {
+        Add(cLocal, aLocal, bLocal, MASK_FULL, repeatTimes,
+            {1, 1, 1, 8, 8, 8});
+    }
+
+    if (tailCount &gt; 0) {
+        uint32_t offset = repeatTimes * MASK_FULL;
+        Add(cLocal[offset], aLocal[offset], bLocal[offset],
+            tailCount, 1, {1, 1, 1, 8, 8, 8});
+    }
+
+    queueC_.EnQue(cLocal);
+    queueA_.FreeTensor(aLocal);
+    queueB_.FreeTensor(bLocal);
+}</code></pre>
+
+<p><code>Add</code> API 的参数说明（参见 <a href="06-API参考-6.3-计算API详解.html">6.3 计算 API 详解</a>）：</p>
+
+<table>
+<thead><tr><th>参数</th><th>含义</th><th>示例值</th></tr></thead>
+<tbody>
+<tr><td>dst</td><td>目标 LocalTensor</td><td>cLocal</td></tr>
+<tr><td>src0</td><td>第一个源操作数</td><td>aLocal</td></tr>
+<tr><td>src1</td><td>第二个源操作数</td><td>bLocal</td></tr>
+<tr><td>mask</td><td>每次迭代处理的元素数</td><td>MASK_FULL (128 for float)</td></tr>
+<tr><td>repeatTimes</td><td>重复执行次数</td><td>len / MASK_FULL</td></tr>
+<tr><td>repeatParams</td><td>地址步进参数 {dstRepStride, src0RepStride, src1RepStride, ...}</td><td>{1, 1, 1, 8, 8, 8}</td></tr>
+</tbody>
+</table>
+
+<svg viewBox="0 0 660 200" xmlns="http://www.w3.org/2000/svg" style="max-width:660px;display:block;margin:1.5rem auto">
+  <text x="330" y="20" text-anchor="middle" font-size="13" font-weight="bold" fill="#37474f">Add API 的 repeat/mask 机制</text>
+  <rect x="20" y="40" width="620" height="25" rx="4" fill="#e3f2fd" stroke="#90caf9" stroke-width="1"/>
+  <text x="330" y="57" text-anchor="middle" font-size="11" fill="#1565c0">aLocal: [e0 e1 ... e127 | e128 e129 ... e255 | ... ]</text>
+  <rect x="20" y="75" width="150" height="25" rx="4" fill="#c8e6c9" stroke="#66bb6a" stroke-width="1.5"/>
+  <text x="95" y="92" text-anchor="middle" font-size="10" fill="#2e7d32">mask=128 元素</text>
+  <rect x="180" y="75" width="150" height="25" rx="4" fill="#c8e6c9" stroke="#66bb6a" stroke-width="1.5"/>
+  <text x="255" y="92" text-anchor="middle" font-size="10" fill="#2e7d32">mask=128 元素</text>
+  <rect x="340" y="75" width="150" height="25" rx="4" fill="#c8e6c9" stroke="#66bb6a" stroke-width="1.5"/>
+  <text x="415" y="92" text-anchor="middle" font-size="10" fill="#2e7d32">mask=128 元素</text>
+  <text x="520" y="92" font-size="12" fill="#78909c">...</text>
+  <text x="95" y="120" text-anchor="middle" font-size="10" fill="#546e7a">repeat 0</text>
+  <text x="255" y="120" text-anchor="middle" font-size="10" fill="#546e7a">repeat 1</text>
+  <text x="415" y="120" text-anchor="middle" font-size="10" fill="#546e7a">repeat 2</text>
+  <rect x="20" y="140" width="620" height="45" rx="6" fill="#fff8e1" stroke="#ffc107" stroke-width="1"/>
+  <text x="330" y="160" text-anchor="middle" font-size="12" fill="#f57f17">repeatTimes = len / MASK_FULL</text>
+  <text x="330" y="178" text-anchor="middle" font-size="11" fill="#ff8f00">尾部不足 MASK_FULL 的部分单独处理（tailCount）</text>
+</svg>
+
+<h3>CopyOut：数据搬出</h3>
+
+<pre><code class="language-cpp">__aicore__ inline void AddCustomKernel::CopyOut(uint32_t offset, uint32_t len)
+{
+    LocalTensor&lt;float&gt; cLocal = queueC_.DeQue&lt;float&gt;();
+    DataCopy(cGM_[offset], cLocal, len);
+    queueC_.FreeTensor(cLocal);
+}</code></pre>
+
+<h3>Process：主循环</h3>
+
+<pre><code class="language-cpp">__aicore__ inline void AddCustomKernel::Process()
+{
+    if (myCount_ == 0) {
+        return;
+    }
+
+    uint32_t offset = myOffset_;
+    uint32_t tileLoop = myCount_ / tiling_.tileMod;
+    uint32_t tileTail = myCount_ % tiling_.tileMod;
+
+    for (uint32_t i = 0; i &lt; tileLoop; i++) {
+        CopyIn(offset, tiling_.tileMod);
+        Compute(tiling_.tileMod);
+        CopyOut(offset, tiling_.tileMod);
+        offset += tiling_.tileMod;
+    }
+
+    if (tileTail &gt; 0) {
+        CopyIn(offset, tileTail);
+        Compute(tileTail);
+        CopyOut(offset, tileTail);
+    }
+}</code></pre>
+
+<h3>Kernel 入口</h3>
+
+<pre><code class="language-cpp">extern "C" __global__ __aicore__ void add_custom_kernel(
+    GM_ADDR a, GM_ADDR b, GM_ADDR c, GM_ADDR tilingGm)
+{
+    AddCustomKernel op;
+    op.Init(a, b, c, tilingGm);
+    op.Process();
+}</code></pre>
+
+<h2>Host 侧实现</h2>
+
+<h3>Tiling 函数</h3>
+
+<p>Tiling 函数在 GetWorkspaceSize 阶段被调用，负责计算切分参数：</p>
+
+<pre><code class="language-cpp">static void AddCustomTilingFunc(
+    const ge::Shape&amp; aShape, const ge::Shape&amp; bShape,
+    const ge::Shape&amp; cShape, const op::AddCustom&amp; op,
+    AddCustomTilingData&amp; tiling, uint32_t&amp; workspaceSize)
+{
+    uint32_t totalLength = aShape.GetShapeSize();
+    tiling.totalLength = totalLength;
+    tiling.alignNum = 32 / sizeof(float);
+
+    uint32_t coreNum = ascendcPlatform.GetCoreNumAiv();
+    uint32_t rawPerCore = totalLength / coreNum;
+    tiling.coreCount = (rawPerCore / tiling.alignNum) * tiling.alignNum;
+    tiling.coreRemainder = totalLength - tiling.coreCount * coreNum;
+
+    constexpr uint32_t ubSize = 248 * 1024;
+    constexpr uint32_t bufferCount = 3;
+    constexpr uint32_t pingPong = 2;
+    uint32_t maxElements = ubSize / (bufferCount * pingPong * sizeof(float));
+    tiling.tileMod = (maxElements / tiling.alignNum) * tiling.alignNum;
+
+    tiling.tileNumPerTime = tiling.tileMod / MASK_FULL;
+    tiling.tileCount = tiling.coreCount / tiling.tileMod;
+    tiling.tileTail = tiling.coreCount % tiling.tileMod;
+
+    workspaceSize = 0;
+}</code></pre>
+
+<p>注意 UB 空间的分配：add 有 3 个队列（A、B、C），每个队列使用双 Buffer（ping-pong），所以 UB 被分成 3 &times; 2 = 6 块。</p>
+
+<h3>aclnn 接口注册</h3>
+
+<pre><code class="language-cpp">aclnnStatus aclnnAddCustomGetWorkspaceSize(
+    const aclOpExecutor* executor,
+    const aclTensor* a, const aclTensor* b, const aclTensor* c,
+    uint64_t* workspaceSize, aclOpExecutor** outExecutor)
+{
+    AddCustomTilingData tiling;
+    uint32_t wsSize = 0;
+    AddCustomTilingFunc(
+        GetShape(a), GetShape(b), GetShape(c),
+        *static_cast&lt;const op::AddCustom*&gt;(executor-&gt;op),
+        tiling, wsSize);
+
+    *workspaceSize = wsSize;
+    SET_TILING(executor, tiling);
+    *outExecutor = executor;
+    return ACLNN_SUCCESS;
+}
+
+aclnnStatus aclnnAddCustomExecute(
+    aclrtStream stream, const aclOpExecutor* executor,
+    const aclTensor* a, const aclTensor* b, const aclTensor* c,
+    void* workspace, uint64_t workspaceSize)
+{
+    GET_TILING(executor, AddCustomTilingData, tiling);
+
+    uint32_t coreNum = ascendcPlatform.GetCoreNumAiv();
+    uint32_t numBlocks = (tiling.totalLength &lt; coreNum) ?
+                          tiling.totalLength : coreNum;
+
+    add_custom_kernel&lt;&lt;&lt;numBlocks, nullptr, stream&gt;&gt;&gt;(
+        GetAddr(a), GetAddr(b), GetAddr(c), GET_TILING_ADDR(executor));
+
+    return ACLNN_SUCCESS;
+}</code></pre>
+
+<h2>CMakeLists 配置</h2>
+
+<p>算子需要通过 CMakeLists.txt 注册到 CANN 框架：</p>
+
+<pre><code class="language-cmake">cmake_minimum_required(VERSION 3.16)
+
+set(OP_NAME "AddCustom")
+
+add_library(${OP_NAME} SHARED
+    op_host/add_custom_aclnn.cpp
+    op_host/add_custom_tiling.cpp
+    op_kernel/add_custom.cpp
+)
+
+target_include_directories(${OP_NAME} PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/op_tiling
+    ${CANN_TOOLKIT_DIR}/include
+    ${CANN_TOOLKIT_DIR}/include/aclnn
+)
+
+target_link_libraries(${OP_NAME} PRIVATE
+    ascendcl
+    acl_op_compiler
+)
+
+ascendc_register_op(${OP_NAME}
+    OP_TYPE add_custom
+    INPUT a tensor float32
+    INPUT b tensor float32
+    OUTPUT c tensor float32
+)</code></pre>
+
+<p><code>ascendc_register_op</code> 宏将算子的类型名、输入输出参数注册到 CANN 框架中，使得调用方可以通过 <code>aclnnAddCustom</code> 接口调用。</p>
+
+<h2>编译与测试</h2>
+
+<pre><code class="language-bash">bash build.sh --ops=AddCustom --soc=ascend950 --run</code></pre>
+
+<p>测试框架会验证多种场景：</p>
+
+<ul>
+<li>不同数据规模（n = 128, 1024, 65536, 1048576）</li>
+<li>边界情况（n = 1, n 不是对齐数的倍数）</li>
+<li>精度验证（NPU 结果与 CPU golden 的误差在 FP32 精度标准内）</li>
+</ul>
+
+<h2>直调 vs aclnn 注册：对比</h2>
+
+<svg viewBox="0 0 660 340" xmlns="http://www.w3.org/2000/svg" style="max-width:660px;display:block;margin:1.5rem auto">
+  <defs>
+    <linearGradient id="directG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#42a5f5"/><stop offset="100%" stop-color="#1e88e5"/></linearGradient>
+    <linearGradient id="aclnnG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#66bb6a"/><stop offset="100%" stop-color="#43a047"/></linearGradient>
+  </defs>
+  <rect x="15" y="15" width="310" height="310" rx="12" fill="#e3f2fd" stroke="#90caf9" stroke-width="1.5"/>
+  <rect x="35" y="30" width="270" height="36" rx="6" fill="url(#directG)"/>
+  <text x="170" y="54" text-anchor="middle" font-size="15" font-weight="bold" fill="#fff">直调方式 (swap)</text>
+  <rect x="35" y="78" width="270" height="28" rx="4" fill="#bbdefb"/>
+  <text x="170" y="97" text-anchor="middle" font-size="11" fill="#0d47a1">Host 直接 &lt;&lt;&lt;&gt;&gt;&gt; 启动 Kernel</text>
+  <rect x="35" y="114" width="270" height="28" rx="4" fill="#bbdefb"/>
+  <text x="170" y="133" text-anchor="middle" font-size="11" fill="#0d47a1">TilingData 通过 aclrtMemcpy 传递</text>
+  <rect x="35" y="150" width="270" height="28" rx="4" fill="#bbdefb"/>
+  <text x="170" y="169" text-anchor="middle" font-size="11" fill="#0d47a1">3 个文件：tiling_data.h + kernel + host</text>
+  <rect x="35" y="186" width="270" height="28" rx="4" fill="#bbdefb"/>
+  <text x="170" y="205" text-anchor="middle" font-size="11" fill="#0d47a1">无需框架注册，编译即可用</text>
+  <rect x="35" y="222" width="270" height="28" rx="4" fill="#bbdefb"/>
+  <text x="170" y="241" text-anchor="middle" font-size="11" fill="#0d47a1">启动开销小，调用灵活</text>
+  <rect x="35" y="258" width="270" height="28" rx="4" fill="#e0e0e0"/>
+  <text x="170" y="277" text-anchor="middle" font-size="11" fill="#616161">适用：BLAS Level 1 简单算子</text>
+  <rect x="335" y="15" width="310" height="310" rx="12" fill="#e8f5e9" stroke="#a5d6a7" stroke-width="1.5"/>
+  <rect x="355" y="30" width="270" height="36" rx="6" fill="url(#aclnnG)"/>
+  <text x="490" y="54" text-anchor="middle" font-size="15" font-weight="bold" fill="#fff">aclnn 注册方式 (add)</text>
+  <rect x="355" y="78" width="270" height="28" rx="4" fill="#c8e6c9"/>
+  <text x="490" y="97" text-anchor="middle" font-size="11" fill="#1b5e20">两段式接口：GetWorkspaceSize + Execute</text>
+  <rect x="355" y="114" width="270" height="28" rx="4" fill="#c8e6c9"/>
+  <text x="490" y="133" text-anchor="middle" font-size="11" fill="#1b5e20">TilingData 通过框架 Tiling 机制传递</text>
+  <rect x="355" y="150" width="270" height="28" rx="4" fill="#c8e6c9"/>
+  <text x="490" y="169" text-anchor="middle" font-size="11" fill="#1b5e20">多目录：op_host + op_kernel + op_tiling</text>
+  <rect x="355" y="186" width="270" height="28" rx="4" fill="#c8e6c9"/>
+  <text x="490" y="205" text-anchor="middle" font-size="11" fill="#1b5e20">需 CMakeLists 注册到 CANN 框架</text>
+  <rect x="355" y="222" width="270" height="28" rx="4" fill="#c8e6c9"/>
+  <text x="490" y="241" text-anchor="middle" font-size="11" fill="#1b5e20">框架自动管理 Workspace 和类型推导</text>
+  <rect x="355" y="258" width="270" height="28" rx="4" fill="#e0e0e0"/>
+  <text x="490" y="277" text-anchor="middle" font-size="11" fill="#616161">适用：复杂算子、需要框架集成</text>
+  <circle cx="330" cy="170" r="18" fill="#37474f"/>
+  <text x="330" y="175" text-anchor="middle" font-size="12" font-weight="bold" fill="#fff">VS</text>
+</svg>
+
+<table>
+<thead><tr><th>维度</th><th>直调方式</th><th>aclnn 注册方式</th></tr></thead>
+<tbody>
+<tr><td>Kernel 启动</td><td>Host 直接 <code>&lt;&lt;&lt;&gt;&gt;&gt;</code></td><td>通过 Execute 接口间接启动</td></tr>
+<tr><td>Tiling 传递</td><td><code>aclrtMalloc</code> + <code>aclrtMemcpy</code></td><td>框架 Tiling 机制自动传递</td></tr>
+<tr><td>文件结构</td><td>3 个文件，同目录</td><td>多目录（op_host / op_kernel / op_tiling）</td></tr>
+<tr><td>框架集成</td><td>无需注册</td><td>需 CMakeLists 注册</td></tr>
+<tr><td>Workspace</td><td>手动管理</td><td>框架自动管理</td></tr>
+<tr><td>适用场景</td><td>BLAS Level 1（swap, scal, copy）</td><td>复杂算子（add, matmul, attention）</td></tr>
+</tbody>
+</table>
+
+<h2>Q&amp;A</h2>
+
+<details><summary>Q: add 算子为什么用双 Buffer 而 swap 用单 Buffer？</summary>
+<p>add 有 Vector 计算阶段（Add API），双 Buffer 可以让 MTE2 搬运和 Vector 计算重叠执行：当 Vector 在处理 ping Buffer 的数据时，MTE2 同时向 pong Buffer 搬运下一批数据。swap 没有 Vector 计算，双 Buffer 无法带来重叠收益。</p>
+</details>
+
+<details><summary>Q: MASK_FULL 是什么？</summary>
+<p>MASK_FULL 是 Vector 单元单次操作能处理的最大元素数。对于 float32，MASK_FULL = 128（即 512 字节 / 4 字节）。Add API 的 mask 参数设为 MASK_FULL 表示每次迭代处理 128 个元素。</p>
+</details>
+
+<details><summary>Q: workspaceSize 为什么设为 0？</summary>
+<p>add 算子不需要额外的 Workspace 内存（所有中间数据都在 UB 中处理）。Workspace 通常用于需要额外临时存储的复杂算子（如 matmul 的分块中间结果）。</p>
+</details>
+
+<details><summary>Q: 如何选择直调还是 aclnn 注册？</summary>
+<p>简单原则：如果算子接口简单（输入输出少、类型固定）、不需要框架自动管理 Workspace 和类型推导，用直调方式更简洁。如果算子需要与 PyTorch/MindSpore 等框架深度集成、需要支持多种数据类型、或需要框架自动管理资源，用 aclnn 注册方式。</p>
+</details>
+
+<details><summary>Q: repeatParams 中的 {1, 1, 1, 8, 8, 8} 是什么意思？</summary>
+<p>这是 Add API 的地址步进参数。前三个值 {1, 1, 1} 是 dst/src0/src1 在单次 repeat 内的地址步进（单位为 block），后三个值 {8, 8, 8} 是相邻 repeat 之间的地址步进。对于连续存储的数据，通常设为 {1, 1, 1, 8, 8, 8}。</p>
+</details>
+
+<div id="quiz"></div>
+<div class="page-nav"><a href="09-实战演练-9.2-swap算子开发.html" class="nav-prev"><span class="nav-label">&larr; 上一篇</span><span class="nav-title">9.2 swap 算子开发</span></a><a href="附录-A-数据类型速查表.html" class="nav-next"><span class="nav-label">下一篇 &rarr;</span><span class="nav-title">A. 数据类型速查表</span></a></div>
+</div>
+</main>
+<script src="../js/quiz.js"></script>
+<script>
+renderQuiz('quiz', [
+  {
+    question: "aclnn 两段式接口的两个阶段分别是？",
+    options: ["Init 和 Process", "GetWorkspaceSize 和 Execute", "Compile 和 Run", "Tiling 和 Kernel"],
+    answer: 1,
+    explanation: "aclnn 框架要求算子实现 GetWorkspaceSize（计算 Workspace 大小和 Tiling 参数）和 Execute（使用 Tiling 参数启动 Kernel）两个接口。"
+  },
+  {
+    question: "add 算子使用双 Buffer（ping-pong）的目的是？",
+    options: ["增加代码可读性", "让 MTE2 搬运和 Vector 计算重叠执行，提高流水线利用率", "减少 UB 空间占用", "支持更大的数据量"],
+    answer: 1,
+    explanation: "双 Buffer 让 MTE2 搬运和 Vector 计算可以重叠执行：当 Vector 在处理 ping Buffer 的数据时，MTE2 同时向 pong Buffer 搬运下一批数据，从而提高流水线利用率。"
+  },
+  {
+    question: "Add API 中 mask 参数设为 MASK_FULL 时，对于 float32 每次处理多少个元素？",
+    options: ["32", "64", "128", "256"],
+    answer: 2,
+    explanation: "MASK_FULL 对于 float32 等于 128（512 字节 / 4 字节 = 128 个元素）。这是 Vector 单元单次操作能处理的最大元素数。"
+  },
+  {
+    question: "add 算子的 UB 空间被分成多少块 Buffer？",
+    options: ["2 块（x 和 y 各一块）", "4 块（ping-pong 各两块）", "6 块（A、B、C 各两块 ping-pong）", "3 块（A、B、C 各一块）"],
+    answer: 2,
+    explanation: "add 有 3 个队列（A、B、C），每个队列使用双 Buffer（ping-pong），所以 UB 被分成 3 × 2 = 6 块。"
+  },
+  {
+    question: "以下哪种场景更适合使用 aclnn 注册方式？",
+    options: ["BLAS Level 1 的 sscal 算子", "BLAS Level 1 的 scopy 算子", "需要支持多种数据类型并与 PyTorch 集成的 matmul 算子", "简单的向量交换操作"],
+    answer: 2,
+    explanation: "aclnn 注册方式适合复杂算子：需要支持多种数据类型、需要框架自动管理 Workspace、需要与 PyTorch/MindSpore 等深度学习框架深度集成。BLAS Level 1 的简单算子更适合直调方式。"
+  }
+]);
+</script>
+</body>
+</html>
