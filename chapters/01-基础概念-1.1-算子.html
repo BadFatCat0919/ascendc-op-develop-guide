@@ -76,22 +76,34 @@
 <script>
 renderQuiz('quiz', [
   {
-    question: "按照计算特征，Add 算子和 MatMul 算子分别属于哪种类别，各自主要使用哪个计算单元？",
-    options: ["Add 用 Cube，MatMul 用 Vector", "Add 是逐元素算子用 Vector，MatMul 是矩阵乘算子用 Cube", "两者都用 Cube", "两者都用 Vector"],
+    question: "ReLU、Sigmoid、GELU 这些激活函数属于哪类算子？主要使用哪个计算单元？",
+    options: ["归约算子，用 Cube", "逐元素算子，用 Vector", "矩阵乘算子，用 Cube", "数据搬运算子，用 MTE"],
     answer: 1,
-    explanation: "Add 是逐元素（Element-wise）算子，每个元素独立计算互不依赖，主要使用 Vector 单元。MatMul 是矩阵乘算子，计算密集型，主要使用 Cube 单元。不同类别的算子对应不同的硬件计算单元，这也是 Tiling 设计和编程模型选择的出发点。"
+    explanation: "激活函数对每个元素独立做非线性变换（如 ReLU: max(0, x)），元素之间互不依赖，属于逐元素（Element-wise）算子，主要使用 Vector 单元。这类算子计算简单，但出现频率极高（每一层后面都跟一个）。"
   },
   {
-    question: "\"函数\"、\"层\"和\"算子\"这三个概念的视角各不相同。以下哪个说法是正确的？",
-    options: ["函数是硬件执行概念，算子是编程概念", "层是网络结构概念，算子是硬件执行概念", "层和算子完全等价，只是叫法不同", "函数和算子完全等价，只是叫法不同"],
+    question: "Softmax 算子需要先求指数、再求和、最后做除法。它属于哪类算子？",
+    options: ["逐元素算子，因为每一步都是逐元素操作", "归约算子，因为需要沿某个轴求和", "矩阵乘算子，因为涉及矩阵运算", "数据搬运算子，因为需要重排数据"],
     answer: 1,
-    explanation: "函数是编程概念（如 add(a, b) 是一个 C++ 函数），层是网络结构概念（如\"卷积层\"是网络架构图里的一个方框），算子是硬件执行概念（如 Conv2D 算子是调度 NPU 完成卷积运算的代码集合）。一个\"层\"往往包含多个算子，比如\"卷积层\"= Conv2D + BiasAdd + ReLU。"
+    explanation: "Softmax 虽然包含逐元素操作（求指数、做除法），但关键步骤是沿某个轴求和（归约），这决定了它的计算特征——元素之间有依赖关系，需要先收集数据再聚合。因此归类为归约（Reduction）算子，主要使用 Vector 单元。"
   },
   {
-    question: "以下哪个不是自己开发算子的常见原因？",
-    options: ["框架没覆盖新架构需要的算子（如 DeepSeek 的 MLA 注意力机制）", "针对特定硬件做性能优化", "把多个小算子融合成一个大算子减少搬运", "框架自带的算子功能不正确，需要重写"],
-    answer: 3,
-    explanation: "自己开发算子的三个主要原因是：（1）框架没覆盖——比如 DeepSeek 推出的 MLA 注意力机制等新架构，框架里还没有现成实现；（2）性能优化——通用算子不一定是最快的，针对特定硬件和形状做定制优化可以快很多；（3）算子融合——把多个小算子融合成一个大算子减少数据搬运。框架自带算子的功能通常是正确的，不需要因为\"功能不正确\"而重写。"
+    question: "Transpose（转置）算子不涉及任何数值计算，只是把数据从一种排布变成另一种。它主要使用哪个计算单元？",
+    options: ["Vector，因为要做逐元素操作", "Cube，因为涉及矩阵运算", "MTE，因为是纯数据搬运", "Scalar，因为只是控制流"],
+    answer: 2,
+    explanation: "Transpose 不改变数据值，只改变数据在内存中的排布顺序（如从 NCHW 变成 NHWC）。这类算子属于数据搬运（Data Move）算子，主要使用 MTE（Memory Transfer Engine）引擎。性能瓶颈在于搬运效率，而不是计算能力。"
+  },
+  {
+    question: "以下哪个算子组合最适合做算子融合？",
+    options: ["MatMul + Transpose + MatMul", "Conv2D + BiasAdd + ReLU", "Softmax + Transpose + Softmax", "Gather + Scatter + Gather"],
+    answer: 1,
+    explanation: "Conv2D + BiasAdd + ReLU 是最经典的融合组合：Conv2D 用 Cube 做矩阵乘，BiasAdd 和 ReLU 都是逐元素操作可以用 Vector，三者串联执行，中间结果不需要写回 GM。融合后数据只需从 GM 读 1 次、写 1 次，搬运开销减少约 2/3。"
+  },
+  {
+    question: "BatchMatMul（批量矩阵乘）同时对多组矩阵做乘法。它和普通的 MatMul 在计算单元使用上有什么区别？",
+    options: ["BatchMatMul 用 Vector，MatMul 用 Cube", "两者都用 Cube，但 BatchMatMul 需要在 batch 维度上做循环", "BatchMatMul 用 MTE，MatMul 用 Cube", "两者完全一样，没有区别"],
+    answer: 1,
+    explanation: "BatchMatMul 和 MatMul 的核心计算都是矩阵乘，都使用 Cube 单元。区别在于 BatchMatMul 需要在 batch 维度上做循环，对每一组矩阵分别调用 Cube 计算。Tiling 设计时需要考虑 batch 维度的切分策略。"
   }
 ]);
 </script>
