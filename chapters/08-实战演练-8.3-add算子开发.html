@@ -3,21 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>9.3 add 算子开发 - AscendC Guide</title>
+<title>8.3 add 算子开发 - AscendC Guide</title>
 <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-<div class="top-header"><a href="index.html" class="logo"><span class="logo-icon">A</span>AscendC Guide</a><span class="header-subtitle">CANN 算子开发手册</span></div>
-<nav class="sidebar"><div class="sidebar-header"><h2><a href="../index.html" style="color:inherit;text-decoration:none">AscendC Guide</a></h2><p>算子开发从入门到精通</p></div><ul class="sidebar-nav"><li class="chapter-group"><span class="chapter-title">第1章 基础概念</span><ul class="article-list"><li><a href="01-基础概念-1.1-什么是算子.html">1.1 什么是算子</a></li><li><a href="01-基础概念-1.2-数据排布格式.html">1.2 数据排布格式</a></li><li><a href="01-基础概念-1.3-数据类型.html">1.3 数据类型</a></li><li><a href="01-基础概念-1.4-量化与反量化.html">1.4 量化与反量化</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第2章 编程语言</span><ul class="article-list"><li><a href="02-编程语言-2.1-昇腾编程语言.html">2.1 昇腾编程语言</a></li><li><a href="02-编程语言-2.2-编程模型.html">2.2 编程模型</a></li><li><a href="02-编程语言-2.3-Ascend软件栈.html">2.3 Ascend 软件栈</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第3章 昇腾硬件</span><ul class="article-list"><li><a href="03-昇腾硬件-3.1-A5通用架构.html">3.1 A5 通用架构</a></li><li><a href="03-昇腾硬件-3.2-A5新特性.html">3.2 A5 新特性</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第5章 核心开发</span><ul class="article-list"><li><a href="05-核心开发-5.1-Tiling设计.html">5.1 Tiling 设计</a></li><li><a href="05-核心开发-5.2-内存管理与数据搬运.html">5.2 内存管理与数据搬运</a></li><li><a href="05-核心开发-5.3-Vector计算.html">5.3 Vector 计算</a></li><li><a href="05-核心开发-5.4-Cube计算.html">5.4 Cube 计算</a></li><li><a href="05-核心开发-5.5-同步与流水线.html">5.5 同步与流水线</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第6章 API 参考</span><ul class="article-list"><li><a href="06-API参考-6.1-AscendC常用API概览.html">6.1 Ascend C 常用 API 概览</a></li><li><a href="06-API参考-6.2-数据搬运API详解.html">6.2 数据搬运 API 详解</a></li><li><a href="06-API参考-6.3-计算API详解.html">6.3 计算 API 详解</a></li><li><a href="06-API参考-6.4-ACL运行时API.html">6.4 ACL 运行时 API</a></li><li><a href="06-API参考-6.5-同步与队列API详解.html">6.5 同步与队列 API 详解</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第7章 调试与优化</span><ul class="article-list"><li><a href="07-调试与优化-7.1-精度不对怎么办.html">7.1 精度不对怎么办</a></li><li><a href="07-调试与优化-7.2-性能不达标怎么办.html">7.2 性能不达标怎么办</a></li><li><a href="07-调试与优化-7.3-算子精度标准.html">7.3 算子精度标准</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第8章 进阶</span><ul class="article-list"><li><a href="08-进阶-8.1-常见踩坑与最佳实践.html">8.1 常见踩坑与最佳实践</a></li><li><a href="08-进阶-8.2-RegBase编程模型.html">8.2 RegBase 编程模型</a></li><li><a href="08-进阶-8.3-SIMT混合编程.html">8.3 SIMT 混合编程</a></li><li><a href="08-进阶-8.4-NDDMA高维搬运.html">8.4 NDDMA 高维搬运</a></li><li><a href="08-进阶-8.5-CCU通算融合.html">8.5 CCU 通算融合</a></li><li><a href="08-进阶-8.6-跨架构兼容.html">8.6 跨架构兼容</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第9章 实战演练</span><ul class="article-list"><li><a href="09-实战演练-9.1-五分钟跑通一个算子.html">9.1 五分钟跑通一个算子</a></li><li><a href="09-实战演练-9.2-swap算子开发.html">9.2 swap 算子开发</a></li><li><a href="09-实战演练-9.3-add算子开发.html" class="active">9.3 add 算子开发</a></li></ul></li><li class="chapter-group"><span class="chapter-title">附录</span><ul class="article-list"><li><a href="附录-A-数据类型速查表.html">A. 数据类型速查表</a></li></ul></li></ul></nav>
+<div class="top-header"><a href="../index.html" class="logo"><span class="logo-icon">A</span>AscendC Guide</a><span class="header-subtitle">CANN 算子开发手册</span></div>
+<nav class="sidebar"><div class="sidebar-header"><h2><a href="../index.html" style="color:inherit;text-decoration:none">AscendC Guide</a></h2><p>算子开发从入门到精通</p></div><ul class="sidebar-nav"><li class="chapter-group"><span class="chapter-title">第1章 基础概念</span><ul class="article-list"><li><a href="01-基础概念-1.1-什么是算子.html">1.1 什么是算子</a></li><li><a href="01-基础概念-1.2-数据排布格式.html">1.2 数据排布格式</a></li><li><a href="01-基础概念-1.3-数据类型.html">1.3 数据类型</a></li><li><a href="01-基础概念-1.4-量化与反量化.html">1.4 量化与反量化</a></li><li><a href="01-基础概念-1.5-融合算子.html">1.5 融合算子</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第2章 昇腾硬件</span><ul class="article-list"><li><a href="02-昇腾硬件-2.1-DaVinci架构.html">2.1 DaVinci 架构</a></li><li><a href="02-昇腾硬件-2.2-A5新特性.html">2.2 A5 新特性</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第3章 编程语言</span><ul class="article-list"><li><a href="03-编程语言-3.1-昇腾编程语言.html">3.1 昇腾编程语言</a></li><li><a href="03-编程语言-3.2-编程模型.html">3.2 编程模型</a></li><li><a href="03-编程语言-3.3-Ascend软件栈.html">3.3 Ascend 软件栈</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第4章 核心开发</span><ul class="article-list"><li><a href="04-核心开发-4.1-算子精度标准.html">4.1 算子精度标准</a></li><li><a href="04-核心开发-4.2-Tiling设计.html">4.2 Tiling 设计</a></li><li><a href="04-核心开发-4.3-内存管理与数据搬运.html">4.3 内存管理与数据搬运</a></li><li><a href="04-核心开发-4.4-Vector计算.html">4.4 Vector 计算</a></li><li><a href="04-核心开发-4.5-Cube计算.html">4.5 Cube 计算</a></li><li><a href="04-核心开发-4.6-同步与流水线.html">4.6 同步与流水线</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第5章 API 参考</span><ul class="article-list"><li><a href="05-API参考-5.1-AscendC常用API概览.html">5.1 Ascend C 常用 API 概览</a></li><li><a href="05-API参考-5.2-数据搬运API详解.html">5.2 数据搬运 API 详解</a></li><li><a href="05-API参考-5.3-计算API详解.html">5.3 计算 API 详解</a></li><li><a href="05-API参考-5.4-ACL运行时API.html">5.4 ACL 运行时 API</a></li><li><a href="05-API参考-5.5-同步与队列API详解.html">5.5 同步与队列 API 详解</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第6章 调试优化</span><ul class="article-list"><li><a href="06-调试与优化-6.1-精度不对怎么办.html">6.1 精度不对怎么办</a></li><li><a href="06-调试与优化-6.2-性能不达标怎么办.html">6.2 性能不达标怎么办</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第7章 进阶指南</span><ul class="article-list"><li><a href="07-进阶-7.1-常见踩坑与最佳实践.html">7.1 常见踩坑与最佳实践</a></li><li><a href="07-进阶-7.2-RegBase编程模型.html">7.2 RegBase 编程模型</a></li><li><a href="07-进阶-7.3-SIMT混合编程.html">7.3 SIMT 混合编程</a></li><li><a href="07-进阶-7.4-NDDMA高维搬运.html">7.4 NDDMA 高维搬运</a></li><li><a href="07-进阶-7.5-CCU通算融合.html">7.5 CCU 通算融合</a></li><li><a href="07-进阶-7.6-跨架构兼容.html">7.6 跨架构兼容</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第8章 实战演练</span><ul class="article-list"><li><a href="08-实战演练-8.1-五分钟跑通一个算子.html">8.1 五分钟跑通一个算子</a></li><li><a href="08-实战演练-8.2-swap算子开发.html">8.2 swap 算子开发</a></li><li><a href="08-实战演练-8.3-add算子开发.html">8.3 add 算子开发</a></li></ul></li><li class="chapter-group"><span class="chapter-title">附录</span><ul class="article-list"><li><a href="附录-A-数据类型速查表.html">A. 数据类型速查表</a></li><li><a href="附录-B-专有名词速查表.html">B. 专有名词速查表</a></li></ul></li></ul></nav>
 <main class="main">
 <div class="content">
 <div class="meta-bar"><a href="../index.html">&larr; 返回目录</a></div>
 
-<h1>9.3 add 算子开发（aclnn 注册方式）</h1>
+<h1>8.3 add 算子开发（aclnn 注册方式）</h1>
 
-<p>本章以逐元素加法 <code>add</code> 算子为例，讲解通过 <strong>aclnn 框架注册</strong>方式开发算子的完整流程。与 <a href="09-实战演练-9.2-swap算子开发.html">9.2 swap 算子开发</a> 中的直调方式不同，aclnn 注册方式需要实现两段式接口（GetWorkspaceSize + Execute），并通过 CMakeLists 配置将算子注册到 CANN 框架中。</p>
+<p>本章以逐元素加法 <code>add</code> 算子为例，讲解通过 <strong>aclnn 框架注册</strong>方式开发算子的完整流程。与 <a href="08-实战演练-8.2-swap算子开发.html">8.2 swap 算子开发</a> 中的直调方式不同，aclnn 注册方式需要实现两段式接口（GetWorkspaceSize + Execute），并通过 CMakeLists 配置将算子注册到 CANN 框架中。</p>
 
-<h2>功能说明</h2>
+<h2>8.3.1 功能说明</h2>
 
 <p>add 算子执行逐元素加法：</p>
 
@@ -40,7 +40,7 @@
   <line x1="410" y1="75" x2="505" y2="75" stroke="#43a047" stroke-width="1.5"/>
 </svg>
 
-<h2>aclnn 两段式接口</h2>
+<h2>8.3.2 aclnn 两段式接口</h2>
 
 <p>aclnn 框架要求算子实现两个接口：</p>
 
@@ -78,7 +78,7 @@
   <text x="415" y="133" text-anchor="middle" font-size="11" fill="#9e9e9e">开发者只需实现 GetWorkspaceSize 和 Execute 两个函数</text>
 </svg>
 
-<h2>文件结构</h2>
+<h2>8.3.3 文件结构</h2>
 
 <p>ops-math 仓中 add 算子的目录结构如下：</p>
 
@@ -102,7 +102,7 @@
 </tbody>
 </table>
 
-<h2>TilingData 设计</h2>
+<h2>8.3.4 TilingData 设计</h2>
 
 <p>add 算子的 TilingData 需要描述数据切分方式和 Vector API 的 repeat/mask 参数：</p>
 
@@ -138,11 +138,11 @@ struct AddCustomTilingData {
 </tbody>
 </table>
 
-<h2>Kernel 实现</h2>
+<h2>8.3.5 Kernel 实现</h2>
 
 <p>与 swap 不同，add 算子有真正的 Vector 计算阶段。数据流为：MTE2 搬入 &rarr; Vector Add &rarr; MTE3 搬出。</p>
 
-<h3>类定义</h3>
+<h3>8.3.5.1 类定义</h3>
 
 <pre><code class="language-cpp">class AddCustomKernel {
 public:
@@ -175,7 +175,7 @@ private:
 <li><code>TPipe</code> 作为类成员（而非外部传入），因为 add 的 Kernel 结构更简单</li>
 </ul>
 
-<h3>Init：初始化与 Buffer 分配</h3>
+<h3>8.3.5.2 Init：初始化与 Buffer 分配</h3>
 
 <pre><code class="language-cpp">__aicore__ inline void AddCustomKernel::Init(
     GM_ADDR a, GM_ADDR b, GM_ADDR c, GM_ADDR tilingGm)
@@ -200,7 +200,7 @@ private:
 
 <p>add 使用<strong>双 Buffer（ping-pong）</strong>，让 MTE2 搬运和 Vector 计算可以重叠执行。每个队列分配 2 个 Buffer。</p>
 
-<h3>CopyIn：数据搬入</h3>
+<h3>8.3.5.3 CopyIn：数据搬入</h3>
 
 <pre><code class="language-cpp">__aicore__ inline void AddCustomKernel::CopyIn(uint32_t offset, uint32_t len)
 {
@@ -214,7 +214,7 @@ private:
     queueB_.EnQue(bLocal);
 }</code></pre>
 
-<h3>Compute：Vector 加法</h3>
+<h3>8.3.5.4 Compute：Vector 加法</h3>
 
 <p>这是 add 算子的核心计算逻辑，使用 Ascend C 的 <code>Add</code> API：</p>
 
@@ -243,7 +243,7 @@ private:
     queueB_.FreeTensor(bLocal);
 }</code></pre>
 
-<p><code>Add</code> API 的参数说明（参见 <a href="06-API参考-6.3-计算API详解.html">6.3 计算 API 详解</a>）：</p>
+<p><code>Add</code> API 的参数说明（参见 <a href="05-API参考-5.3-计算API详解.html">5.3 计算 API 详解</a>）：</p>
 
 <table>
 <thead><tr><th>参数</th><th>含义</th><th>示例值</th></tr></thead>
@@ -276,7 +276,7 @@ private:
   <text x="330" y="178" text-anchor="middle" font-size="11" fill="#ff8f00">尾部不足 MASK_FULL 的部分单独处理（tailCount）</text>
 </svg>
 
-<h3>CopyOut：数据搬出</h3>
+<h3>8.3.5.5 CopyOut：数据搬出</h3>
 
 <pre><code class="language-cpp">__aicore__ inline void AddCustomKernel::CopyOut(uint32_t offset, uint32_t len)
 {
@@ -285,7 +285,7 @@ private:
     queueC_.FreeTensor(cLocal);
 }</code></pre>
 
-<h3>Process：主循环</h3>
+<h3>8.3.5.6 Process：主循环</h3>
 
 <pre><code class="language-cpp">__aicore__ inline void AddCustomKernel::Process()
 {
@@ -311,7 +311,7 @@ private:
     }
 }</code></pre>
 
-<h3>Kernel 入口</h3>
+<h3>8.3.5.7 Kernel 入口</h3>
 
 <pre><code class="language-cpp">extern "C" __global__ __aicore__ void add_custom_kernel(
     GM_ADDR a, GM_ADDR b, GM_ADDR c, GM_ADDR tilingGm)
@@ -321,9 +321,9 @@ private:
     op.Process();
 }</code></pre>
 
-<h2>Host 侧实现</h2>
+<h2>8.3.6 Host 侧实现</h2>
 
-<h3>Tiling 函数</h3>
+<h3>8.3.6.1 Tiling 函数</h3>
 
 <p>Tiling 函数在 GetWorkspaceSize 阶段被调用，负责计算切分参数：</p>
 
@@ -356,7 +356,7 @@ private:
 
 <p>注意 UB 空间的分配：add 有 3 个队列（A、B、C），每个队列使用双 Buffer（ping-pong），所以 UB 被分成 3 &times; 2 = 6 块。</p>
 
-<h3>aclnn 接口注册</h3>
+<h3>8.3.6.2 aclnn 接口注册</h3>
 
 <pre><code class="language-cpp">aclnnStatus aclnnAddCustomGetWorkspaceSize(
     const aclOpExecutor* executor,
@@ -393,7 +393,7 @@ aclnnStatus aclnnAddCustomExecute(
     return ACLNN_SUCCESS;
 }</code></pre>
 
-<h2>CMakeLists 配置</h2>
+<h2>8.3.7 CMakeLists 配置</h2>
 
 <p>算子需要通过 CMakeLists.txt 注册到 CANN 框架：</p>
 
@@ -427,7 +427,7 @@ ascendc_register_op(${OP_NAME}
 
 <p><code>ascendc_register_op</code> 宏将算子的类型名、输入输出参数注册到 CANN 框架中，使得调用方可以通过 <code>aclnnAddCustom</code> 接口调用。</p>
 
-<h2>编译与测试</h2>
+<h2>8.3.8 编译与测试</h2>
 
 <pre><code class="language-bash">bash build.sh --ops=AddCustom --soc=ascend950 --run</code></pre>
 
@@ -439,7 +439,7 @@ ascendc_register_op(${OP_NAME}
 <li>精度验证（NPU 结果与 CPU golden 的误差在 FP32 精度标准内）</li>
 </ul>
 
-<h2>直调 vs aclnn 注册：对比</h2>
+<h2>8.3.9 直调 vs aclnn 注册：对比</h2>
 
 <svg viewBox="0 0 660 340" xmlns="http://www.w3.org/2000/svg" style="max-width:660px;display:block;margin:1.5rem auto">
   <defs>
@@ -515,7 +515,7 @@ ascendc_register_op(${OP_NAME}
 </details>
 
 <div id="quiz"></div>
-<div class="page-nav"><a href="09-实战演练-9.2-swap算子开发.html" class="nav-prev"><span class="nav-label">&larr; 上一篇</span><span class="nav-title">9.2 swap 算子开发</span></a><a href="附录-A-数据类型速查表.html" class="nav-next"><span class="nav-label">下一篇 &rarr;</span><span class="nav-title">A. 数据类型速查表</span></a></div>
+<div class="page-nav"><a href="08-实战演练-8.2-swap算子开发.html" class="nav-prev"><span class="nav-label">&larr; 上一篇</span><span class="nav-title">8.2 swap 算子开发</span></a><a href="附录-A-数据类型速查表.html" class="nav-next"><span class="nav-label">下一篇 &rarr;</span><span class="nav-title">A. 数据类型速查表</span></a></div>
 </div>
 </main>
 <script src="../js/quiz.js"></script>

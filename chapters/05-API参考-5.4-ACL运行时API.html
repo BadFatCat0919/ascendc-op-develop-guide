@@ -3,17 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>6.4 ACL 运行时 API - AscendC Guide</title>
+<title>5.4 ACL 运行时 API - AscendC Guide</title>
 <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-<div class="top-header"><a href="index.html" class="logo"><span class="logo-icon">A</span>AscendC Guide</a><span class="header-subtitle">CANN 算子开发手册</span></div>
-<nav class="sidebar"><div class="sidebar-header"><h2><a href="../index.html" style="color:inherit;text-decoration:none">AscendC Guide</a></h2><p>算子开发从入门到精通</p></div><ul class="sidebar-nav"><li class="chapter-group"><span class="chapter-title">第1章 基础概念</span><ul class="article-list"><li><a href="01-基础概念-1.1-什么是算子.html">1.1 什么是算子</a></li><li><a href="01-基础概念-1.2-数据排布格式.html">1.2 数据排布格式</a></li><li><a href="01-基础概念-1.3-数据类型.html">1.3 数据类型</a></li><li><a href="01-基础概念-1.4-量化与反量化.html">1.4 量化与反量化</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第2章 编程语言</span><ul class="article-list"><li><a href="02-编程语言-2.1-昇腾编程语言.html">2.1 昇腾编程语言</a></li><li><a href="02-编程语言-2.2-编程模型.html">2.2 编程模型</a></li><li><a href="02-编程语言-2.3-Ascend软件栈.html">2.3 Ascend 软件栈</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第3章 昇腾硬件</span><ul class="article-list"><li><a href="03-昇腾硬件-3.1-A5通用架构.html">3.1 A5 通用架构</a></li><li><a href="03-昇腾硬件-3.2-A5新特性.html">3.2 A5 新特性</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第5章 核心开发</span><ul class="article-list"><li><a href="05-核心开发-5.1-Tiling设计.html">5.1 Tiling 设计</a></li><li><a href="05-核心开发-5.2-内存管理与数据搬运.html">5.2 内存管理与数据搬运</a></li><li><a href="05-核心开发-5.3-Vector计算.html">5.3 Vector 计算</a></li><li><a href="05-核心开发-5.4-Cube计算.html">5.4 Cube 计算</a></li><li><a href="05-核心开发-5.5-同步与流水线.html">5.5 同步与流水线</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第6章 API 参考</span><ul class="article-list"><li><a href="06-API参考-6.1-AscendC常用API概览.html">6.1 Ascend C 常用 API 概览</a></li><li><a href="06-API参考-6.2-数据搬运API详解.html">6.2 数据搬运 API 详解</a></li><li><a href="06-API参考-6.3-计算API详解.html">6.3 计算 API 详解</a></li><li><a href="06-API参考-6.4-ACL运行时API.html" class="active">6.4 ACL 运行时 API</a></li><li><a href="06-API参考-6.5-同步与队列API详解.html">6.5 同步与队列 API 详解</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第7章 调试与优化</span><ul class="article-list"><li><a href="07-调试与优化-7.1-精度不对怎么办.html">7.1 精度不对怎么办</a></li><li><a href="07-调试与优化-7.2-性能不达标怎么办.html">7.2 性能不达标怎么办</a></li><li><a href="07-调试与优化-7.3-算子精度标准.html">7.3 算子精度标准</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第8章 进阶</span><ul class="article-list"><li><a href="08-进阶-8.1-常见踩坑与最佳实践.html">8.1 常见踩坑与最佳实践</a></li><li><a href="08-进阶-8.2-RegBase编程模型.html">8.2 RegBase 编程模型</a></li><li><a href="08-进阶-8.3-SIMT混合编程.html">8.3 SIMT 混合编程</a></li><li><a href="08-进阶-8.4-NDDMA高维搬运.html">8.4 NDDMA 高维搬运</a></li><li><a href="08-进阶-8.5-CCU通算融合.html">8.5 CCU 通算融合</a></li><li><a href="08-进阶-8.6-跨架构兼容.html">8.6 跨架构兼容</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第9章 实战演练</span><ul class="article-list"><li><a href="09-实战演练-9.1-五分钟跑通一个算子.html">9.1 五分钟跑通一个算子</a></li><li><a href="09-实战演练-9.2-swap算子开发.html">9.2 swap 算子开发</a></li><li><a href="09-实战演练-9.3-add算子开发.html">9.3 add 算子开发</a></li></ul></li><li class="chapter-group"><span class="chapter-title">附录</span><ul class="article-list"><li><a href="附录-A-数据类型速查表.html">A. 数据类型速查表</a></li></ul></li></ul></nav>
+<div class="top-header"><a href="../index.html" class="logo"><span class="logo-icon">A</span>AscendC Guide</a><span class="header-subtitle">CANN 算子开发手册</span></div>
+<nav class="sidebar"><div class="sidebar-header"><h2><a href="../index.html" style="color:inherit;text-decoration:none">AscendC Guide</a></h2><p>算子开发从入门到精通</p></div><ul class="sidebar-nav"><li class="chapter-group"><span class="chapter-title">第1章 基础概念</span><ul class="article-list"><li><a href="01-基础概念-1.1-什么是算子.html">1.1 什么是算子</a></li><li><a href="01-基础概念-1.2-数据排布格式.html">1.2 数据排布格式</a></li><li><a href="01-基础概念-1.3-数据类型.html">1.3 数据类型</a></li><li><a href="01-基础概念-1.4-量化与反量化.html">1.4 量化与反量化</a></li><li><a href="01-基础概念-1.5-融合算子.html">1.5 融合算子</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第2章 昇腾硬件</span><ul class="article-list"><li><a href="02-昇腾硬件-2.1-DaVinci架构.html">2.1 DaVinci 架构</a></li><li><a href="02-昇腾硬件-2.2-A5新特性.html">2.2 A5 新特性</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第3章 编程语言</span><ul class="article-list"><li><a href="03-编程语言-3.1-昇腾编程语言.html">3.1 昇腾编程语言</a></li><li><a href="03-编程语言-3.2-编程模型.html">3.2 编程模型</a></li><li><a href="03-编程语言-3.3-Ascend软件栈.html">3.3 Ascend 软件栈</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第4章 核心开发</span><ul class="article-list"><li><a href="04-核心开发-4.1-算子精度标准.html">4.1 算子精度标准</a></li><li><a href="04-核心开发-4.2-Tiling设计.html">4.2 Tiling 设计</a></li><li><a href="04-核心开发-4.3-内存管理与数据搬运.html">4.3 内存管理与数据搬运</a></li><li><a href="04-核心开发-4.4-Vector计算.html">4.4 Vector 计算</a></li><li><a href="04-核心开发-4.5-Cube计算.html">4.5 Cube 计算</a></li><li><a href="04-核心开发-4.6-同步与流水线.html">4.6 同步与流水线</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第5章 API 参考</span><ul class="article-list"><li><a href="05-API参考-5.1-AscendC常用API概览.html">5.1 Ascend C 常用 API 概览</a></li><li><a href="05-API参考-5.2-数据搬运API详解.html">5.2 数据搬运 API 详解</a></li><li><a href="05-API参考-5.3-计算API详解.html">5.3 计算 API 详解</a></li><li><a href="05-API参考-5.4-ACL运行时API.html">5.4 ACL 运行时 API</a></li><li><a href="05-API参考-5.5-同步与队列API详解.html">5.5 同步与队列 API 详解</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第6章 调试优化</span><ul class="article-list"><li><a href="06-调试与优化-6.1-精度不对怎么办.html">6.1 精度不对怎么办</a></li><li><a href="06-调试与优化-6.2-性能不达标怎么办.html">6.2 性能不达标怎么办</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第7章 进阶指南</span><ul class="article-list"><li><a href="07-进阶-7.1-常见踩坑与最佳实践.html">7.1 常见踩坑与最佳实践</a></li><li><a href="07-进阶-7.2-RegBase编程模型.html">7.2 RegBase 编程模型</a></li><li><a href="07-进阶-7.3-SIMT混合编程.html">7.3 SIMT 混合编程</a></li><li><a href="07-进阶-7.4-NDDMA高维搬运.html">7.4 NDDMA 高维搬运</a></li><li><a href="07-进阶-7.5-CCU通算融合.html">7.5 CCU 通算融合</a></li><li><a href="07-进阶-7.6-跨架构兼容.html">7.6 跨架构兼容</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第8章 实战演练</span><ul class="article-list"><li><a href="08-实战演练-8.1-五分钟跑通一个算子.html">8.1 五分钟跑通一个算子</a></li><li><a href="08-实战演练-8.2-swap算子开发.html">8.2 swap 算子开发</a></li><li><a href="08-实战演练-8.3-add算子开发.html">8.3 add 算子开发</a></li></ul></li><li class="chapter-group"><span class="chapter-title">附录</span><ul class="article-list"><li><a href="附录-A-数据类型速查表.html">A. 数据类型速查表</a></li><li><a href="附录-B-专有名词速查表.html">B. 专有名词速查表</a></li></ul></li></ul></nav>
 <main class="main">
 <div class="content">
 <div class="meta-bar"><a href="../index.html">← 返回目录</a></div>
 
-<h1>4.4 ACL 运行时 API</h1>
+<h1>5.4 ACL 运行时 API</h1>
 
 <p>ACL（Ascend Computing Language）是昇腾 NPU 的运行时编程接口，类似于 CUDA 的 Runtime API。算子的 Host 侧代码通过 ACL 来管理设备、分配内存、控制执行流。本节系统介绍 ACL 的核心 API。</p>
 
@@ -56,11 +56,11 @@
 </svg>
 </div>
 
-<h2>4.4.1 初始化与销毁</h2>
+<h2>5.4.1 初始化与销毁</h2>
 
 <p>ACL 运行时在使用前必须初始化，使用完毕后必须销毁。这是所有 ACL 调用的前提。</p>
 
-<h3>aclInit</h3>
+<h3>5.4.1.1 aclInit</h3>
 <pre><code class="language-cpp">aclError aclInit(const char *configPath);</code></pre>
 
 <table>
@@ -73,7 +73,7 @@
 <p><strong>返回值</strong>：<code>ACL_SUCCESS</code>（0）表示成功，其他值表示失败。</p>
 <p><strong>调用时机</strong>：程序启动时调用一次，在所有 ACL 操作之前。</p>
 
-<h3>aclFinalize</h3>
+<h3>5.4.1.2 aclFinalize</h3>
 <pre><code class="language-cpp">aclError aclFinalize();</code></pre>
 
 <p><strong>调用时机</strong>：程序退出前调用一次，在所有 ACL 操作之后。必须与 <code>aclInit</code> 成对出现。</p>
@@ -84,11 +84,11 @@
     return 0;
 }</code></pre>
 
-<h2>4.4.2 设备管理</h2>
+<h2>5.4.2 设备管理</h2>
 
 <p>一个服务器可能有多张 NPU 卡，设备管理 API 用来选择当前要使用哪张卡。</p>
 
-<h3>aclrtSetDevice</h3>
+<h3>5.4.2.1 aclrtSetDevice</h3>
 <pre><code class="language-cpp">aclError aclrtSetDevice(int32_t deviceId);</code></pre>
 
 <table>
@@ -100,12 +100,12 @@
 
 <p><strong>作用</strong>：设置当前线程使用的 NPU 设备。后续的内存分配、Kernel 启动等操作都会在这个设备上执行。</p>
 
-<h3>aclrtResetDevice</h3>
+<h3>5.4.2.2 aclrtResetDevice</h3>
 <pre><code class="language-cpp">aclError aclrtResetDevice(int32_t deviceId);</code></pre>
 
 <p><strong>作用</strong>：重置指定设备，释放该设备上的所有资源。必须与 <code>aclrtSetDevice</code> 成对使用。</p>
 
-<h3>aclrtGetDeviceCount</h3>
+<h3>5.4.2.3 aclrtGetDeviceCount</h3>
 <pre><code class="language-cpp">aclError aclrtGetDeviceCount(uint32_t *count);</code></pre>
 
 <p><strong>作用</strong>：获取当前可用的 NPU 设备数量。</p>
@@ -117,11 +117,11 @@ aclrtResetDevice(0);</code></pre>
 <p><strong>注意</strong>：<code>aclrtSetDevice</code> 是线程级的——每个线程可以设置不同的设备。如果你在多线程环境中使用，每个线程都需要单独调用 <code>aclrtSetDevice</code>。</p>
 </div>
 
-<h2>4.4.3 内存管理</h2>
+<h2>5.4.3 内存管理</h2>
 
 <p>内存管理是算子开发中使用频率最高的 ACL API 模块。Host 侧需要在 Device（NPU HBM）上分配内存来存放输入、输出和 Tiling 数据。</p>
 
-<h3>aclrtMalloc</h3>
+<h3>5.4.3.1 aclrtMalloc</h3>
 <pre><code class="language-cpp">aclError aclrtMalloc(void **devPtr, size_t size, aclrtMemMallocPolicy policy);</code></pre>
 
 <table>
@@ -142,7 +142,7 @@ aclrtResetDevice(0);</code></pre>
 </tbody>
 </table>
 
-<h3>aclrtMemcpy</h3>
+<h3>5.4.3.2 aclrtMemcpy</h3>
 <pre><code class="language-cpp">aclError aclrtMemcpy(void *dst, size_t destMax,
                       const void *src, size_t count,
                       aclrtMemcpyKind kind);</code></pre>
@@ -168,7 +168,7 @@ aclrtResetDevice(0);</code></pre>
 </tbody>
 </table>
 
-<h3>aclrtFree</h3>
+<h3>5.4.3.3 aclrtFree</h3>
 <pre><code class="language-cpp">aclError aclrtFree(void *devPtr, size_t size);</code></pre>
 
 <p><strong>作用</strong>：释放 <code>aclrtMalloc</code> 分配的 Device 内存。必须与 <code>aclrtMalloc</code> 成对使用。</p>
@@ -251,19 +251,19 @@ aclrtFree(devOutput, dataSize);</code></pre>
 </svg>
 </div>
 
-<h2>4.4.4 流管理</h2>
+<h2>5.4.4 流管理</h2>
 
 <p>Stream（流）是 NPU 上的异步执行队列。同一个 Stream 内的操作按提交顺序执行，不同 Stream 之间的操作可以并行。</p>
 
-<h3>aclrtCreateStream</h3>
+<h3>5.4.4.1 aclrtCreateStream</h3>
 <pre><code class="language-cpp">aclError aclrtCreateStream(aclrtStream *stream);</code></pre>
 <p><strong>作用</strong>：创建一个新的执行流。</p>
 
-<h3>aclrtDestroyStream</h3>
+<h3>5.4.4.2 aclrtDestroyStream</h3>
 <pre><code class="language-cpp">aclError aclrtDestroyStream(aclrtStream stream);</code></pre>
 <p><strong>作用</strong>：销毁指定执行流，释放相关资源。</p>
 
-<h3>aclrtSynchronizeStream</h3>
+<h3>5.4.4.3 aclrtSynchronizeStream</h3>
 <pre><code class="language-cpp">aclError aclrtSynchronizeStream(aclrtStream stream);</code></pre>
 <p><strong>作用</strong>：阻塞等待指定 Stream 中的所有操作完成。Kernel 启动是异步的，必须用此 API 等待完成。</p>
 
@@ -282,26 +282,26 @@ aclrtDestroyStream(stream);</code></pre>
 <p><strong>常见错误</strong>：启动 Kernel 后没有调用 <code>aclrtSynchronizeStream</code> 就直接拷贝结果。Kernel 是异步的，此时结果还没算完，拷贝回来的数据是未初始化的垃圾值。</p>
 </div>
 
-<h2>4.4.5 事件管理</h2>
+<h2>5.4.5 事件管理</h2>
 
 <p>Event（事件）用于流间同步——当一个 Stream 的操作依赖另一个 Stream 的结果时，用 Event 来建立依赖关系。</p>
 
-<h3>aclrtCreateEvent</h3>
+<h3>5.4.5.1 aclrtCreateEvent</h3>
 <pre><code class="language-cpp">aclError aclrtCreateEvent(aclrtEvent *event);</code></pre>
 
-<h3>aclrtRecordEvent</h3>
+<h3>5.4.5.2 aclrtRecordEvent</h3>
 <pre><code class="language-cpp">aclError aclrtRecordEvent(aclrtEvent event, aclrtStream stream);</code></pre>
 <p><strong>作用</strong>：在指定 Stream 中记录一个事件。当 Stream 执行到该事件时，事件被标记为"已完成"。</p>
 
-<h3>aclrtStreamWaitEvent</h3>
+<h3>5.4.5.3 aclrtStreamWaitEvent</h3>
 <pre><code class="language-cpp">aclError aclrtStreamWaitEvent(aclrtStream stream, aclrtEvent event);</code></pre>
 <p><strong>作用</strong>：让指定 Stream 等待某个事件完成后才继续执行后续操作。</p>
 
-<h3>aclrtSynchronizeEvent</h3>
+<h3>5.4.5.4 aclrtSynchronizeEvent</h3>
 <pre><code class="language-cpp">aclError aclrtSynchronizeEvent(aclrtEvent event);</code></pre>
 <p><strong>作用</strong>：阻塞等待指定事件完成。</p>
 
-<h3>aclrtDestroyEvent</h3>
+<h3>5.4.5.5 aclrtDestroyEvent</h3>
 <pre><code class="language-cpp">aclError aclrtDestroyEvent(aclrtEvent event);</code></pre>
 
 <pre><code class="language-cpp">aclrtEvent event = nullptr;
@@ -376,13 +376,13 @@ aclrtDestroyEvent(event);</code></pre>
 </svg>
 </div>
 
-<h2>4.4.6 错误处理</h2>
+<h2>5.4.6 错误处理</h2>
 
-<h3>aclGetRecentErrMsg</h3>
+<h3>5.4.6.1 aclGetRecentErrMsg</h3>
 <pre><code class="language-cpp">const char* aclGetRecentErrMsg();</code></pre>
 <p><strong>作用</strong>：获取最近一次 ACL 错误的描述信息。</p>
 
-<h3>推荐的错误检查宏</h3>
+<h3>5.4.6.2 推荐的错误检查宏</h3>
 <pre><code class="language-cpp">#define ACL_CHECK(call) do { \
     aclError ret = (call); \
     if (ret != ACL_SUCCESS) { \
@@ -392,7 +392,7 @@ aclrtDestroyEvent(event);</code></pre>
     } \
 } while(0)</code></pre>
 
-<h3>常用错误码</h3>
+<h3>5.4.6.3 常用错误码</h3>
 
 <table>
 <thead><tr><th>错误码</th><th>含义</th><th>常见原因</th></tr></thead>
@@ -407,9 +407,9 @@ aclrtDestroyEvent(event);</code></pre>
 </tbody>
 </table>
 
-<h2>4.4.7 最佳实践与资源生命周期</h2>
+<h2>5.4.7 最佳实践与资源生命周期</h2>
 
-<h3>资源管理原则</h3>
+<h3>5.4.7.1 资源管理原则</h3>
 <ol>
 <li><strong>成对使用</strong>：<code>aclInit/aclFinalize</code>、<code>aclrtSetDevice/aclrtResetDevice</code>、<code>aclrtMalloc/aclrtFree</code>、<code>aclrtCreateStream/aclrtDestroyStream</code> 必须成对出现。</li>
 <li><strong>释放顺序</strong>：先释放 Stream/Event，再释放内存，最后 ResetDevice 和 Finalize。顺序反了可能导致段错误。</li>
@@ -458,7 +458,7 @@ aclrtDestroyEvent(event);</code></pre>
 </svg>
 </div>
 
-<h3>完整 Host 侧模板</h3>
+<h3>5.4.7.2 完整 Host 侧模板</h3>
 
 <pre><code class="language-cpp">#include "acl/acl.h"
 #include &lt;cstdio&gt;
@@ -545,7 +545,7 @@ int main() {
 
 <div id="quiz"></div>
 
-<div class="page-nav"><a href="06-API参考-6.3-计算API详解.html" class="nav-prev"><span class="nav-label">&larr; 上一篇</span><span class="nav-title">6.3 计算 API 详解</span></a><a href="06-API参考-6.5-同步与队列API详解.html" class="nav-next"><span class="nav-label">下一篇 &rarr;</span><span class="nav-title">6.5 同步与队列 API 详解</span></a></div>
+<div class="page-nav"><a href="05-API参考-5.3-计算API详解.html" class="nav-prev"><span class="nav-label">&larr; 上一篇</span><span class="nav-title">5.3 计算 API 详解</span></a><a href="05-API参考-5.5-同步与队列API详解.html" class="nav-next"><span class="nav-label">下一篇 &rarr;</span><span class="nav-title">5.5 同步与队列 API 详解</span></a></div>
 </div>
 </main>
 <script src="../js/quiz.js"></script>

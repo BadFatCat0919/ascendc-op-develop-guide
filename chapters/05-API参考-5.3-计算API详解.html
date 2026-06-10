@@ -3,25 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>6.3 计算 API 详解 - AscendC Guide</title>
+<title>5.3 计算 API 详解 - AscendC Guide</title>
 <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-<div class="top-header"><a href="index.html" class="logo"><span class="logo-icon">A</span>AscendC Guide</a><span class="header-subtitle">CANN 算子开发手册</span></div>
-<nav class="sidebar"><div class="sidebar-header"><h2><a href="../index.html" style="color:inherit;text-decoration:none">AscendC Guide</a></h2><p>算子开发从入门到精通</p></div><ul class="sidebar-nav"><li class="chapter-group"><span class="chapter-title">第1章 基础概念</span><ul class="article-list"><li><a href="01-基础概念-1.1-什么是算子.html">1.1 什么是算子</a></li><li><a href="01-基础概念-1.2-数据排布格式.html">1.2 数据排布格式</a></li><li><a href="01-基础概念-1.3-数据类型.html">1.3 数据类型</a></li><li><a href="01-基础概念-1.4-量化与反量化.html">1.4 量化与反量化</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第2章 编程语言</span><ul class="article-list"><li><a href="02-编程语言-2.1-昇腾编程语言.html">2.1 昇腾编程语言</a></li><li><a href="02-编程语言-2.2-编程模型.html">2.2 编程模型</a></li><li><a href="02-编程语言-2.3-Ascend软件栈.html">2.3 Ascend 软件栈</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第3章 昇腾硬件</span><ul class="article-list"><li><a href="03-昇腾硬件-3.1-A5通用架构.html">3.1 A5 通用架构</a></li><li><a href="03-昇腾硬件-3.2-A5新特性.html">3.2 A5 新特性</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第5章 核心开发</span><ul class="article-list"><li><a href="05-核心开发-5.1-Tiling设计.html">5.1 Tiling 设计</a></li><li><a href="05-核心开发-5.2-内存管理与数据搬运.html">5.2 内存管理与数据搬运</a></li><li><a href="05-核心开发-5.3-Vector计算.html">5.3 Vector 计算</a></li><li><a href="05-核心开发-5.4-Cube计算.html">5.4 Cube 计算</a></li><li><a href="05-核心开发-5.5-同步与流水线.html">5.5 同步与流水线</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第6章 API 参考</span><ul class="article-list"><li><a href="06-API参考-6.1-AscendC常用API概览.html">6.1 Ascend C 常用 API 概览</a></li><li><a href="06-API参考-6.2-数据搬运API详解.html">6.2 数据搬运 API 详解</a></li><li><a href="06-API参考-6.3-计算API详解.html" class="active">6.3 计算 API 详解</a></li><li><a href="06-API参考-6.4-ACL运行时API.html">6.4 ACL 运行时 API</a></li><li><a href="06-API参考-6.5-同步与队列API详解.html">6.5 同步与队列 API 详解</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第7章 调试与优化</span><ul class="article-list"><li><a href="07-调试与优化-7.1-精度不对怎么办.html">7.1 精度不对怎么办</a></li><li><a href="07-调试与优化-7.2-性能不达标怎么办.html">7.2 性能不达标怎么办</a></li><li><a href="07-调试与优化-7.3-算子精度标准.html">7.3 算子精度标准</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第8章 进阶</span><ul class="article-list"><li><a href="08-进阶-8.1-常见踩坑与最佳实践.html">8.1 常见踩坑与最佳实践</a></li><li><a href="08-进阶-8.2-RegBase编程模型.html">8.2 RegBase 编程模型</a></li><li><a href="08-进阶-8.3-SIMT混合编程.html">8.3 SIMT 混合编程</a></li><li><a href="08-进阶-8.4-NDDMA高维搬运.html">8.4 NDDMA 高维搬运</a></li><li><a href="08-进阶-8.5-CCU通算融合.html">8.5 CCU 通算融合</a></li><li><a href="08-进阶-8.6-跨架构兼容.html">8.6 跨架构兼容</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第9章 实战演练</span><ul class="article-list"><li><a href="09-实战演练-9.1-五分钟跑通一个算子.html">9.1 五分钟跑通一个算子</a></li><li><a href="09-实战演练-9.2-swap算子开发.html">9.2 swap 算子开发</a></li><li><a href="09-实战演练-9.3-add算子开发.html">9.3 add 算子开发</a></li></ul></li><li class="chapter-group"><span class="chapter-title">附录</span><ul class="article-list"><li><a href="附录-A-数据类型速查表.html">A. 数据类型速查表</a></li></ul></li></ul></nav>
+<div class="top-header"><a href="../index.html" class="logo"><span class="logo-icon">A</span>AscendC Guide</a><span class="header-subtitle">CANN 算子开发手册</span></div>
+<nav class="sidebar"><div class="sidebar-header"><h2><a href="../index.html" style="color:inherit;text-decoration:none">AscendC Guide</a></h2><p>算子开发从入门到精通</p></div><ul class="sidebar-nav"><li class="chapter-group"><span class="chapter-title">第1章 基础概念</span><ul class="article-list"><li><a href="01-基础概念-1.1-什么是算子.html">1.1 什么是算子</a></li><li><a href="01-基础概念-1.2-数据排布格式.html">1.2 数据排布格式</a></li><li><a href="01-基础概念-1.3-数据类型.html">1.3 数据类型</a></li><li><a href="01-基础概念-1.4-量化与反量化.html">1.4 量化与反量化</a></li><li><a href="01-基础概念-1.5-融合算子.html">1.5 融合算子</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第2章 昇腾硬件</span><ul class="article-list"><li><a href="02-昇腾硬件-2.1-DaVinci架构.html">2.1 DaVinci 架构</a></li><li><a href="02-昇腾硬件-2.2-A5新特性.html">2.2 A5 新特性</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第3章 编程语言</span><ul class="article-list"><li><a href="03-编程语言-3.1-昇腾编程语言.html">3.1 昇腾编程语言</a></li><li><a href="03-编程语言-3.2-编程模型.html">3.2 编程模型</a></li><li><a href="03-编程语言-3.3-Ascend软件栈.html">3.3 Ascend 软件栈</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第4章 核心开发</span><ul class="article-list"><li><a href="04-核心开发-4.1-算子精度标准.html">4.1 算子精度标准</a></li><li><a href="04-核心开发-4.2-Tiling设计.html">4.2 Tiling 设计</a></li><li><a href="04-核心开发-4.3-内存管理与数据搬运.html">4.3 内存管理与数据搬运</a></li><li><a href="04-核心开发-4.4-Vector计算.html">4.4 Vector 计算</a></li><li><a href="04-核心开发-4.5-Cube计算.html">4.5 Cube 计算</a></li><li><a href="04-核心开发-4.6-同步与流水线.html">4.6 同步与流水线</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第5章 API 参考</span><ul class="article-list"><li><a href="05-API参考-5.1-AscendC常用API概览.html">5.1 Ascend C 常用 API 概览</a></li><li><a href="05-API参考-5.2-数据搬运API详解.html">5.2 数据搬运 API 详解</a></li><li><a href="05-API参考-5.3-计算API详解.html">5.3 计算 API 详解</a></li><li><a href="05-API参考-5.4-ACL运行时API.html">5.4 ACL 运行时 API</a></li><li><a href="05-API参考-5.5-同步与队列API详解.html">5.5 同步与队列 API 详解</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第6章 调试优化</span><ul class="article-list"><li><a href="06-调试与优化-6.1-精度不对怎么办.html">6.1 精度不对怎么办</a></li><li><a href="06-调试与优化-6.2-性能不达标怎么办.html">6.2 性能不达标怎么办</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第7章 进阶指南</span><ul class="article-list"><li><a href="07-进阶-7.1-常见踩坑与最佳实践.html">7.1 常见踩坑与最佳实践</a></li><li><a href="07-进阶-7.2-RegBase编程模型.html">7.2 RegBase 编程模型</a></li><li><a href="07-进阶-7.3-SIMT混合编程.html">7.3 SIMT 混合编程</a></li><li><a href="07-进阶-7.4-NDDMA高维搬运.html">7.4 NDDMA 高维搬运</a></li><li><a href="07-进阶-7.5-CCU通算融合.html">7.5 CCU 通算融合</a></li><li><a href="07-进阶-7.6-跨架构兼容.html">7.6 跨架构兼容</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第8章 实战演练</span><ul class="article-list"><li><a href="08-实战演练-8.1-五分钟跑通一个算子.html">8.1 五分钟跑通一个算子</a></li><li><a href="08-实战演练-8.2-swap算子开发.html">8.2 swap 算子开发</a></li><li><a href="08-实战演练-8.3-add算子开发.html">8.3 add 算子开发</a></li></ul></li><li class="chapter-group"><span class="chapter-title">附录</span><ul class="article-list"><li><a href="附录-A-数据类型速查表.html">A. 数据类型速查表</a></li><li><a href="附录-B-专有名词速查表.html">B. 专有名词速查表</a></li></ul></li></ul></nav>
 <main class="main">
 <div class="content">
 <div class="meta-bar"><a href="../index.html">← 返回目录</a></div>
 
-<h1>4.3 计算 API 详解</h1>
+<h1>5.3 计算 API 详解</h1>
 
 <p>本节详细介绍 Ascend C 的计算类 API，包括向量算术运算、向量数学函数、标量运算、归约运算、类型转换和矩阵计算。这些 API 是算子 Kernel 中执行实际计算的核心接口。</p>
 
-<h2>4.3.1 向量算术运算</h2>
+<h2>5.3.1 向量算术运算</h2>
 
 <p>向量算术运算 API 对两个输入 Tensor 的对应元素执行二元运算，由 Vector 单元执行。所有 API 共享相同的调用模式。</p>
 
-<h3>通用签名</h3>
+<h3>5.3.1.1 通用签名</h3>
 <pre><code class="language-cpp">template &lt;typename T&gt;
 __aicore__ inline void Add(const LocalTensor&lt;T&gt;&amp; dst,
                             const LocalTensor&lt;T&gt;&amp; src0,
@@ -42,7 +42,7 @@ __aicore__ inline void Add(const LocalTensor&lt;T&gt;&amp; dst,
 </tbody>
 </table>
 
-<h3>RepeatParams 结构</h3>
+<h3>5.3.1.2 RepeatParams 结构</h3>
 <pre><code class="language-cpp">struct RepeatParams {
     uint16_t dstRepStride;
     uint8_t src0RepStride;
@@ -64,7 +64,7 @@ __aicore__ inline void Add(const LocalTensor&lt;T&gt;&amp; dst,
 </tbody>
 </table>
 
-<h3>repeat 次数计算</h3>
+<h3>5.3.1.3 repeat 次数计算</h3>
 
 <p>每次 repeat 处理 256 字节数据。repeat 次数的计算公式：</p>
 
@@ -79,7 +79,7 @@ __aicore__ inline void Add(const LocalTensor&lt;T&gt;&amp; dst,
 </tbody>
 </table>
 
-<h3>常用算术 API 对照</h3>
+<h3>5.3.1.4 常用算术 API 对照</h3>
 
 <table>
 <thead><tr><th>API</th><th>运算</th><th>数学表达</th></tr></thead>
@@ -93,17 +93,17 @@ __aicore__ inline void Add(const LocalTensor&lt;T&gt;&amp; dst,
 </tbody>
 </table>
 
-<h3>使用示例</h3>
+<h3>5.3.1.5 使用示例</h3>
 <pre><code class="language-cpp">RepeatParams rp = {1, 1, 1, 8, 8, 8};
 Add(dst, src0, src1, 1024, 8, rp);
 Sub(dst, src0, src1, 1024, 8, rp);
 Mul(dst, src0, src1, 512, 4, rp);</code></pre>
 
-<h2>4.3.2 向量数学函数</h2>
+<h2>5.3.2 向量数学函数</h2>
 
 <p>向量数学函数对单个输入 Tensor 的每个元素执行一元运算。</p>
 
-<h3>通用签名（一元运算）</h3>
+<h3>5.3.2.1 通用签名（一元运算）</h3>
 <pre><code class="language-cpp">template &lt;typename T&gt;
 __aicore__ inline void Exp(const LocalTensor&lt;T&gt;&amp; dst,
                             const LocalTensor&lt;T&gt;&amp; src,
@@ -122,17 +122,17 @@ __aicore__ inline void Exp(const LocalTensor&lt;T&gt;&amp; dst,
 </tbody>
 </table>
 
-<h3>使用示例</h3>
+<h3>5.3.2.2 使用示例</h3>
 <pre><code class="language-cpp">RepeatParams rp = {1, 1, 8, 8};
 Exp(dst, src, 128, 1, rp);
 Sqrt(dst, src, 256, 2, rp);
 Abs(dst, src, 128, 1, rp);</code></pre>
 
-<h2>4.3.3 标量运算</h2>
+<h2>5.3.3 标量运算</h2>
 
 <p>标量运算 API 将一个向量与一个标量值进行运算，常用于缩放、偏移等操作。</p>
 
-<h3>Adds</h3>
+<h3>5.3.3.1 Adds</h3>
 <pre><code class="language-cpp">template &lt;typename T&gt;
 __aicore__ inline void Adds(const LocalTensor&lt;T&gt;&amp; dst,
                              const LocalTensor&lt;T&gt;&amp; src,
@@ -141,7 +141,7 @@ __aicore__ inline void Adds(const LocalTensor&lt;T&gt;&amp; dst,
                              const uint8_t repeatTimes,
                              const RepeatParams&amp; repeatParams);</code></pre>
 
-<h3>Muls</h3>
+<h3>5.3.3.2 Muls</h3>
 <pre><code class="language-cpp">template &lt;typename T&gt;
 __aicore__ inline void Muls(const LocalTensor&lt;T&gt;&amp; dst,
                              const LocalTensor&lt;T&gt;&amp; src,
@@ -158,16 +158,16 @@ __aicore__ inline void Muls(const LocalTensor&lt;T&gt;&amp; dst,
 </tbody>
 </table>
 
-<h3>使用示例</h3>
+<h3>5.3.3.3 使用示例</h3>
 <pre><code class="language-cpp">RepeatParams rp = {1, 1, 8, 8};
 Adds(dst, src, 1.0f, 128, 1, rp);
 Muls(dst, src, 0.5f, 256, 2, rp);</code></pre>
 
-<h2>4.3.4 归约运算</h2>
+<h2>5.3.4 归约运算</h2>
 
 <p>归约运算将多个元素聚合为更少的结果。Ascend C 提供三种基本归约操作。</p>
 
-<h3>函数签名</h3>
+<h3>5.3.4.1 函数签名</h3>
 <pre><code class="language-cpp">template &lt;typename T&gt;
 __aicore__ inline void ReduceSum(const LocalTensor&lt;T&gt;&amp; dst,
                                   const LocalTensor&lt;T&gt;&amp; src,
@@ -185,7 +185,7 @@ __aicore__ inline void ReduceSum(const LocalTensor&lt;T&gt;&amp; dst,
 
 <p>归约 API 需要一个 work Buffer 用于中间计算结果。work Buffer 的大小取决于数据类型和 calCount。</p>
 
-<h3>两阶段归约模式</h3>
+<h3>5.3.4.2 两阶段归约模式</h3>
 
 <p>在多核场景中，归约通常采用两阶段模式：</p>
 <ol>
@@ -193,9 +193,9 @@ __aicore__ inline void ReduceSum(const LocalTensor&lt;T&gt;&amp; dst,
 <li><strong>跨核归约</strong>：所有核将中间结果写入 GM workspace，由一个核做全局归约</li>
 </ol>
 
-<h2>4.3.5 类型转换（Cast）</h2>
+<h2>5.3.5 类型转换（Cast）</h2>
 
-<h3>函数签名</h3>
+<h3>5.3.5.1 函数签名</h3>
 <pre><code class="language-cpp">template &lt;typename DST_T, typename SRC_T&gt;
 __aicore__ inline void Cast(const LocalTensor&lt;DST_T&gt;&amp; dst,
                              const LocalTensor&lt;SRC_T&gt;&amp; src,
@@ -203,7 +203,7 @@ __aicore__ inline void Cast(const LocalTensor&lt;DST_T&gt;&amp; dst,
                              const uint8_t repeatTimes,
                              const RepeatParams&amp; repeatParams);</code></pre>
 
-<h3>支持的转换路径</h3>
+<h3>5.3.5.2 支持的转换路径</h3>
 
 <table>
 <thead><tr><th>源类型</th><th>目标类型</th><th>精度影响</th></tr></thead>
@@ -218,15 +218,15 @@ __aicore__ inline void Cast(const LocalTensor&lt;DST_T&gt;&amp; dst,
 </tbody>
 </table>
 
-<h3>精度注意事项</h3>
+<h3>5.3.5.3 精度注意事项</h3>
 
 <p>FP16 → BF16 不能直接转换，因为两者的指数位宽度不同。正确做法是先 Cast 到 FP32（保留完整精度），再从 FP32 Cast 到 BF16：</p>
 <pre><code class="language-cpp">Cast(tmpFp32, srcFp16, count, repeat, rp);
 Cast(dstBf16, tmpFp32, count, repeat, rp);</code></pre>
 
-<h2>4.3.6 矩阵计算</h2>
+<h2>5.3.6 矩阵计算</h2>
 
-<h3>Matmul</h3>
+<h3>5.3.6.1 Matmul</h3>
 <pre><code class="language-cpp">template &lt;typename T&gt;
 __aicore__ inline void Matmul(const LocalTensor&lt;T&gt;&amp; dstL0C,
                                const LocalTensor&lt;T&gt;&amp; srcL0A,
@@ -235,7 +235,7 @@ __aicore__ inline void Matmul(const LocalTensor&lt;T&gt;&amp; dstL0C,
 
 <p>Matmul 驱动 Cube 单元执行矩阵乘法 C = A × B。输入数据必须在 L0A 和 L0B 中，输出在 L0C 中。矩阵维度必须是 16 的倍数（FP16）。</p>
 
-<h3>MatmulLeakyRelu</h3>
+<h3>5.3.6.2 MatmulLeakyRelu</h3>
 <pre><code class="language-cpp">template &lt;typename T&gt;
 __aicore__ inline void MatmulLeakyRelu(const LocalTensor&lt;T&gt;&amp; dstL0C,
                                         const LocalTensor&lt;T&gt;&amp; srcL0A,
@@ -245,7 +245,7 @@ __aicore__ inline void MatmulLeakyRelu(const LocalTensor&lt;T&gt;&amp; dstL0C,
 
 <p>将矩阵乘法与 LeakyReLU 激活函数融合为一条指令，减少后处理开销。alpha 是 LeakyReLU 的负半轴斜率。</p>
 
-<h3>FixPipe</h3>
+<h3>5.3.6.3 FixPipe</h3>
 <pre><code class="language-cpp">template &lt;typename DST_T, typename SRC_T&gt;
 __aicore__ inline void FixPipe(const LocalTensor&lt;DST_T&gt;&amp; dst,
                                 const LocalTensor&lt;SRC_T&gt;&amp; src,
@@ -276,13 +276,13 @@ __aicore__ inline void FixPipe(const LocalTensor&lt;DST_T&gt;&amp; dst,
 <ul>
 <li><a href="https://hiascend.com/document/redirect/CannCommunityAscendCApi">Ascend C API 参考 — Vector 计算</a></li>
 <li><a href="https://hiascend.com/document/redirect/CannCommunityAscendCApi">Ascend C API 参考 — Cube 计算</a></li>
-<li><a href="05-核心开发-5.3-Vector计算.html">5.3 Vector 计算</a></li>
-<li><a href="05-核心开发-5.4-Cube计算.html">5.4 Cube 计算</a></li>
+<li><a href="04-核心开发-4.4-Vector计算.html">4.4 Vector 计算</a></li>
+<li><a href="04-核心开发-4.5-Cube计算.html">4.5 Cube 计算</a></li>
 </ul>
 
 <div id="quiz"></div>
 
-<div class="page-nav"><a href="06-API参考-6.2-数据搬运API详解.html" class="nav-prev"><span class="nav-label">&larr; 上一篇</span><span class="nav-title">6.2 数据搬运 API 详解</span></a><a href="06-API参考-6.4-ACL运行时API.html" class="nav-next"><span class="nav-label">下一篇 &rarr;</span><span class="nav-title">6.4 ACL 运行时 API</span></a></div>
+<div class="page-nav"><a href="05-API参考-5.2-数据搬运API详解.html" class="nav-prev"><span class="nav-label">&larr; 上一篇</span><span class="nav-title">5.2 数据搬运 API 详解</span></a><a href="05-API参考-5.4-ACL运行时API.html" class="nav-next"><span class="nav-label">下一篇 &rarr;</span><span class="nav-title">5.4 ACL 运行时 API</span></a></div>
 </div>
 </main>
 <script src="../js/quiz.js"></script>

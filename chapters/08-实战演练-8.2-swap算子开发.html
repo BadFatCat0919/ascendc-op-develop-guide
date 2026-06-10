@@ -3,21 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>9.2 swap 算子开发 - AscendC Guide</title>
+<title>8.2 swap 算子开发 - AscendC Guide</title>
 <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-<div class="top-header"><a href="index.html" class="logo"><span class="logo-icon">A</span>AscendC Guide</a><span class="header-subtitle">CANN 算子开发手册</span></div>
-<nav class="sidebar"><div class="sidebar-header"><h2><a href="../index.html" style="color:inherit;text-decoration:none">AscendC Guide</a></h2><p>算子开发从入门到精通</p></div><ul class="sidebar-nav"><li class="chapter-group"><span class="chapter-title">第1章 基础概念</span><ul class="article-list"><li><a href="01-基础概念-1.1-什么是算子.html">1.1 什么是算子</a></li><li><a href="01-基础概念-1.2-数据排布格式.html">1.2 数据排布格式</a></li><li><a href="01-基础概念-1.3-数据类型.html">1.3 数据类型</a></li><li><a href="01-基础概念-1.4-量化与反量化.html">1.4 量化与反量化</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第2章 编程语言</span><ul class="article-list"><li><a href="02-编程语言-2.1-昇腾编程语言.html">2.1 昇腾编程语言</a></li><li><a href="02-编程语言-2.2-编程模型.html">2.2 编程模型</a></li><li><a href="02-编程语言-2.3-Ascend软件栈.html">2.3 Ascend 软件栈</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第3章 昇腾硬件</span><ul class="article-list"><li><a href="03-昇腾硬件-3.1-A5通用架构.html">3.1 A5 通用架构</a></li><li><a href="03-昇腾硬件-3.2-A5新特性.html">3.2 A5 新特性</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第5章 核心开发</span><ul class="article-list"><li><a href="05-核心开发-5.1-Tiling设计.html">5.1 Tiling 设计</a></li><li><a href="05-核心开发-5.2-内存管理与数据搬运.html">5.2 内存管理与数据搬运</a></li><li><a href="05-核心开发-5.3-Vector计算.html">5.3 Vector 计算</a></li><li><a href="05-核心开发-5.4-Cube计算.html">5.4 Cube 计算</a></li><li><a href="05-核心开发-5.5-同步与流水线.html">5.5 同步与流水线</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第6章 API 参考</span><ul class="article-list"><li><a href="06-API参考-6.1-AscendC常用API概览.html">6.1 Ascend C 常用 API 概览</a></li><li><a href="06-API参考-6.2-数据搬运API详解.html">6.2 数据搬运 API 详解</a></li><li><a href="06-API参考-6.3-计算API详解.html">6.3 计算 API 详解</a></li><li><a href="06-API参考-6.4-ACL运行时API.html">6.4 ACL 运行时 API</a></li><li><a href="06-API参考-6.5-同步与队列API详解.html">6.5 同步与队列 API 详解</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第7章 调试与优化</span><ul class="article-list"><li><a href="07-调试与优化-7.1-精度不对怎么办.html">7.1 精度不对怎么办</a></li><li><a href="07-调试与优化-7.2-性能不达标怎么办.html">7.2 性能不达标怎么办</a></li><li><a href="07-调试与优化-7.3-算子精度标准.html">7.3 算子精度标准</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第8章 进阶</span><ul class="article-list"><li><a href="08-进阶-8.1-常见踩坑与最佳实践.html">8.1 常见踩坑与最佳实践</a></li><li><a href="08-进阶-8.2-RegBase编程模型.html">8.2 RegBase 编程模型</a></li><li><a href="08-进阶-8.3-SIMT混合编程.html">8.3 SIMT 混合编程</a></li><li><a href="08-进阶-8.4-NDDMA高维搬运.html">8.4 NDDMA 高维搬运</a></li><li><a href="08-进阶-8.5-CCU通算融合.html">8.5 CCU 通算融合</a></li><li><a href="08-进阶-8.6-跨架构兼容.html">8.6 跨架构兼容</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第9章 实战演练</span><ul class="article-list"><li><a href="09-实战演练-9.1-五分钟跑通一个算子.html">9.1 五分钟跑通一个算子</a></li><li><a href="09-实战演练-9.2-swap算子开发.html" class="active">9.2 swap 算子开发</a></li><li><a href="09-实战演练-9.3-add算子开发.html">9.3 add 算子开发</a></li></ul></li><li class="chapter-group"><span class="chapter-title">附录</span><ul class="article-list"><li><a href="附录-A-数据类型速查表.html">A. 数据类型速查表</a></li></ul></li></ul></nav>
+<div class="top-header"><a href="../index.html" class="logo"><span class="logo-icon">A</span>AscendC Guide</a><span class="header-subtitle">CANN 算子开发手册</span></div>
+<nav class="sidebar"><div class="sidebar-header"><h2><a href="../index.html" style="color:inherit;text-decoration:none">AscendC Guide</a></h2><p>算子开发从入门到精通</p></div><ul class="sidebar-nav"><li class="chapter-group"><span class="chapter-title">第1章 基础概念</span><ul class="article-list"><li><a href="01-基础概念-1.1-什么是算子.html">1.1 什么是算子</a></li><li><a href="01-基础概念-1.2-数据排布格式.html">1.2 数据排布格式</a></li><li><a href="01-基础概念-1.3-数据类型.html">1.3 数据类型</a></li><li><a href="01-基础概念-1.4-量化与反量化.html">1.4 量化与反量化</a></li><li><a href="01-基础概念-1.5-融合算子.html">1.5 融合算子</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第2章 昇腾硬件</span><ul class="article-list"><li><a href="02-昇腾硬件-2.1-DaVinci架构.html">2.1 DaVinci 架构</a></li><li><a href="02-昇腾硬件-2.2-A5新特性.html">2.2 A5 新特性</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第3章 编程语言</span><ul class="article-list"><li><a href="03-编程语言-3.1-昇腾编程语言.html">3.1 昇腾编程语言</a></li><li><a href="03-编程语言-3.2-编程模型.html">3.2 编程模型</a></li><li><a href="03-编程语言-3.3-Ascend软件栈.html">3.3 Ascend 软件栈</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第4章 核心开发</span><ul class="article-list"><li><a href="04-核心开发-4.1-算子精度标准.html">4.1 算子精度标准</a></li><li><a href="04-核心开发-4.2-Tiling设计.html">4.2 Tiling 设计</a></li><li><a href="04-核心开发-4.3-内存管理与数据搬运.html">4.3 内存管理与数据搬运</a></li><li><a href="04-核心开发-4.4-Vector计算.html">4.4 Vector 计算</a></li><li><a href="04-核心开发-4.5-Cube计算.html">4.5 Cube 计算</a></li><li><a href="04-核心开发-4.6-同步与流水线.html">4.6 同步与流水线</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第5章 API 参考</span><ul class="article-list"><li><a href="05-API参考-5.1-AscendC常用API概览.html">5.1 Ascend C 常用 API 概览</a></li><li><a href="05-API参考-5.2-数据搬运API详解.html">5.2 数据搬运 API 详解</a></li><li><a href="05-API参考-5.3-计算API详解.html">5.3 计算 API 详解</a></li><li><a href="05-API参考-5.4-ACL运行时API.html">5.4 ACL 运行时 API</a></li><li><a href="05-API参考-5.5-同步与队列API详解.html">5.5 同步与队列 API 详解</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第6章 调试优化</span><ul class="article-list"><li><a href="06-调试与优化-6.1-精度不对怎么办.html">6.1 精度不对怎么办</a></li><li><a href="06-调试与优化-6.2-性能不达标怎么办.html">6.2 性能不达标怎么办</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第7章 进阶指南</span><ul class="article-list"><li><a href="07-进阶-7.1-常见踩坑与最佳实践.html">7.1 常见踩坑与最佳实践</a></li><li><a href="07-进阶-7.2-RegBase编程模型.html">7.2 RegBase 编程模型</a></li><li><a href="07-进阶-7.3-SIMT混合编程.html">7.3 SIMT 混合编程</a></li><li><a href="07-进阶-7.4-NDDMA高维搬运.html">7.4 NDDMA 高维搬运</a></li><li><a href="07-进阶-7.5-CCU通算融合.html">7.5 CCU 通算融合</a></li><li><a href="07-进阶-7.6-跨架构兼容.html">7.6 跨架构兼容</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第8章 实战演练</span><ul class="article-list"><li><a href="08-实战演练-8.1-五分钟跑通一个算子.html">8.1 五分钟跑通一个算子</a></li><li><a href="08-实战演练-8.2-swap算子开发.html">8.2 swap 算子开发</a></li><li><a href="08-实战演练-8.3-add算子开发.html">8.3 add 算子开发</a></li></ul></li><li class="chapter-group"><span class="chapter-title">附录</span><ul class="article-list"><li><a href="附录-A-数据类型速查表.html">A. 数据类型速查表</a></li><li><a href="附录-B-专有名词速查表.html">B. 专有名词速查表</a></li></ul></li></ul></nav>
 <main class="main">
 <div class="content">
 <div class="meta-bar"><a href="../index.html">&larr; 返回目录</a></div>
 
-<h1>9.2 swap 算子开发（直调方式）</h1>
+<h1>8.2 swap 算子开发（直调方式）</h1>
 
 <p>本章以 BLAS Level 1 的 <code>sswap</code> 算子为例，从零开始讲解一个完整算子的开发过程。swap 使用<strong>直调（direct-call）</strong>方式，即 Host 侧直接通过 <code>&lt;&lt;&lt;&gt;&gt;&gt;</code> 语法启动 Kernel，无需经过 aclnn 框架注册。这是 ops-blas 仓中 Level 1 算子的标准做法。</p>
 
-<h2>功能说明</h2>
+<h2>8.2.1 功能说明</h2>
 
 <p>BLAS <code>sswap</code> 的功能是交换两个单精度浮点向量的对应元素：</p>
 
@@ -64,7 +64,7 @@
   <text x="340" y="140" font-size="13" fill="#37474f">y 的数据写到 x 的位置</text>
 </svg>
 
-<h2>文件结构</h2>
+<h2>8.2.2 文件结构</h2>
 
 <p>在 ops-blas 仓中，sswap 的 arch35 实现由 3 个文件组成：</p>
 
@@ -82,7 +82,7 @@
 </tbody>
 </table>
 
-<h2>TilingData 设计</h2>
+<h2>8.2.3 TilingData 设计</h2>
 
 <p>TilingData 是 Host 和 Kernel 之间的通信契约。Host 侧计算好切分参数，通过 GM 传递给 Kernel。</p>
 
@@ -133,11 +133,11 @@ constexpr uint32_t ELEMENTS_PER_BLOCK = 32 / sizeof(float);
   <text x="330" y="175" text-anchor="middle" font-size="12" fill="#546e7a">GM 中的连续向量 x[0..9999]</text>
 </svg>
 
-<h2>Kernel 实现</h2>
+<h2>8.2.4 Kernel 实现</h2>
 
 <p>Kernel 侧的代码运行在 AI Core 上。核心思路是：每个核从 GM 读入自己负责的那段 x 和 y 到 UB，然后<strong>交叉写回</strong>&mdash;&mdash;x 的数据写到 y 的位置，y 的数据写到 x 的位置。</p>
 
-<h3>类定义</h3>
+<h3>8.2.4.1 类定义</h3>
 
 <pre><code class="language-cpp">class SswapAIV {
 public:
@@ -163,12 +163,12 @@ private:
 <p>关键成员说明：</p>
 
 <ul>
-<li><code>TPipe*</code> &mdash; 流水线管理器，负责 Buffer 分配（参见 <a href="05-核心开发-5.2-内存管理与数据搬运.html">5.2 内存管理</a>）</li>
+<li><code>TPipe*</code> &mdash; 流水线管理器，负责 Buffer 分配（参见 <a href="04-核心开发-4.3-内存管理与数据搬运.html">4.3 内存管理</a>）</li>
 <li><code>GlobalTensor&lt;float&gt;</code> &mdash; GM 上的全局张量，提供 <code>operator[]</code> 偏移访问</li>
-<li><code>TQueBind&lt;VECIN, VECOUT, 1&gt;</code> &mdash; 绑定输入和输出位置的队列，提供隐式同步（参见 <a href="05-核心开发-5.5-同步与流水线.html">5.5 同步与流水线</a>）</li>
+<li><code>TQueBind&lt;VECIN, VECOUT, 1&gt;</code> &mdash; 绑定输入和输出位置的队列，提供隐式同步（参见 <a href="04-核心开发-4.6-同步与流水线.html">4.6 同步与流水线</a>）</li>
 </ul>
 
-<h3>Init：初始化</h3>
+<h3>8.2.4.2 Init：初始化</h3>
 
 <pre><code class="language-cpp">__aicore__ inline void SswapAIV::Init(GM_ADDR x, GM_ADDR y, GM_ADDR tilingGm, TPipe* pipe)
 {
@@ -197,7 +197,7 @@ private:
 <li><strong>初始化 Buffer</strong> &mdash; 通过 TPipe 为 x 和 y 各分配一块 UB Buffer</li>
 </ol>
 
-<h3>SingleIteration：单次迭代</h3>
+<h3>8.2.4.3 SingleIteration：单次迭代</h3>
 
 <p>这是 swap 的核心逻辑。每次迭代处理一个 tile 大小的数据：</p>
 
@@ -276,7 +276,7 @@ private:
   <text x="330" y="216" text-anchor="middle" font-size="11" fill="#7b1fa2">swap 只做数据交换，不做算术运算，因此 AIV 模式下只需 MTE2 + MTE3</text>
 </svg>
 
-<h3>Process：主循环</h3>
+<h3>8.2.4.4 Process：主循环</h3>
 
 <pre><code class="language-cpp">__aicore__ inline void SswapAIV::Process()
 {
@@ -300,7 +300,7 @@ private:
 
 <p>Process 将本核的数据按 tileSize 切分为多个迭代，每次调用 SingleIteration 处理一个 tile。最后处理尾部不足一个 tile 的数据。</p>
 
-<h3>Kernel 入口</h3>
+<h3>8.2.4.5 Kernel 入口</h3>
 
 <pre><code class="language-cpp">extern "C" __global__ __aicore__ void sswap_kernel(
     GM_ADDR x, GM_ADDR y, GM_ADDR workSpace, GM_ADDR tilingGm)
@@ -325,11 +325,11 @@ void sswap_kernel_do(
 <li><code>KERNEL_TYPE_AIV_ONLY</code> 表示只使用 AIV（Vector 核），不使用 AIC（Cube 核），因为 swap 没有矩阵计算</li>
 </ul>
 
-<h2>Host 侧实现</h2>
+<h2>8.2.5 Host 侧实现</h2>
 
 <p>Host 侧代码运行在 CPU 上，负责参数校验、Tiling 计算和 Kernel 启动。</p>
 
-<h3>参数校验</h3>
+<h3>8.2.5.1 参数校验</h3>
 
 <pre><code class="language-cpp">static aclblasStatus_t ValidateSswapParams(
     const float* x, const float* y, int incx, int incy)
@@ -349,7 +349,7 @@ void sswap_kernel_do(
     return ACLBLAS_STATUS_SUCCESS;
 }</code></pre>
 
-<h3>Tiling 计算</h3>
+<h3>8.2.5.2 Tiling 计算</h3>
 
 <pre><code class="language-cpp">static SswapTilingData CalSswapTilingData(uint32_t n, uint32_t coreNum)
 {
@@ -376,7 +376,7 @@ void sswap_kernel_do(
 <li><strong>UB 切分</strong>：248KB UB 空间分给 x 和 y 两块 Buffer，每块 tileSize 个元素</li>
 </ol>
 
-<h3>Kernel 启动</h3>
+<h3>8.2.5.3 Kernel 启动</h3>
 
 <pre><code class="language-cpp">aclblasStatus_t aclblasSswap(
     aclblasHandle_t handle, int n, float* x, int incx, float* y, int incy)
@@ -435,21 +435,21 @@ void sswap_kernel_do(
   <line x1="552" y1="110" x2="552" y2="122" stroke="#546e7a" stroke-width="1.5" marker-end="url(#hArr)"/>
 </svg>
 
-<h2>编译与测试</h2>
+<h2>8.2.6 编译与测试</h2>
 
 <pre><code class="language-bash">bash build.sh --ops=swap --soc=ascend950 --run</code></pre>
 
 <p>测试框架会自动生成多种规模的测试用例（n=1, 8, 1024, 65536, 1048576 等），验证不同数据量下 swap 的正确性。</p>
 
-<h2>关键设计决策</h2>
+<h2>8.2.7 关键设计决策</h2>
 
-<h3>为什么用单 Buffer 而不是双 Buffer（ping-pong）？</h3>
+<h3>8.2.7.1 为什么用单 Buffer 而不是双 Buffer（ping-pong）？</h3>
 
 <p>双 Buffer（ping-pong）的目的是让搬运和计算重叠执行：当 Vector 单元在处理 ping Buffer 的数据时，MTE 同时向 pong Buffer 搬运下一批数据。</p>
 
 <p>但 swap 算子<strong>没有 Vector 计算阶段</strong>。它的整个流程只有 MTE2（GM&rarr;UB）和 MTE3（UB&rarr;GM），没有中间的 Vector 计算可以与搬运重叠。因此双 Buffer 没有任何收益，反而浪费一半的 UB 空间。使用单 Buffer 可以让 tileSize 更大，减少迭代次数。</p>
 
-<h3>为什么用交叉写回而不是临时变量？</h3>
+<h3>8.2.7.2 为什么用交叉写回而不是临时变量？</h3>
 
 <p>一种直觉做法是：读入 x 和 y，在 UB 中交换，然后写回。但这需要额外的临时 Buffer 来暂存数据。交叉写回的技巧是：</p>
 
@@ -498,11 +498,11 @@ void sswap_kernel_do(
 </details>
 
 <details><summary>Q: 为什么 swap 用直调而不用 aclnn 注册？</summary>
-<p>BLAS Level 1 算子（如 swap、scal、copy）接口简单，不需要 aclnn 框架提供的自动类型推导、Workspace 管理等高级功能。直调方式代码更简洁，启动开销更小。aclnn 注册更适合复杂算子（如 add、matmul），详见 <a href="09-实战演练-9.3-add算子开发.html">9.3 add 算子开发</a>。</p>
+<p>BLAS Level 1 算子（如 swap、scal、copy）接口简单，不需要 aclnn 框架提供的自动类型推导、Workspace 管理等高级功能。直调方式代码更简洁，启动开销更小。aclnn 注册更适合复杂算子（如 add、matmul），详见 <a href="08-实战演练-8.3-add算子开发.html">8.3 add 算子开发</a>。</p>
 </details>
 
 <div id="quiz"></div>
-<div class="page-nav"><a href="09-实战演练-9.1-五分钟跑通一个算子.html" class="nav-prev"><span class="nav-label">&larr; 上一篇</span><span class="nav-title">9.1 五分钟跑通一个算子</span></a><a href="09-实战演练-9.3-add算子开发.html" class="nav-next"><span class="nav-label">下一篇 &rarr;</span><span class="nav-title">9.3 add 算子开发</span></a></div>
+<div class="page-nav"><a href="08-实战演练-8.1-五分钟跑通一个算子.html" class="nav-prev"><span class="nav-label">&larr; 上一篇</span><span class="nav-title">8.1 五分钟跑通一个算子</span></a><a href="08-实战演练-8.3-add算子开发.html" class="nav-next"><span class="nav-label">下一篇 &rarr;</span><span class="nav-title">8.3 add 算子开发</span></a></div>
 </div>
 </main>
 <script src="../js/quiz.js"></script>
