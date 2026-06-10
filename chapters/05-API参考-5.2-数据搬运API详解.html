@@ -209,7 +209,7 @@ __aicore__ inline void CopyOut(const GlobalTensor&lt;T&gt;&amp; dst,
 
 <h3>5.2.3.3 对齐要求</h3>
 
-<p>CopyIn/CopyOut 的对齐要求与矩阵维度相关。对于 FP16 矩阵，通常要求搬运元素数为 16 的倍数。具体的对齐规则取决于目标架构（A2/A5）和矩阵形状。</p>
+<p>CopyIn/CopyOut 的对齐要求与矩阵维度相关。对于 FP16 矩阵，通常要求搬运元素数为 16 的倍数。具体的对齐规则取决于目标架构（A5 以前的架构/A5）和矩阵形状。</p>
 
 <h2>5.2.4 性能优化建议</h2>
 

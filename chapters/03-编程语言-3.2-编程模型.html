@@ -95,7 +95,7 @@
 <h3>3.2.6.2 SIMT 内存空间</h3>
 <table><thead><tr><th>内存</th><th>说明</th><th>访问修饰符</th></tr></thead><tbody><tr><td>寄存器/栈</td><td>线程私有</td><td>默认</td></tr><tr><td>UB</td><td>核内共享</td><td><code>__ubuf__</code></td></tr><tr><td>GM</td><td>全局内存</td><td><code>__gm__</code></td></tr></tbody></table>
 <p>SIMT 的一个重要特性是<strong>支持直接读写 GM</strong>，不需要像 SIMD 那样显式调用 DataCopy 搬入搬出。这意味着你可以像写普通 C++ 代码一样直接通过指针访问全局内存，编程体验更直观。</p>
-<p>SIMT 模式下可用的 UB 容量为 256KB - 8KB（系统预留）- 32KB（DCache）= 216KB。</p>
+<p>SIMT 模式下可用的 UB 容量为 256KB - 8KB（系统预留）- 32KB（DCache，SIMT 模式下的数据缓存，详见 <a href="07-进阶指南-7.3-SIMT混合编程.html">7.3</a>）= 216KB。</p>
 <h3>3.2.6.3 SIMT 适用场景</h3>
 <p>SIMT 擅长处理离散、不规则的访问模式：</p>
 <ul>

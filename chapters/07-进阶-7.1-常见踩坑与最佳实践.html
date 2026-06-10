@@ -120,7 +120,7 @@ TQueBind&lt;QuePosition::VECIN, QuePosition::VECOUT, 1&gt; inQueueY_;</code></pr
 <h2>7.1.5 硬编码硬件参数</h2>
 <p>这是一个看似方便、实则致命的坏习惯。</p>
 <h3>7.1.5.1 为什么不能硬编码</h3>
-<p>不同的昇腾芯片型号，Vector 核数、UB 大小等硬件参数完全不同。A2 不同型号核数不同（如 910B2 有 48 个 Vector 核），sswap arch22 代码中使用 DEFAULT_VECTOR_CNT = 40。这就是为什么必须动态获取核数而不是硬编码。如果你在代码里写死 <code>CORE_NUM = 32</code>，换一块芯片就可能出问题——要么浪费了一半的核，要么核数不够导致数据丢失。</p>
+<p>不同的昇腾芯片型号，Vector 核数、UB 大小等硬件参数完全不同。A5 以前的架构不同型号核数不同（如 910B2 有 48 个 Vector 核），sswap arch22 代码中使用 DEFAULT_VECTOR_CNT = 40。这就是为什么必须动态获取核数而不是硬编码。如果你在代码里写死 <code>CORE_NUM = 32</code>，换一块芯片就可能出问题——要么浪费了一半的核，要么核数不够导致数据丢失。</p>
 <h3>7.1.5.2 sswap 的正确做法</h3>
 <p>sswap 在 Host 侧通过 <code>aclrtGetDeviceInfo</code> 动态获取核数：</p>
 <pre class=""><code>static uint32_t GetVectorCoreCount()

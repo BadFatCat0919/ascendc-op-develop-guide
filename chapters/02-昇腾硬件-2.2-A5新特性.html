@@ -67,7 +67,7 @@
 <p>A5 引入了多种全新的编程模型，给算子开发者提供了更多选择。这些编程模型在 <a href="03-编程语言-3.2-编程模型.html">3.2 编程模型</a> 中有详细讲解，这里做一个总览。</p>
 <table><thead><tr><th>编程模型</th><th>说明</th><th>适用场景</th></tr></thead><tbody>
 <tr><td><strong>SIMT</strong></td><td>线程级并行方式，每个线程处理一个或少量数据元素，硬件按 Warp（32 线程一组）调度</td><td>离散访问（Gather/Scatter）、排序、Hash</td></tr>
-<tr><td><strong>SIMD-RegBase</strong></td><td>中间计算结果保存在寄存器中而非 UB，减少 UB 读写次数，支持 OOO 指令双发</td><td>多步融合计算（如 Gelu+Cast）</td></tr>
+<tr><td><strong>SIMD-RegBase</strong></td><td>中间计算结果保存在寄存器中而非 UB，减少 UB 读写次数，支持 OOO（Out-of-Order，乱序执行）指令双发（详见 <a href="07-进阶指南-7.2-RegBase编程模型.html">7.2</a>）</td><td>多步融合计算（如 Gelu+Cast）</td></tr>
 <tr><td><strong>NDDMA</strong></td><td>高维 DMA 指令，支持多维张量的直接搬运，不需要拆成一维循环</td><td>多维张量搬运、转置</td></tr>
 </tbody></table>
 <h2>2.2.4 新增数据类型</h2>

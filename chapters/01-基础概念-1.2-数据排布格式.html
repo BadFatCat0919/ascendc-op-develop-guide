@@ -88,7 +88,7 @@
 <table><thead><tr><th>数据类型</th><th>每元素字节数</th><th>对齐粒度（元素个数）</th></tr></thead><tbody><tr><td>FP32 (float)</td><td>4B</td><td>8 个元素</td></tr><tr><td>FP16 (half)</td><td>2B</td><td>16 个元素</td></tr><tr><td>BF16</td><td>2B</td><td>16 个元素</td></tr><tr><td>INT8</td><td>1B</td><td>32 个元素</td></tr></tbody></table>
 <p>对齐后长度的计算公式：</p>
 <pre class=""><code>对齐后长度 = ceil(原始长度 / 对齐粒度) × 对齐粒度</code></pre>
-<p><strong>以 swap 算子为例</strong>，如果使用 FP32（float）类型，每个 float 占 4 字节，所以对齐粒度 = 32 / 4 = <strong>8 个 float</strong>。如果向量长度不是 8 的倍数，就需要在末尾补齐（padding）到 8 的倍数才能用 DataCopy 搬运。</p>
+<p><strong>以 swap 算子为例</strong>，如果使用 FP32（float）类型，每个 float 占 4 字节，所以对齐粒度 = 32 / 4 = <strong>8 个 float</strong>。如果向量长度不是 8 的倍数，就需要在末尾补齐（padding）到 8 的倍数才能用数据搬运指令（Ascend C 中叫 <code>DataCopy</code>，详见 <a href="04-核心开发-4.3-内存管理与数据搬运.html">4.3</a>）搬运。</p>
 <blockquote>
 <p><strong>Q：对齐填充（padding）的数据会影响计算结果吗？</strong></p>
 <p>A：不会。填充的数据只是用来凑够 32B 搬运粒度的"占位符"，搬运时会一起搬到 UB，但计算时算子会根据实际的向量长度（Tiling 参数中传入）忽略这些填充元素。写回结果时也只写回实际长度的数据，填充部分不会写回 Global Memory。</p>

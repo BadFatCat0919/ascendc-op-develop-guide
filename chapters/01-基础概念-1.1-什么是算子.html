@@ -18,12 +18,8 @@
 
 <h3>1.1.1.1 算子 vs 函数 vs 层</h3>
 <p>这三个词经常混用，但它们的视角不同：</p>
-<table><thead><tr><th>概念</th><th>视角</th><th>举例</th></tr></thead><tbody><tr><td><strong>函数</strong></td><td>编程概念</td><td><code>add(a, b)</code> 是一个 C++ 函数</td></tr><tr><td><strong>层（Layer）</strong></td><td>网络结构概念</td><td>"卷积层"是网络架构图里的一个方框</td></tr><tr><td><strong>算子（Operator）</strong></td><td>硬件执行概念</td><td>Conv2D 算子是 NPU 上实际运行的一段 Kernel 代码</td></tr></tbody></table>
+<table><thead><tr><th>概念</th><th>视角</th><th>举例</th></tr></thead><tbody><tr><td><strong>函数</strong></td><td>编程概念</td><td><code>add(a, b)</code> 是一个 C++ 函数</td></tr><tr><td><strong>层（Layer）</strong></td><td>网络结构概念</td><td>"卷积层"是网络架构图里的一个方框</td></tr><tr><td><strong>算子（Operator）</strong></td><td>硬件执行概念</td><td>Conv2D 算子是调度 NPU 完成卷积运算的代码集合（包含 Host 侧和 Kernel 侧）</td></tr></tbody></table>
 <p>一个"层"往往包含多个算子。比如一个典型的"卷积层"实际上由三个算子串联而成：Conv2D（卷积计算）→ BiasAdd（加偏置）→ ReLU（激活函数）。框架在调度时，会把它们拆成独立的算子节点依次执行。</p>
-<blockquote>
-<p><strong>Q：为什么框架要把一个"层"拆成多个算子？直接整层执行不是更简单吗？</strong></p>
-<p>A：拆开有两个好处：（1）<strong>灵活性</strong>——不同的网络可能用不同的卷积、偏置和激活函数组合，拆开后框架可以自由排列组合；（2）<strong>优化空间</strong>——框架可以对独立的算子节点做调度优化，比如算子融合（把多个小算子合成一个大的 Kernel 来减少数据搬运），或者把不同算子分配给不同的硬件单元（Vector / Cube）并行执行。</p>
-</blockquote>
 <h3>1.1.1.2 算子在框架中的角色</h3>
 <p>当你在 PyTorch 里写模型代码时，框架会在内部构建一张<strong>计算图（Compute Graph）</strong>——图中的每个节点就是一个算子，边代表数据的流向。</p>
 <ul>
@@ -53,12 +49,8 @@
 <p><strong>算子开发者的工作，就是实现最底层那个 Kernel</strong>——让它在 NPU 上高效地跑起来。上面的几层（框架调度、接口封装）由 CANN 和框架团队负责，你只需要关注"数据怎么切分"和"核函数怎么写"。</p>
 <h3>1.1.1.3 常见算子分类</h3>
 <p>按照计算特征，算子可以分为以下几大类：</p>
-<table><thead><tr><th>类别</th><th>典型算子</th><th>主要计算单元</th><th>特点</th></tr></thead><tbody><tr><td>逐元素（Element-wise）</td><td>Add、Mul、ReLU</td><td>Vector</td><td>最简单，每个元素独立计算，互不依赖</td></tr><tr><td>归约（Reduction）</td><td>Sum、Max、Softmax</td><td>Vector</td><td>沿某个轴做聚合，比如对一行求和</td></tr><tr><td>矩阵乘（MatMul）</td><td>GEMM、GEMV</td><td>Cube</td><td>计算密集型，算力是瓶颈</td></tr><tr><td>卷积（Convolution）</td><td>Conv2D</td><td>Cube</td><td>本质也是矩阵运算（im2col + GEMM）</td></tr><tr><td>激活（Activation）</td><td>ReLU、Sigmoid、GELU</td><td>Vector</td><td>非线性变换，通常与其他算子融合</td></tr><tr><td>数据搬运（Data Move）</td><td>Transpose、Gather、<strong>Swap</strong></td><td>MTE</td><td>不涉及数值计算，搬运效率是关键</td></tr></tbody></table>
+<table><thead><tr><th>类别</th><th>典型算子</th><th>主要计算单元</th><th>特点</th></tr></thead><tbody><tr><td>逐元素（Element-wise）</td><td>Add、Mul、ReLU、Sigmoid</td><td>Vector</td><td>最简单，每个元素独立计算，互不依赖</td></tr><tr><td>归约（Reduction）</td><td>Sum、Max、Softmax</td><td>Vector</td><td>沿某个轴做聚合，比如对一行求和</td></tr><tr><td>矩阵乘（MatMul）</td><td>GEMM、GEMV</td><td>Cube</td><td>计算密集型，算力是瓶颈</td></tr><tr><td>卷积（Convolution）</td><td>Conv2D</td><td>Cube</td><td>本质也是矩阵运算（im2col + GEMM）</td></tr><tr><td>数据搬运（Data Move）</td><td>Transpose、Gather、<strong>Swap</strong></td><td>MTE</td><td>不涉及数值计算，搬运效率是关键</td></tr></tbody></table>
 <p><strong>以 swap 算子为例</strong>：swap 是一种数据搬运算子，功能是交换两个向量的对应元素——<code>swap(x, y)</code> 执行后，x 变成原来的 y，y 变成原来的 x。它不做任何加减乘除，纯粹是把数据从 A 搬到 B、从 B 搬到 A。对于这类算子，关键不在于"算什么"，而在于"怎么搬得更快"。</p>
-<blockquote>
-<p><strong>Q：激活函数（如 ReLU）明明很简单（max(0, x)），为什么单独算一类？</strong></p>
-<p>A：激活函数虽然计算简单，但它在网络中出现频率极高（每一层后面都跟一个），而且它的计算特征属于逐元素操作。单独列出来是因为在实际工程中，激活函数很少单独跑一个 Kernel——通常会和前一个算子（如 Conv2D 或 MatMul）<strong>融合</strong>在一起执行，以减少数据搬运开销。理解这一点对于后续的算子融合设计非常重要。</p>
-</blockquote>
 <h3>1.1.1.4 为什么需要"开发算子"</h3>
 <p>框架自带的算子库已经很丰富了，为什么还要自己写算子？主要有三个原因：</p>
 <ol>
@@ -94,7 +86,7 @@ renderQuiz('quiz', [
     question: "\"函数\"、\"层\"和\"算子\"这三个概念的视角各不相同。以下哪个说法是正确的？",
     options: ["函数是硬件执行概念，算子是编程概念", "层是网络结构概念，算子是硬件执行概念", "层和算子完全等价，只是叫法不同", "函数和算子完全等价，只是叫法不同"],
     answer: 1,
-    explanation: "函数是编程概念（如 add(a, b) 是一个 C++ 函数），层是网络结构概念（如\"卷积层\"是网络架构图里的一个方框），算子是硬件执行概念（如 Conv2D 算子是 NPU 上实际运行的一段 Kernel 代码）。一个\"层\"往往包含多个算子，比如\"卷积层\"= Conv2D + BiasAdd + ReLU。"
+    explanation: "函数是编程概念（如 add(a, b) 是一个 C++ 函数），层是网络结构概念（如\"卷积层\"是网络架构图里的一个方框），算子是硬件执行概念（如 Conv2D 算子是调度 NPU 完成卷积运算的代码集合）。一个\"层\"往往包含多个算子，比如\"卷积层\"= Conv2D + BiasAdd + ReLU。"
   },
   {
     question: "以下哪个不是自己开发算子的常见原因？",

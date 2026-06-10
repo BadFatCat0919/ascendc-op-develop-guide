@@ -28,6 +28,7 @@
 <pre class=""><code>extern &quot;C&quot; __global__ __aicore__ void my_kernel(
     GM_ADDR x, GM_ADDR y,
     GM_ADDR workspace, GM_ADDR tiling)</code></pre>
+<p>其中 <code>__global__</code> 标记该函数可被 Host 侧调用，<code>__aicore__</code> 标记该函数运行在 AI Core 上，<code>GM_ADDR</code> 是指向 Global Memory 的地址修饰符。</p>
 <p>Kernel 内部通过 <code>SetGlobalBuffer</code> 把 <code>GM_ADDR</code> 包装成 <code>GlobalTensor</code>，方便后续用偏移量访问：</p>
 <pre class=""><code>xGM_.SetGlobalBuffer((__gm__ float*)x, tiling_.totalN);
 yGM_.SetGlobalBuffer((__gm__ float*)y, tiling_.totalN);</code></pre>

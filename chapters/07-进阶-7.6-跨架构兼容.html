@@ -15,7 +15,7 @@
 
 <p>在实际工程中，同一个算子往往需要同时支持 A5 以前的架构（arch22）和 A5（arch35）。一般算子仓的做法是在算子目录下按架构分子目录：</p>
 <pre class="ascii-art"><code>blas/swap/sswap/
-├── arch22/          # A2/A3 实现
+├── arch22/          # A5 以前的架构实现
 │   ├── sswap_host.cpp
 │   └── sswap_kernel.cpp
 └── arch35/          # A5 实现
@@ -92,7 +92,7 @@
 if (npuArch == NpuArch::DAV_3510) {
     // A5 特殊逻辑（可用 RegBase/SIMT）
 } else {
-    // A2/A3 通用逻辑（仅 MemBase）
+    // A5 以前的架构通用逻辑（仅 MemBase）
 }</code></pre>
 
 <h3>7.6.2.2 Kernel 侧：编译宏</h3>
