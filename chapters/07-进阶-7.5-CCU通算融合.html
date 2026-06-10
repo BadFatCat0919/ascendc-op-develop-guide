@@ -70,12 +70,12 @@
 <p><strong>AIV 直驱 URMA</strong>：AIV 直接发起 URMA（Unified Remote Memory Access）异步通信请求。相比 UBMem 方式减少了 UB 中转，但 AIV 仍需参与通信调度和状态轮询。</p>
 <p><strong>AIV + CCU</strong>：AIV 发起通信请求后，CCU 接管全部通信流程&mdash;&mdash;包括跨节点同步、数据 Reduce（如 AllReduce 的求和）、数据搬运。AIV 可以立即返回执行计算任务，通信与计算完全并行。</p>
 
-<h4>7.5.2.1 KFC 调度模型变化</h4>
+<p><strong>(1) KFC 调度模型变化</strong></p>
 <p>CCU 的引入改变了 Kernel Function Call 的调度路径：</p>
 <table><thead><tr><th>模式</th><th>调度路径</th></tr></thead><tbody><tr><td>传统</td><td><code>AICore (KFC) &harr; AICPU (KFC) &rarr; SDMA</code></td></tr><tr><td>CCU</td><td><code>AICore (KFC) &harr; CCU (KFC) &rarr; URMA</code></td></tr></tbody></table>
 <p>CCU 模式下，通信任务通过 KFC 直接调度到 CCU，绕过了 AICPU 中转环节，通信任务展开更快，AICore 发起到通信开始的静态时延更小。</p>
 
-<h4>7.5.2.2 CCU 对算子开发的优势</h4>
+<p><strong>(2) CCU 对算子开发的优势</strong></p>
 <ul>
 <li><strong>通信不占用 AI Core 计算算力</strong> &mdash; AI Core 可以全速执行计算，通信在 CCU 上并行完成</li>
 <li><strong>通信任务展开更快</strong> &mdash; AICore 发起到通信开始的静态时延更小</li>
@@ -90,10 +90,10 @@
 <li><strong>Megatron 并行策略</strong> &mdash; Tensor Parallelism 中的 AllReduce 与计算重叠</li>
 </ul>
 
-<h4>7.5.3.1 CCU 使用前置条件</h4>
+<p><strong>(1) CCU 使用前置条件</strong></p>
 <table><thead><tr><th>条件</th><th>说明</th></tr></thead><tbody><tr><td>架构</td><td>仅 DAV_3510（IO-Die 上配备 CCU）；前代架构无此选项</td></tr><tr><td>算法</td><td>通算融合算子（如 AllReduce / AllGather 与 MatMul 融合）</td></tr><tr><td>拓扑</td><td>集群间通信需支持 URMA 的硬件互联</td></tr></tbody></table>
 
-<h4>7.5.3.2 代码示例</h4>
+<p><strong>(2) 代码示例</strong></p>
 <p>以下是通算融合的概念性代码，展示 CCU 模式下 AllReduce 与 MatMul 并行的编程模式：</p>
 <pre><code class="language-cpp">__global__ __aicore__ void FusedAllReduceMatMul(
     GM_ADDR gradOutput, GM_ADDR weights,

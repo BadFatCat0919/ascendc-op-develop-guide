@@ -13,7 +13,7 @@
 <div class="content">
 <div class="meta-bar"><a href="../index.html">← 返回目录</a></div>
 <h1>4.2 Tiling 设计</h1>
-<h3>4.2.1 什么是 Tiling</h3>
+<h3>4.2.1 Tiling 的定义</h3>
 <p>Tiling 的本质是"分而治之"。想象公司团建点了 1000 杯雪王奶茶，一家门店做不完，于是你把订单分给 20 家门店同时做——每家分 50 杯。但问题来了：1000 除 20 刚好整除，那如果是 1003 杯呢？最后 3 杯给谁做？而且每家门店的吧台（UB）就那么大，一次放不下 50 杯的原料，得分批从总仓库（GM）进货。Tiling 就是解决这些问题的"分单策略"——怎么分、每家分多少、分几批做。</p>
 <p>一个好的 Tiling 策略需要同时满足三个目标：</p>
 <ol>
@@ -21,7 +21,7 @@
 <li><strong>充分利用 UB 空间</strong>：A5 芯片每核有 248KB 的 Unified Buffer，这是计算的主战场。Tiling 要让每次搬运进来的数据尽量填满 UB，减少搬运次数。</li>
 <li><strong>减少搬运开销</strong>：每次 GM↔UB 的数据搬运都有延迟，好的 Tiling 应该让"搬运时间"和"计算时间"尽量重叠，把搬运开销藏起来。</li>
 </ol>
-<h4>4.2.1.1 Tiling 的三个核心问题</h4>
+<p><strong>(1) Tiling 的三个核心问题</strong></p>
 <p>设计 Tiling 时，你需要回答三个问题：</p>
 <ol>
 <li><strong>多核切分</strong>：总数据量怎么分给 N 个 AI Core？每个核处理哪一段？</li>
@@ -31,7 +31,7 @@
 <p>下面我们以 swap（向量交换）算子为例，逐一解答这三个问题。swap 的功能是交换两个向量 x 和 y 的对应元素，属于纯数据搬运型算子，逻辑简单，非常适合用来理解 Tiling 的基本框架。</p>
 <h3>4.2.2 多核切分策略</h3>
 <p>多核切分的目标很直接：把总数据量尽量均匀地分给所有可用的 AI Core。</p>
-<h4>4.2.2.1 基本切分公式</h4>
+<p><strong>(1) 基本切分公式</strong></p>
 <p>最直观的做法是用总数据量除以核数：</p>
 <pre class=""><code>perCoreN = totalN / coreNum</code></pre>
 <p>但这里有一个关键细节：昇腾 NPU 的 DataCopy 要求搬运长度按 32 字节对齐。对于 FP32（4 字节/元素），这意味着每次搬运的元素个数必须是 8 的倍数（32 ÷ 4 = 8）。所以我们不能简单地均分，还需要把每核的处理量<strong>向下对齐</strong>到对齐单元。</p>
@@ -41,7 +41,7 @@
 uint32_t rawPerCore = n / coreNum;
 tiling.perCoreN = (rawPerCore / alignUnit) * alignUnit;</code></pre>
 <p>先用 <code>n / coreNum</code> 算出粗略的每核处理量，再向下取整到 <code>ELEMENTS_PER_BLOCK</code> 的倍数。这样每个核处理的元素个数一定是 8 的倍数，满足 DataCopy 的对齐要求。</p>
-<h4>4.2.2.2 尾块处理</h4>
+<p><strong>(2) 尾块处理</strong></p>
 <p>向下对齐之后，必然会有剩余数据。比如 1000 个元素分给 32 个核，每核对齐后只能分 24 个（假设对齐单元为 8），总共才处理了 768 个，还剩 232 个没着落。</p>
 <p>swap 的策略是把所有剩余数据都交给<strong>最后一个核</strong>处理：</p>
 <pre class=""><code>tiling.remainder = n - tiling.perCoreN * coreNum;</code></pre>
@@ -58,7 +58,7 @@ if (blockIdx_ == GetBlockNum() - 1) {
 <h3>4.2.3 UB 空间切分</h3>
 <p>多核切分解决了"每个核处理多少数据"的问题，但每个核分到的数据量可能远大于 UB 能装下的量。比如 A5 的 UB 是 248KB，对于 FP32 最多装约 62K 个元素，如果每核分到 10 万个元素，就需要分多轮搬入 UB 处理。</p>
 <p>UB 切分要回答的问题是：<strong>UB 空间怎么分配给各个 Buffer？每轮能处理多少元素？</strong></p>
-<h4>4.2.3.1 Buffer 规划示例（swap）</h4>
+<p><strong>(1) Buffer 规划示例（swap）</strong></p>
 <p>swap 需要两个输入 Buffer（xBuffer 和 yBuffer），没有中间计算结果，也不需要输出 Buffer（直接把 x 的内容写回 y 的 GM 地址，y 的内容写回 x 的 GM 地址）。所以 UB 空间的分配很简单：</p>
 <div style="margin:20px 0;text-align:center">
 <svg viewBox="0 0 700 160" style="width:100%;max-width:700px" xmlns="http://www.w3.org/2000/svg">
@@ -78,7 +78,7 @@ constexpr uint32_t bufferCount = 2;
 uint32_t maxElements = ubSize / (bufferCount * sizeof(float));
 tiling.tileSize = (maxElements / alignUnit) * alignUnit;</code></pre>
 <p><code>maxElements</code> 是 UB 能装下的总元素数，除以 2 得到每个 Buffer 的大小，再向下对齐到 <code>ELEMENTS_PER_BLOCK</code>。这个 <code>tileSize</code> 就是 UB 单轮能处理的最大元素数。</p>
-<h4>4.2.3.2 Buffer 规划示例（Add）</h4>
+<p><strong>(2) Buffer 规划示例（Add）</strong></p>
 <p>再来看一个需要计算的例子。Add 算子做逐元素加法 <code>C[i] = A[i] + B[i]</code>，它需要三个 Buffer：两个输入（aBuffer、bBuffer）和一个输出（cBuffer）。UB 空间的分配如下：</p>
 <div style="margin:20px 0;text-align:center">
 <svg viewBox="0 0 700 160" style="width:100%;max-width:700px" xmlns="http://www.w3.org/2000/svg">
@@ -101,7 +101,7 @@ uint32_t maxElements = ubSize / (bufferCount * sizeof(float));
 tiling.tileSize = (maxElements / alignUnit) * alignUnit;</code></pre>
 <p>Add 的 Buffer 规划比 swap 多了一个输出 Buffer，所以 UB 空间要分成三份。每份约 82KB，能装约 20K 个 FP32 元素。这意味着如果每核分到 10 万个元素，需要分 5 轮搬入 UB 处理。</p>
 <p>注意 Add 有 Vector 计算阶段（<code>c = a + b</code>），所以可以采用双 Buffer 策略：把每个 Buffer 分成两块，一块用于当前轮的计算，另一块用于下一轮数据的搬入，让搬运和计算重叠执行，提升效率。这将在 <a href="04-核心开发-4.6-同步与流水线.html">4.6 同步与流水线</a> 中详细讨论。</p>
-<h4>4.2.3.3 双 Buffer 策略</h4>
+<p><strong>(3) 双 Buffer 策略</strong></p>
 <p>对于有 Vector 计算的算子（如 Add、Mul），通常会采用双 Buffer 策略：把每个 Buffer 分成两块，一块用于当前轮的计算，另一块用于下一轮数据的搬入，两者交替使用，让搬运和计算重叠执行。</p>
 <pre class=""><code>时间线：
 Buffer[0]: [搬运] [计算]        [搬运] [计算]
@@ -110,7 +110,7 @@ Buffer[1]:        [搬运] [计算]        [搬运] [计算]</code></pre>
 <h3>4.2.4 Tiling 数据结构设计</h3>
 <p>Tiling 数据是 Host 侧和 Device 侧之间的"合同"。Host 侧根据输入规模和硬件参数计算出切分方案，打包成一个结构体写入 GM；Kernel 侧从 GM 读出这个结构体，就知道自己该处理哪段数据、每轮搬多少。</p>
 <p>这个结构体需要包含 Kernel 运行所需的全部切分信息，不多不少。字段太少，Kernel 无法正确工作；字段太多，增加 GM 读写开销和代码复杂度。</p>
-<h4>4.2.4.2 swap 的 Tiling 结构</h4>
+<p><strong>(1) swap 的 Tiling 结构</strong></p>
 <pre class=""><code>struct SswapTilingData {
     uint32_t totalN;     // 总元素个数
     uint32_t perCoreN;   // 每核处理量（已对齐到 ELEMENTS_PER_BLOCK）
@@ -141,7 +141,7 @@ if (tileTail &gt; 0) {
 uint32_t coreNum = ascendcPlatform.GetCoreNumAiv();
 uint64_t ubSize;
 ascendcPlatform.GetCoreMemSize(platform_ascendc::CoreMemType::UB, ubSize);</code></pre>
-<h4>4.2.5.1 反例：硬编码</h4>
+<p><strong>(1) 反例：硬编码</strong></p>
 <pre class=""><code>// ❌ 错误：硬编码典型值
 constexpr uint32_t CORE_NUM = 32;
 constexpr uint32_t UB_SIZE = 248 * 1024;
@@ -153,12 +153,12 @@ ascendcPlatform.GetCoreMemSize(platform_ascendc::CoreMemType::UB, ubSize);</code
 <p>swap 的 UB 大小目前使用了常量值 248KB（A5 架构固定值），核数通过动态获取。理想情况下应通过接口获取 UB 大小，但 swap 作为简单算子使用了 A5 的固定值。在实际工程中，封装函数会统一处理这些查询。</p>
 <h3>4.2.6 不同算子类型的 Tiling 策略</h3>
 <p>不同类型的算子，Tiling 的侧重点不同。</p>
-<h4>4.2.6.1 逐元素算子</h4>
+<p><strong>(1) 逐元素算子</strong></p>
 <p>逐元素算子（如 Add、Mul、swap）是最简单的情况。每个输出元素只依赖对应位置的输入元素，元素之间没有依赖关系。因此 Tiling 只需要按元素数量均分，不需要考虑元素间的关联。</p>
 <p>swap 就是典型的逐元素算子：<code>x[i]</code> 和 <code>y[i]</code> 交换，跟 <code>x[j]</code> 和 <code>y[j]</code> 完全无关。所以它的 Tiling 策略非常直接——按 <code>n</code> 均分，对齐到 32B 边界，尾块给最后一核。</p>
-<h4>4.2.6.2 归约算子</h4>
+<p><strong>(2) 归约算子</strong></p>
 <p>归约算子（如 Sum、Max）需要沿某个维度聚合数据。Tiling 时需要区分"归约轴内"和"归约轴外"：轴内的数据必须累加到一起，不能随意切分；轴外的数据可以独立分配给不同核。通常的做法是：每个核先做局部归约，把中间结果写入 workspace，最后由一个核做全局归约。</p>
-<h4>4.2.6.3 矩阵乘算子</h4>
+<p><strong>(3) 矩阵乘算子</strong></p>
 <p>矩阵乘 <code>C[M,N] = A[M,K] × B[K,N]</code> 需要在 M、N、K 三个维度上同时切分。M 和 N 维度的切分类似逐元素算子（分给不同核），但 K 维度是累加维度，切分后需要累加中间结果。此外，分块大小受 L0A/L0B/L0C 容量限制，Tiling 设计更加复杂。这部分将在 <a href="04-核心开发-4.5-Cube计算.html">4.5 Cube 计算</a> 中详细讨论。</p>
 <p>更多关于 Tiling 的高级技巧（如 StreamK、尾块均衡），详见 <a href="07-进阶-7.1-常见踩坑与最佳实践.html">7.1 常见踩坑与最佳实践</a>。</p>
 <h3>参考链接</h3>

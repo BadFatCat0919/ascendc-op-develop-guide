@@ -15,7 +15,7 @@
 <h1>2.1 DaVinci 架构</h1>
 <h3>2.1.1 昇腾芯片概览</h3>
 <p>昇腾（Ascend）是华为自研的 AI 处理器系列，覆盖从训练到推理的多种场景。昇腾芯片的命名体系比较丰富，同一颗芯片在不同语境下有不同的叫法，搞清楚它们之间的关系是算子开发的第一步。</p>
-<h4>2.1.1.1 芯片命名体系</h4>
+<p><strong>(1) 芯片命名体系</strong></p>
 <p>昇腾芯片有以下几套命名，各自服务于不同的场景：</p>
 <table><thead><tr><th>命名方式</th><th>示例</th><th>说明</th><th>使用场景</th></tr></thead><tbody>
 <tr><td><strong>芯片型号</strong></td><td>Ascend910B2、Ascend310P3、Ascend950PR</td><td>芯片的正式产品名，印在芯片上的</td><td>产品文档、采购清单</td></tr>
@@ -30,7 +30,7 @@
 <p><strong>Q：为什么 A2 和 A3 的 NpuArch 都是 DAV_2201？</strong></p>
 <p>A：因为它们共用同一套硬件架构（指令集、Buffer 容量等都一样），只是芯片型号不同（A3 对应 Ascend910_93，是 A2 的后续版本）。对算子开发者来说，A2 和 A3 写同一份代码就行——都放在 arch22 目录下。</p>
 </blockquote>
-<h4>2.1.1.2 完整产品映射表</h4>
+<p><strong>(2) 完整产品映射表</strong></p>
 <p>下表列出了昇腾 NPU 的全部产品系列。一个 NpuArch 可以对应多个芯片型号：</p>
 <table><thead><tr><th>产品系列</th><th>服务器代号</th><th>SocVersion</th><th>NpuArch</th><th>archXX</th><th>芯片型号</th><th>定位</th></tr></thead><tbody>
 <tr><td>Atlas 训练系列</td><td>—</td><td>ASCEND910</td><td>DAV_1001</td><td>arch10</td><td>Ascend910</td><td>训练</td></tr>
@@ -42,7 +42,7 @@
 <tr><td>Atlas A5 推理</td><td><strong>A5</strong></td><td>ASCEND950</td><td>DAV_3510</td><td>arch35</td><td>Ascend950PR (Prefill)</td><td>推理</td></tr>
 </tbody></table>
 <p>可以看到，昇腾芯片分为两大产品线：<strong>910 系列</strong>面向训练和大模型推理（算力大、显存大），<strong>310 系列</strong>面向推理和边缘场景（功耗低、体积小）。其中 310P 是较早的推理芯片（DAV_2002 架构），310B 是 A2 时代的边缘推理芯片（DAV_3002 架构），而 950 系列（A5）是最新的训练/推理芯片。</p>
-<h4>2.1.1.3 DaVinci 核的演进</h4>
+<p><strong>(3) DaVinci 核的演进</strong></p>
 <p>昇腾 AI Core 的架构名称叫 <strong>DaVinci</strong>（达芬奇），每一代芯片的 DaVinci 核都有不同的架构版本号。下表展示了各代 DaVinci 核的关键差异——每一代相较于前代做了什么改动：</p>
 <table><thead><tr><th>特征</th><th>DAV_1001<br>(Ascend910)</th><th>DAV_2002<br>(Ascend310P)</th><th>DAV_2201<br>(A2/A3)</th><th>DAV_3002<br>(Ascend310B)</th><th>DAV_3510<br>(A5)</th></tr></thead><tbody>
 <tr><td>核心类型</td><td>AICore（单一核）</td><td>AICore + VectorCore</td><td>CubeCore + VectorCore</td><td>AICore + VectorCore + CubeCore</td><td>CubeCore + VectorCore</td></tr>
@@ -67,20 +67,20 @@
 <p><strong>Q：为什么 A5 删除了稀疏 4:2 支持？</strong></p>
 <p>A：稀疏 4:2 是一种结构化剪枝加速技术，要求权重矩阵中每 4 个元素有 2 个为零。实际工程中，模型稀疏化的效果有限且增加了编程复杂度，A5 选择用更低的精度（FP8/MXFP4）来换取算力提升，而不是依赖稀疏加速。</p>
 </blockquote>
-<h4>2.1.1.4 本文的讲解范围</h4>
+<p><strong>(4) 本文的讲解范围</strong></p>
 <p>本文以 <strong>A5（DAV_3510 / arch35）</strong>架构为主线讲解硬件结构，因为它是当前最新的标准架构，也是算子开发的主要目标平台。在算子仓中，不同架构的实现按目录区分：arch22 目录存放 A5 以前的架构的实现，arch35 目录存放 A5 的实现。A5 相比之前的架构的差异特性将在 <a href="02-昇腾硬件-2.2-A5新特性.html">2.2 A5 新特性</a> 中专门介绍。</p>
 <h3>2.1.2 AI Core：Da Vinci 核</h3>
 <p>AI Core 是昇腾 NPU 的基本计算单元，地位类似 GPU 中的 SM（Streaming Multiprocessor）。每个 AI Core 内部集成了三种计算单元，可以把它想象成一把王者荣耀里的团战阵容：Cube 是坦克（扛伤害，做最重的矩阵乘），Vector 是射手（持续输出，做逐元素运算），Scalar 是辅助（指挥走位，做控制流和地址计算）。</p>
-<h4>2.1.2.1 三大计算单元</h4>
+<p><strong>(1) 三大计算单元</strong></p>
 <table><thead><tr><th>计算单元</th><th>类比</th><th>擅长场景</th><th>算力 (A5 Server)</th></tr></thead><tbody><tr><td><strong>Cube</strong></td><td>吕布大招（一刀劈一片）</td><td>矩阵乘加（16×16×16 MAC 阵列）</td><td>432T (BF16)</td></tr><tr><td><strong>Vector</strong></td><td>流水线工人</td><td>逐元素运算、归约、类型转换</td><td>54T (FP16)</td></tr><tr><td><strong>Scalar</strong></td><td>管理员</td><td>控制流、地址计算</td><td>-</td></tr></tbody></table>
 <p><strong>Cube</strong> 是算力担当，专门做矩阵乘法。它内部是一个 16×16×16 的 MAC（乘累加）阵列，每个时钟周期可以完成一次 16×16 的矩阵乘运算。对于 FP8 精度，阵列扩大为 16×32×16，算力翻倍；对于 MXFP4 精度，阵列进一步扩大为 16×64×16，算力再翻倍。</p>
 <p><strong>Vector</strong> 是通用计算单元，宽度为 256 Bytes（2048 bit），每次可以处理 256 Bytes 的数据（对于 float 就是 64 个元素，对于 half 就是 128 个元素）。当数据总量超过一次处理的宽度时，Vector 通过 repeat（重复执行）和 mask（掩码选择）机制来处理任意长度的向量。</p>
 <p><strong>Scalar</strong> 负责控制流和地址计算等标量操作，不参与大规模数据计算。</p>
 <div class="sswap-callout"><p>sswap 是纯数据搬运算子（交换两个向量的元素），只做 CopyIn 和 CopyOut，不涉及加减乘除。因此它只使用 <strong>Vector</strong> 单元来驱动数据搬运（MTE2 搬入、MTE3 搬出），完全不需要 Cube 单元。这也是为什么 sswap 的 kernel 入口使用 <code>KERNEL_TASK_TYPE_DEFAULT(KERNEL_TYPE_AIV_ONLY)</code>——只启动 AIV（AI Vector）核，不启动 AIC（AI Cube）核。</p></div>
-<h4>2.1.2.2 Cube 单元详解</h4>
+<p><strong>(2) Cube 单元详解</strong></p>
 <p>Cube 的核心是一个脉动阵列（Systolic Array），在 FP16/BF16 精度下规模为 16×16×16。你可以把它理解为王者里吕布的大招：蓄力（数据从 L0A/L0B 送入）→ 一刀劈下去（16×16 的矩阵乘一步完成）→ 范围内的敌人全被打到（结果写入 L0C）。每个时钟周期，阵列中的每个乘加单元都在做一次乘法和一次累加，数据像波浪一样从一端流向另一端。</p>
 <p>FP8 精度下阵列规模变为 16×32×16（K 维度翻倍），MXFP4 下变为 16×64×16（K 维度再翻倍），精度越低、吞吐越高。</p>
-<h4>2.1.2.3 Vector 单元详解</h4>
+<p><strong>(3) Vector 单元详解</strong></p>
 <p>Vector 单元的物理宽度是 256 Bytes（2048 bit），一次指令操作的数据量由 VL（Vector Length）决定，最大为 256 Bytes。以 float（4 Bytes）为例，一次可以处理 64 个元素；以 half（2 Bytes）为例，一次可以处理 128 个元素。</p>
 <p>当向量长度超过单次处理能力时，Vector 通过 <strong>repeat</strong> 参数指定重复执行次数，通过 <strong>mask</strong> 参数指定每次执行时哪些元素有效。这套机制让 Vector 能够处理任意长度的向量，而不需要程序员手写循环。</p>
 <h3>2.1.3 存储层次</h3>
@@ -119,7 +119,7 @@
   <text x="490" y="300" fill="#64748b" font-size="13">每核 192~248KB，Vector 工作区</text>
 </svg>
 </div>
-<h4>2.1.3.1 各层存储容量</h4>
+<p><strong>(1) 各层存储容量</strong></p>
 <table><thead><tr><th>Buffer</th><th>A2 (910B2)</th><th>A5 (950PR)</th><th>用途</th></tr></thead><tbody><tr><td>GM</td><td>64 GB</td><td>112~128 GB</td><td>全局存储</td></tr><tr><td>L2</td><td>192 MB</td><td>112~128 MB</td><td>跨核共享</td></tr><tr><td>L1</td><td>512 KB</td><td>512 KB</td><td>Cube 输入缓存</td></tr><tr><td>L0A</td><td>64 KB</td><td>64 KB</td><td>Cube 左矩阵</td></tr><tr><td>L0B</td><td>64 KB</td><td>64 KB</td><td>Cube 右矩阵</td></tr><tr><td>L0C</td><td>128 KB</td><td><strong>256 KB</strong></td><td>Cube 输出（A5 翻倍）</td></tr><tr><td>UB</td><td>192 KB</td><td><strong>248 KB</strong></td><td>Vector 工作区</td></tr><tr><td>BT</td><td>1 KB</td><td><strong>4 KB</strong></td><td>FixPipe Bias</td></tr></tbody></table>
 <p>注意 A5 相比 A2 有两处显著增大：L0C 从 128 KB 翻倍到 256 KB（Cube 输出缓冲区更大，减少写回次数），UB 从 192 KB 增加到 248 KB（Vector 工作区更大，可以放更多中间数据）。</p>
 <blockquote>

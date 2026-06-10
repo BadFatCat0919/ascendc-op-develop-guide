@@ -13,7 +13,7 @@
 <div class="content">
 <div class="meta-bar"><a href="../index.html">← 返回目录</a></div>
 <h1>1.2 数据排布</h1>
-<h3>1.2.1 为什么数据排布很重要</h3>
+<h3>1.2.1 数据排布的重要性</h3>
 <p>无论数据在逻辑上分几维（1 维向量、2 维矩阵、4 维张量……），最终在内存中都是<strong>连续排布的一维数组</strong>。就像爬黄山，无论多少家庭、多少旅行团，最后到了"一线天"那个狭窄的通道，都得一个个地过。数据排布格式就是规定大家按什么顺序压缩成一条线通过。</p>
 <p>同样的一批数据，在内存中可以按不同的顺序排列。就像你刷大绿书，同样一堆帖子，按"最新"排和按"最热"排，你刷到想看内容的效率完全不同。数据排布格式决定了 NPU 访问内存时的效率——如果排布方式和硬件的计算模式匹配，就能连续读取、一次搬完；不匹配就会产生大量碎片化的随机访问，效率大打折扣。</p>
 <p>在算子开发中，数据排布格式直接影响两件事：</p>
@@ -33,7 +33,7 @@
 <p><strong>Q：为什么 ND 格式最常用，而不是 NCHW 或 NHWC？</strong></p>
 <p>A：因为 Ascend C 开发的大部分算子（如 Add、Mul、Swap 等逐元素和搬运算子）并不关心数据的"语义"（哪个维度是 Channel、哪个是 Height）。它们只关心"总共有多少个元素、怎么连续搬运"。ND 格式不限定维度含义，对这些算子来说最灵活。只有涉及卷积、矩阵乘等需要匹配 Cube 计算粒度的算子时，才需要使用 5HD、FracZ 等专用格式。</p>
 </blockquote>
-<h4>1.2.3.1 格式转换路径</h4>
+<p><strong>(1) 格式转换路径</strong></p>
 <div style="margin:20px 0;text-align:center">
 <svg style="width:100%;max-width:510px" viewBox="0 0 510 210" xmlns="http://www.w3.org/2000/svg">
 <defs><marker id="ah4" markerWidth="6" markerHeight="4" refX="5" refY="2" orient="auto"><polygon points="0 0,6 2,0 4" fill="#6366f1"/></marker></defs>

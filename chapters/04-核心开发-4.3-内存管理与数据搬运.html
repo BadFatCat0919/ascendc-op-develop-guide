@@ -37,7 +37,7 @@ yGM_.SetGlobalBuffer((__gm__ float*)y, tiling_.totalN);</code></pre>
 <h3>4.3.3 Unified Buffer (UB)</h3>
 <p>UB 是每个 AI Core 的片上高速缓存，是 Vector 计算的主战场。与 GM 不同，UB 是每核独享的——核 0 的 UB 和核 1 的 UB 是完全独立的两块内存，互不干扰。</p>
 <p>A5 芯片每核 UB 容量为 248KB。听起来不少，但对于大规模计算来说仍然很紧张，需要精心规划 Buffer 的分配。</p>
-<h4>4.3.3.1 UB 内存管理</h4>
+<p><strong>(1) UB 内存管理</strong></p>
 <p>Ascend C 提供了三种 UB 内存管理方式：</p>
 <p><strong>TBuf（静态 Buffer）</strong>：在编译时确定大小，适合大小固定的临时存储。用法简单，但灵活性差。</p>
 <p><strong>LocalTensor（动态 Tensor）</strong>：在运行时从 UB 中分配一块内存，适合大小在运行时才能确定的场景。通过 <code>AllocTensor</code> 分配，<code>FreeTensor</code> 释放。</p>
@@ -45,13 +45,13 @@ yGM_.SetGlobalBuffer((__gm__ float*)y, tiling_.totalN);</code></pre>
 <pre class=""><code>pipe_-&gt;InitBuffer(inQueueX_, BUFFER_NUM, bufSize);
 pipe_-&gt;InitBuffer(inQueueY_, BUFFER_NUM, bufSize);</code></pre>
 <p>这里为 x 和 y 各初始化了一个队列，单 Buffer，每个 Buffer 的大小为 <code>tileSize * sizeof(float)</code>。</p>
-<h4>4.3.3.2 对齐要求</h4>
+<p><strong>(2) 对齐要求</strong></p>
 <p>UB 中有一个硬性约束：<strong>Buffer 的起始地址必须 32 字节对齐，搬运长度也必须是 32 字节的倍数</strong>。这是因为 MTE（Memory Transfer Engine）以 32B 为最小搬运粒度。</p>
 <p>对于 FP32（4 字节/元素），32B 对齐意味着元素个数必须是 8 的倍数。所有 Tiling 计算中的切分粒度都要对齐到这个值。</p>
 <p>如果数据量不是 32B 的倍数怎么办？可以用 <code>DataCopyPad</code> 来处理，后面会详细讲。</p>
 <h3>4.3.4 DataCopy：数据搬运核心 API</h3>
 <p>DataCopy 是 Ascend C 中最基础、最常用的数据搬运 API。它负责在不同存储层级之间搬运数据，是整个算子执行流程的"物流系统"。</p>
-<h4>4.3.4.1 基本用法</h4>
+<p><strong>(1) 基本用法</strong></p>
 <p>DataCopy 的调用非常直观，根据参数类型自动判断搬运方向：</p>
 <pre class="ascii-art"><code>// GM → UB（搬入）
 DataCopy(dstLocal, srcGlobal, length);
@@ -65,7 +65,7 @@ DataCopy(yLocal, yGM_[curOffset], alignedCount);</code></pre>
 <p>搬出阶段把交换后的数据从 UB 写回 GM——注意这里是"交叉写回"：x 的内容写到 y 的 GM 地址，y 的内容写到 x 的 GM 地址：</p>
 <pre class=""><code>DataCopy(yGM_[curOffset], xIn, alignedCount);
 DataCopy(xGM_[curOffset], yIn, alignedCount);</code></pre>
-<h4>4.3.4.3 DataCopyPad：带填充的搬运</h4>
+<p><strong>(2) DataCopyPad：带填充的搬运</strong></p>
 <p>当数据量不是 32B 对齐时，直接用 DataCopy 会报错。DataCopyPad 通过自动填充（padding）来解决这个问题：搬运时把不足 32B 的尾部数据补齐到 32B 边界，填充的值不影响计算结果。</p>
 <p>swap 在处理尾块时使用了 DataCopyPad。当 <code>tailCount</code>（尾部元素数）不是 8 的倍数时：</p>
 <pre class=""><code>uint8_t paddingNum = ELEMENTS_PER_BLOCK - tailCount;
@@ -78,7 +78,7 @@ DataCopyPad(xLocal[alignedCount], xGM_[curOffset + alignedCount], copyParams, pa
 <h3>4.3.5 队列（Queue）机制</h3>
 <p>队列（Queue）是 Ascend C 流水线的核心数据结构。它扮演了"生产者"和"消费者"之间的缓冲区角色：搬运单元（MTE2）作为生产者把数据放入队列（EnQue），计算单元（Vector/Cube）作为消费者从队列取出数据（DeQue），计算完成后再把结果放入输出队列，由 MTE3 搬出。</p>
 <p>队列的价值不仅在于缓冲，更在于<strong>隐式同步</strong>：EnQue 操作会自动等待搬运完成，DeQue 操作会自动等待数据就绪。开发者不需要手动写 SetFlag/WaitFlag，队列机制帮你处理了大部分同步需求。</p>
-<h4>4.3.5.1 队列使用流程</h4>
+<p><strong>(1) 队列使用流程</strong></p>
 <p>swap 的队列使用分为三步：</p>
 <p><strong>第一步：初始化。</strong> 在 <code>Init</code> 阶段，通过 <code>pipe_->InitBuffer</code> 为队列分配 UB 空间：</p>
 <pre class=""><code>pipe_-&gt;InitBuffer(inQueueX_, BUFFER_NUM, bufSize);
@@ -96,7 +96,7 @@ LocalTensor&lt;float&gt; yIn = inQueueY_.DeQue&lt;float&gt;();
 // ... 使用 xIn 和 yIn 做搬出 ...
 inQueueX_.FreeTensor(xIn);
 inQueueY_.FreeTensor(yIn);</code></pre>
-<h4>4.3.5.2 多队列协作</h4>
+<p><strong>(2) 多队列协作</strong></p>
 <p>swap 有两个输入队列，分别管理 x 和 y 的数据流。对于更复杂的算子，可能还需要输出队列、中间结果队列等。不同队列之间相互独立，各自管理自己的 Buffer 生命周期。</p>
 <p>队列机制的一个关键优势是：它把同步逻辑封装在了 EnQue/DeQue 的语义中。你不需要关心"MTE2 搬完了没有"，只要 DeQue 能返回数据，就说明搬运一定已经完成了。这将在 <a href="04-核心开发-4.6-同步与流水线.html">4.6 同步与流水线</a> 中深入讨论。</p>
 <h3>4.3.6 各层存储之间的搬运路径</h3>

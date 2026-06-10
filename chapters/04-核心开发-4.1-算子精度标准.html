@@ -13,7 +13,7 @@
 <div class="content">
 <div class="meta-bar"><a href="../index.html">← 返回目录</a></div>
 <h1>4.1 算子精度标准</h1>
-<h3>4.1.1 什么是算子精度标准</h3>
+<h3>4.1.1 算子精度标准的定义</h3>
 <p>算子精度标准是衡量 NPU 算子输出结果与"标准答案"之间偏差的一套量化指标体系。它回答了一个核心问题：<strong>我的算子算出来的结果，到底够不够准？</strong></p>
 <p>由于不同硬件的浮点运算实现存在差异，同样的算子在 NPU 和 CPU（或其他芯片）上运行，结果无法做到完全一致。精度标准定义了"偏差在什么范围内可以接受"，是算子开发中不可绕过的验收门槛。</p>
 <p>精度标准之所以重要，有三个原因：</p>
@@ -34,7 +34,7 @@
 </table>
 <p>本章重点介绍商用精度标准的核心指标和使用方法。</p>
 <h3>4.1.2 商用精度标准详解</h3>
-<h4>4.1.2.1 精度等级：L0 / L1 / L2</h4>
+<p><strong>(1) 精度等级：L0 / L1 / L2</strong></p>
 <p>商用标准基于算子重要性，设计了从 L0 到 L2 的三级精度看护体系。等级越高，测试规模越大，通过阈值越严格：</p>
 <table>
 <thead><tr><th>精度等级</th><th>等级定义</th><th>用例规模</th><th>MARE Ratio</th><th>MERE Ratio</th><th>RMSE Ratio</th><th>适用场景</th></tr></thead>
@@ -45,7 +45,7 @@
 </tbody>
 </table>
 <p>开发算子时，首先要确认算子的精度等级。等级越高，开发难度越大——不仅要保证计算逻辑正确，还要在大规模用例下保持精度稳定。</p>
-<h4>4.1.2.2 核心误差指标</h4>
+<p><strong>(2) 核心误差指标</strong></p>
 <p>浮点计算类算子使用三个核心误差指标来衡量精度：</p>
 <p><strong>MARE</strong>（Max Absolute Relative Error，最大绝对相对误差）：所有输出元素中，相对误差的最大值。它反映的是"最坏情况下偏差有多大"：</p>
 <pre class=""><code>MARE = max(|actual - golden| / (|golden| + 1e-7))</code></pre>
@@ -56,7 +56,7 @@
 <blockquote>
 <p><strong>关于 1e-7</strong>：计算相对误差时，分母加上 1e-7 是为了避免 golden 值为 0 时出现除零错误。这个值足够小，不会影响正常值域的误差计算。</p>
 </blockquote>
-<h4>4.1.2.3 双标杆比对方法</h4>
+<p><strong>(3) 双标杆比对方法</strong></p>
 <p>商用标准采用<strong>双标杆比对</strong>，这是它与社区标准（单标杆）的核心区别。</p>
 <p>具体做法：以更高精度的 CPU 实现作为"真值（Golden）"，同时评估三方芯片实现和 NPU 实现相对于真值的误差，然后计算两者的比值（Ratio）：</p>
 <pre class=""><code>Ratio = NPU 误差指标 / 三方芯片误差指标</code></pre>
@@ -77,12 +77,12 @@ MARE_Ratio    = MARE_npu / MARE_benchmark</code></pre>
 <blockquote>
 <p><strong>没有三方芯片对标时怎么办？</strong>对于自定义算子或非标准算子，可以使用小算子拼接实现或自行构造的高精度 CPU 实现作为标杆。</p>
 </blockquote>
-<h4>4.1.2.4 非计算类与整数计算类标准</h4>
+<p><strong>(4) 非计算类与整数计算类标准</strong></p>
 <p>非计算类算子（如 Copy、Swap、Cast）不涉及数值计算，输出应该是输入的精确副本或确定性变换。通过标准最简单也最严格：<strong>二进制一致（Bitwise Match）</strong>。</p>
 <pre class=""><code>is_pass = np.array_equal(npu_output, golden_output)</code></pre>
 <p>只要有一个 bit 不同，就算失败。没有"差不多就行"的空间。</p>
 <p>整数计算类算子（如整数加减、位运算）同样要求二进制一致。整数运算没有舍入误差，结果应该是确定性的。如果整型算子的输出和 golden 不一致，那一定是代码有 bug，而不是精度问题。</p>
-<h4>4.1.2.5 小值域与特殊值处理</h4>
+<p><strong>(5) 小值域与特殊值处理</strong></p>
 <p>当 golden 值接近 0 时，相对误差的计算会变得不稳定（分母太小，一点偏差就会被放大）。此时需要启用<strong>小值域标准</strong>：</p>
 <table>
 <thead><tr><th>数据类型</th><th>小值阈值</th><th>误差阈值</th></tr></thead>
@@ -96,7 +96,7 @@ MARE_Ratio    = MARE_npu / MARE_benchmark</code></pre>
 <p>小值域标准使用 <strong>ErrorCount</strong>（超出误差阈值的元素个数）来评估，通过标准是 NPU 的 ErrorCount 与三方芯片的 ErrorCount 之比 ≤ 2。</p>
 <p>当输出包含 INF 或 NAN 时，需要特殊处理：如果 golden 是 INF/NAN，NPU 输出也应该是对应的 INF/NAN。具体的 INF/NAN 处理规则取决于芯片架构和环境变量配置。</p>
 <h3>4.1.3 如何在开发中使用精度标准</h3>
-<h4>4.1.3.1 开发阶段的精度检查流程</h4>
+<p><strong>(1) 开发阶段的精度检查流程</strong></p>
 <p>在算子开发过程中，精度验证通常遵循以下步骤：</p>
 <ol>
 <li><strong>确认精度等级</strong>：根据算子的业务重要性，确定 L0/L1/L2 等级。</li>
@@ -105,7 +105,7 @@ MARE_Ratio    = MARE_npu / MARE_benchmark</code></pre>
 <li><strong>执行并比对</strong>：在 NPU 上运行算子，计算 MARE/MERE/RMSE Ratio。</li>
 <li><strong>判定结果</strong>：Ratio 全部 ≤ 阈值则通过，否则进入精度调试。</li>
 </ol>
-<h4>4.1.3.2 精度验证代码示例</h4>
+<p><strong>(2) 精度验证代码示例</strong></p>
 <p>以下是一个浮点计算类算子的精度验证示例（Python）：</p>
 <pre class=""><code>import numpy as np
 
@@ -158,7 +158,7 @@ def check_precision(npu_out, golden, benchmark_out, level='L1'):
 <pre class=""><code>def check_bitwise(npu_out, golden):
     """非计算类算子精度检查：二进制一致"""
     return {'is_pass': np.array_equal(npu_out, golden)}</code></pre>
-<h4>4.1.3.3 精度不达标时的复检</h4>
+<p><strong>(3) 精度不达标时的复检</strong></p>
 <p>当单个用例不满足通过标准时，不要急着判定失败。NPU 执行存在一定的随机性，单次运行的结果可能受数值不稳定性影响。</p>
 <p>此时可以启动<strong>复检流程</strong>：</p>
 <ol>

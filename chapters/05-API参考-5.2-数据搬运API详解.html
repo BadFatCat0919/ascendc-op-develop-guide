@@ -216,7 +216,7 @@ __aicore__ inline void CopyOut(const GlobalTensor&lt;T&gt;&amp; dst,
 <h3>5.2.4.1 对齐优先</h3>
 <p>在 Tiling 设计阶段，尽量让每个 tile 的数据量满足 32 字节对齐。这样可以直接使用 DataCopy，避免 DataCopyPad 的额外开销。</p>
 
-<h3>5.2.5.2 减少搬运次数</h3>
+<h3>5.2.4.2 减少搬运次数</h3>
 <p>每次 DataCopy 调用都有固定的启动开销。将多个小块合并为一次大块搬运，比多次小块搬运更高效。</p>
 
 <h3>5.2.4.3 双缓冲重叠</h3>

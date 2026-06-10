@@ -58,11 +58,11 @@
   <text x="250" y="275" text-anchor="middle" fill="#64748b" font-size="12">L1→GM 和 GM→L0A/L0B 的直连通路已被删除</text>
 </svg>
 </div>
-<h4>2.2.2.1 L0C → UB</h4>
+<p><strong>(1) L0C → UB</strong></p>
 <p>Cube 的计算结果可以直接送到 Vector 单元做后处理（如激活函数、类型转换），不再需要先写回 GM 再由 Vector 读回来。这对 FlashAttention / FIA 类融合算子意义重大，可以消除 workspace 的 GM 读写，显著降低延迟。</p>
-<h4>2.2.2.2 UB ↔ L1</h4>
+<p><strong>(2) UB ↔ L1</strong></p>
 <p>Vector 与 Cube 之间建立了双向直连通道，数据可以在两个计算单元之间自由流动。UB→L1 是新增方向，让 Vector 的中间结果可以直接送入 Cube 的输入缓存。</p>
-<h4>2.2.2.3 SSBuffer 消息通路</h4>
+<p><strong>(3) SSBuffer 消息通路</strong></p>
 <p>核间细粒度同步机制，允许多个 AI Core 之间通过消息传递进行协作，而不需要经过 GM 中转。SSBuffer 容量约 256KB，是 DAV_3510 新增的 Buffer 类型。</p>
 <h3>2.2.3 新增编程模型</h3>
 <p>A5 引入了多种全新的编程模型，给算子开发者提供了更多选择。这些编程模型在 <a href="03-编程语言-3.2-编程模型.html">3.2 编程模型</a> 中有详细讲解，这里做一个总览。</p>

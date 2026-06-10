@@ -13,7 +13,7 @@
 <div class="content">
 <div class="meta-bar"><a href="../index.html">← 返回目录</a></div>
 <h1>1.3 数据类型</h1>
-<h3>1.3.1 为什么需要不同的数据类型</h3>
+<h3>1.3.1 多数据类型的必要性</h3>
 <p>在深度学习中，数据类型的选择本质上是一个<strong>精度-速度-显存的三角权衡</strong>：</p>
 <ul>
 <li><strong>精度越高</strong>（如 FP32），数值表示越准确，但每个数占 4 字节，显存消耗大、搬运慢。</li>
@@ -37,7 +37,7 @@
 </ul>
 <h3>1.3.3 数据类型对比表</h3>
 <table><thead><tr><th>类型</th><th>位宽</th><th>符号</th><th>指数</th><th>尾数</th><th>动态范围</th><th>精度</th><th>典型用途</th></tr></thead><tbody><tr><td>FP32 (float)</td><td>32</td><td>1</td><td>8</td><td>23</td><td>大</td><td>高</td><td>训练主精度</td></tr><tr><td>FP16 (half)</td><td>16</td><td>1</td><td>5</td><td>10</td><td>小</td><td>中</td><td>推理、混合精度训练</td></tr><tr><td>BF16 (bfloat16)</td><td>16</td><td>1</td><td>8</td><td>7</td><td>大</td><td>低</td><td>混合精度训练</td></tr><tr><td>FP8 E4M3</td><td>8</td><td>1</td><td>4</td><td>3</td><td>很小</td><td>很低</td><td>推理量化</td></tr><tr><td>FP8 E5M2</td><td>8</td><td>1</td><td>5</td><td>2</td><td>小</td><td>很低</td><td>训练梯度量化</td></tr><tr><td>INT8</td><td>8</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>量化推理</td></tr><tr><td>INT4</td><td>4</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>极致量化推理</td></tr></tbody></table>
-<h3>1.3.4 BF16 vs FP16：天赋点类比</h3>
+<h3>1.3.4 BF16 与 FP16 对比</h3>
 <p><strong>BF16 和 FP16 的区别</strong>是面试和实战中的高频考点。它们都是 16 位，但"天赋点点的位置不同"。</p>
 <p>什么是"天赋点"？在很多 RPG 游戏（比如王者荣耀的铭文系统、暗黑破坏神的技能树）中，角色升级时会获得有限的"天赋点"，你可以自由分配到不同的属性上——比如攻击力和血量。天赋点总数是固定的，加到攻击上的多了，加到血量上的就少了，反之亦然。不同的加点方案让同一个角色走出完全不同的路线。</p>
 <p>BF16 和 FP16 就像同一个英雄的两种天赋加点方案——总共只有 16 位（去掉 1 位符号位，剩 15 位"天赋点"），怎么分配这 15 位给"指数"（相当于血量——动态范围大，不容易溢出）和"尾数"（相当于攻击力——精度高，数值更准确）：</p>
@@ -60,7 +60,7 @@
 <p>写代码时以 C++ 类型名为准，别名通常出现在文档和口头讨论中。</p>
 <h3>1.3.6 A5 特有的数据类型</h3>
 <p>A5（DAV_3510 架构）相比之前的架构新增了多种低精度数据类型，主要服务于量化推理和高效训练。</p>
-<h4>1.3.6.1 MXFP 命名规则解读</h4>
+<p><strong>(1) MXFP 命名规则解读</strong></p>
 <p>看到 FP8 E4M3、MXFP4 E2M1 这种名字，可能一头雾水。其实命名规则很直观：</p>
 <ul>
 <li><strong>E</strong> = Exponent（指数位）：决定数值的大小范围，E 越大能表示的数越大/越小</li>
@@ -72,7 +72,7 @@
 <p><strong>Q：MXFP 命名中的 E 和 M 跟 IEEE 754 的指数位和尾数位是一回事吗？</strong></p>
 <p>A：概念上是一样的——E 都是 Exponent（指数位），M 都是 Mantissa（尾数位）。但 MXFP 的特殊之处在于，它不是每个元素独立拥有完整的指数位，而是 32 个元素共享一个额外的 Scale 因子（也叫 shared exponent）。所以 MXFP 的实际动态范围比"单看 E 位数"所暗示的要更大——因为那个共享的 Scale 因子提供了额外的缩放能力。</p>
 </blockquote>
-<h4>1.3.6.2 A5 Cube MMAD 支持的数据类型</h4>
+<p><strong>(2) A5 Cube MMAD 支持的数据类型</strong></p>
 <table><thead><tr><th>格式</th><th>A5 以前</th><th>A5 支持</th><th>备注</th></tr></thead><tbody><tr><td>FP16 / BF16 / HF32 / FP32 / S8</td><td>✅</td><td>✅</td><td>通用类型，两代都支持</td></tr><tr><td>FP8 E5M2 / E4M3</td><td>❌</td><td>✅</td><td>支持静态/动态量化</td></tr><tr><td>MXFP8 E5M2/E4M3</td><td>❌</td><td>✅</td><td>32 个 Data 共享 1 个 Scale</td></tr><tr><td>MXFP4 E2M1/E1M2</td><td>❌</td><td>✅</td><td>4-bit 浮点，极致压缩</td></tr><tr><td>HiF8</td><td>❌</td><td>✅</td><td>华为自定义 FP8 格式</td></tr></tbody></table>
 <p><strong>MXFP（Microscaling Floating Point）</strong> 是 A5 引入的一种"分组共享指数"格式：32 个数据元素共享 1 个 Scale 因子。这样做的好处是进一步压缩数据体积——32 个数只需要额外存 1 个 Scale，而不是每个数都带完整的指数位。在 Tiling 设计时，需要把 scaleFactor 作为独立的数据来处理，不能和 Data 混在一起搬运。</p>
 <h3>参考链接</h3>

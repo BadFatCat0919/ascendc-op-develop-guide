@@ -103,13 +103,13 @@
 <p><strong>线程数</strong>：单核最大支持 2048 线程，<strong>必须在编译期确定</strong>（使用 <code>constexpr</code> 或字面量），禁止从 tiling 数据动态获取。<code>LAUNCH_BOUND(N)</code> 和 <code>Simt::Dim3(N)</code> 必须使用同一个编译期常量。默认值 1024。</p>
 <p><strong>Warp 调度</strong>：内部按 32 线程分组形成 warp，warp 是硬件调度的最小单位。每个 AIV 核包含 4 个 Warp Scheduler，调度器编号为 <code>warp_id % 4</code>。同一时刻一个 AIV 核只执行一个线程块任务，线程块内多个 Warp 被依次调度执行。</p>
 
-<h4>7.3.2.1 SIMT 内存空间</h4>
+<p><strong>(1) SIMT 内存空间</strong></p>
 <table><thead><tr><th>内存类型</th><th>说明</th><th>访问范围</th><th>地址空间修饰符</th></tr></thead><tbody><tr><td>寄存器和栈</td><td>每个线程独立</td><td>线程私有</td><td>无（默认）</td></tr><tr><td>Unified Buffer (UB)</td><td>本地内存</td><td>核内共享</td><td><code>__ubuf__</code></td></tr><tr><td>Global Memory (GM)</td><td>全局内存</td><td>所有线程可访问</td><td><code>__gm__</code></td></tr></tbody></table>
 <p><strong>寄存器和栈</strong>：每个线程独享一组寄存器，寄存器数量受线程数影响，超出寄存器容量的变量会栈溢出。</p>
 <p><strong>Unified Buffer (UB)</strong>：核内共享的本地内存，总量 256KB。SIMT 算子不能使用全部 UB 空间，需为 DCache 预留 &ge;32KB，实际可用 UB = 256KB - 8KB(预留) - 32KB(DCache) = <strong>216KB</strong>。在 SIMT VF 中通过 <code>__ubuf__</code> 指针访问。</p>
 <p><strong>Global Memory (GM)</strong>：所有核所有线程均可访问。SIMT VF <strong>支持直接读写 GM</strong>，无需显式 Load/Store，通过 <code>__gm__</code> 指针访问，在 kernel 入口通过 <code>GM_ADDR</code> 参数传入。这是 SIMT 相比 SIMD 的一大优势&mdash;&mdash;SIMD 模式下数据必须先搬入 UB 才能被计算单元访问。</p>
 
-<h4>7.3.2.2 SIMT 支持直接读写 GM</h4>
+<p><strong>(2) SIMT 支持直接读写 GM</strong></p>
 <p>SIMT 模式下，线程可以通过 <code>__gm__</code> 指针直接读写 Global Memory，这是通过核内 DCache 实现的。DCache 最大 128KB，复用 UB 空间作为 Cacheline，以 128B 为粒度缓存 GM 数据。</p>
 <pre><code class="language-cpp">__simt_vf__ __aicore__ LAUNCH_BOUND(512) inline void GatherKernel(
     __gm__ const float* src,
@@ -128,7 +128,7 @@
 
 <h3>7.3.3 混合编程声明方式</h3>
 
-<h4>7.3.3.1 SIMT 函数调用层级</h4>
+<p><strong>(1) SIMT 函数调用层级</strong></p>
 <p>混合编程中，函数调用遵循严格的层级结构：</p>
 <pre class="ascii-art"><code>核函数 (__global__ __aicore__)
   ├── __aicore__ 函数
@@ -150,7 +150,7 @@
 <table><thead><tr><th>调用方式</th><th>目标 VF 类型</th><th>使用场景</th></tr></thead><tbody><tr><td><code>Simt::VF_CALL</code></td><td>SIMT VF（<code>__simt_vf__</code>）</td><td>启动线程级并行计算</td></tr><tr><td><code>asc_vf_call</code></td><td>SIMD VF（<code>__simd_vf__</code>）</td><td>启动矢量级计算</td></tr></tbody></table>
 <p>在同一个 <code>__global__ __aicore__</code> 核函数中，可以先调用 <code>VF_CALL</code> 执行 SIMT 逻辑（如 Gather），再调用 <code>asc_vf_call</code> 执行 SIMD 逻辑（如密集 Vector 计算），实现混合编程。</p>
 
-<h4>7.3.4.1 LAUNCH_BOUND 与寄存器数量</h4>
+<p><strong>(1) LAUNCH_BOUND 与寄存器数量</strong></p>
 <p><code>LAUNCH_BOUND(N)</code> 限定每个 VF Block 使用的最大线程数，线程数直接影响每线程可用寄存器数：</p>
 <table><thead><tr><th>线程数范围</th><th>每线程可用寄存器数</th></tr></thead><tbody><tr><td>1025~2048</td><td>16</td></tr><tr><td>513~1024</td><td>32</td></tr><tr><td>257~512</td><td>64</td></tr><tr><td>1~256</td><td>127</td></tr></tbody></table>
 <p>选择合适的线程数需要根据算子的寄存器压力来决定。如果寄存器不够用，编译器会 spill 到 UB，性能反而会下降。</p>
@@ -161,7 +161,7 @@
 <p><strong>场景二：SIMT 处理 Gather/Scatter，SIMD 处理密集计算。</strong> Embedding 查表用 SIMT（地址不连续），后续的 LayerNorm 用 SIMD（数据连续）。</p>
 <p><strong>场景三：SIMT 处理分支密集逻辑。</strong> 如排序、Hash 插入、随机数生成等包含大量条件分支的操作，SIMT 的 Warp Scheduler 可以高效处理分支发散。</p>
 
-<h4>7.3.5.1 混合编程代码示例</h4>
+<p><strong>(1) 混合编程代码示例</strong></p>
 <pre><code class="language-cpp">__global__ __aicore__ void MixedKernel(
     GM_ADDR input, GM_ADDR output,
     GM_ADDR indices, GM_ADDR tiling)
@@ -195,7 +195,7 @@ __simt_vf__ __aicore__ LAUNCH_BOUND(512) inline void GatherSimt(
     }
 }</code></pre>
 
-<h4>7.3.5.2 SIMT 适用与不适用场景</h4>
+<p><strong>(2) SIMT 适用与不适用场景</strong></p>
 <p><strong>适用场景</strong>：Gather/Scatter、Hash 插入、随机数、排序（含原子操作）。</p>
 <p><strong>不适用场景</strong>：</p>
 <ul>

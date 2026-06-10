@@ -16,11 +16,11 @@
 <p>本文以 sswap 算子（arch35）为贯穿示例。sswap 是 BLAS Level-1 算子，功能是交换两个向量的对应元素——纯数据搬运，不涉及 Vector 计算，使用 Single Buffer 和 TQueBind 流水线。</p>
 <h3>7.1.1 对齐问题</h3>
 <p>对齐问题是 Ascend C 开发中最常见、也最容易让人抓狂的坑。根本原因在于 Da Vinci 核的 MTE（Memory Transfer Engine）搬运数据时，硬件要求每次搬运的长度必须是 32 字节的整数倍。你可以把它想象成"集装箱装车"——每辆车只能装整箱，散货必须凑齐一整箱才能发。</p>
-<h4>7.1.1.1 常见场景</h4>
+<p><strong>(1) 常见场景</strong></p>
 <p><strong>场景一：DataCopy 长度不是 32B 的倍数。</strong> 假设你要搬运 10 个 FP32 元素（40 字节），而 40 不是 32 的倍数，直接调用 <code>DataCopy</code> 会报错或产生静默错误——数据看起来对了，但多出来的部分可能是垃圾值。</p>
 <p><strong>场景二：Buffer 起始地址未对齐。</strong> 如果 UB 上某块 Buffer 的起始地址不是 32B 对齐的，搬运过去的数据就会整体"错位"，读出来的值全部对不上。</p>
 <p><strong>场景三：FP16 数据长度不是 16 的倍数。</strong> FP16 每个元素占 2 字节，32B 对齐意味着每次搬运的元素个数必须是 16 的倍数。如果你只搬 10 个 FP16 元素（20 字节），同样不满足对齐要求。</p>
-<h4>7.1.1.2 sswap 是怎么处理的</h4>
+<p><strong>(2) sswap 是怎么处理的</strong></p>
 <p>sswap 在 <code>sswap_tiling_data.h</code> 中定义了一个关键常量：</p>
 <pre class=""><code>constexpr uint32_t ELEMENTS_PER_BLOCK = 32 / sizeof(float);</code></pre>
 <p>对于 FP32，<code>sizeof(float) = 4</code>，所以 <code>ELEMENTS_PER_BLOCK = 8</code>。这意味着 sswap 每次搬运的元素个数必须是 8 的倍数。</p>
@@ -29,7 +29,7 @@
 <li><strong>对齐部分</strong>：<code>alignedCount = (dataCount / 8) * 8</code>，这部分直接用 <code>DataCopy</code> 搬运，高效且安全。</li>
 <li><strong>尾部填充</strong>：<code>tailCount = dataCount - alignedCount</code>，这部分用 <code>DataCopyPad</code> 自动补齐到 8 的倍数，搬运到 UB 后只使用前 <code>tailCount</code> 个有效元素。</li>
 </ul>
-<h4>7.1.1.3 解决方案</h4>
+<p><strong>(3) 解决方案</strong></p>
 <ol>
 <li><strong>优先使用 DataCopyPad 自动填充。</strong> 对于尾部不足一个对齐块的数据，<code>DataCopyPad</code> 会自动在右侧补零，凑满 32B。这是最省心的方式，sswap 就是这么做的。</li>
 </ol>
@@ -58,15 +58,15 @@ if (tileTail &gt; 0) {
 <p>这个"切块 + 循环 + 处理尾巴"的模式，在几乎所有算子中都会用到。</p>
 <h3>7.1.3 Buffer 冲突</h3>
 <p>Buffer 冲突是指同一块 UB 内存被同时读写，导致数据错乱。打个比方：一个人在往黑板上写字，另一个人在同时擦黑板——结果就是谁都看不清写了什么。</p>
-<h4>7.1.3.1 sswap 的做法：两个独立的 TQueBind</h4>
+<p><strong>(1) sswap 的做法：两个独立的 TQueBind</strong></p>
 <p>sswap 需要同时处理 x 和 y 两个向量，它用了<strong>两个独立的 TQueBind</strong> 分别管理：</p>
 <pre class=""><code>TQueBind&lt;QuePosition::VECIN, QuePosition::VECOUT, 1&gt; inQueueX_;
 TQueBind&lt;QuePosition::VECIN, QuePosition::VECOUT, 1&gt; inQueueY_;</code></pre>
 <p>每个 TQueBind 各自管理一块独立的 Buffer，互不干扰。x 的数据走 <code>inQueueX_</code>，y 的数据走 <code>inQueueY_</code>，永远不会踩到对方。</p>
-<h4>7.1.3.2 双 Buffer 交替</h4>
+<p><strong>(2) 双 Buffer 交替</strong></p>
 <p>对于有 Vector 计算阶段的算子（比如 Add、Mul），通常使用<strong>双 Buffer（Ping-Pong）</strong> 模式：当 MTE2 在往 Buffer A 搬数据时，Vector 单元在计算 Buffer B 中的数据，两者交替进行，互不等待。</p>
 <p>但 sswap 是纯搬运算子，没有 Vector 计算阶段，所以双 Buffer 没有意义——它使用了 <strong>Single Buffer</strong>（<code>BUFFER_NUM = 1</code>），节省了一半的 UB 空间。</p>
-<h4>7.1.3.3 EnQue/DeQue 必须配对</h4>
+<p><strong>(3) EnQue/DeQue 必须配对</strong></p>
 <p>使用 TQueBind 时，每次 <code>AllocTensor</code> + <code>EnQue</code> 后，必须有对应的 <code>DeQue</code> + <code>FreeTensor</code>。如果漏掉了 <code>FreeTensor</code>，Queue 会认为 Buffer 还在被使用，下一次 <code>AllocTensor</code> 就会卡住，造成死锁。</p>
 <p>sswap 的流程非常清晰：</p>
 <div style="margin:20px 0;text-align:center">
@@ -120,9 +120,9 @@ TQueBind&lt;QuePosition::VECIN, QuePosition::VECOUT, 1&gt; inQueueY_;</code></pr
 <p>sswap 是纯数据搬运，不涉及任何计算，所以不存在精度问题——它的测试使用的是 <code>PrecisionMode::EXACT</code>（精确比对）。但对于有计算的算子，精度标准的选择至关重要，详见 <a href="04-核心开发-4.1-算子精度标准.html">4.1 算子精度标准</a>。</p>
 <h3>7.1.5 硬编码硬件参数</h3>
 <p>这是一个看似方便、实则致命的坏习惯。</p>
-<h4>7.1.5.1 为什么不能硬编码</h4>
+<p><strong>(1) 为什么不能硬编码</strong></p>
 <p>不同的昇腾芯片型号，Vector 核数、UB 大小等硬件参数完全不同。A5 以前的架构不同型号核数不同（如 910B2 有 48 个 Vector 核），sswap arch22 代码中使用 DEFAULT_VECTOR_CNT = 40。这就是为什么必须动态获取核数而不是硬编码。如果你在代码里写死 <code>CORE_NUM = 32</code>，换一块芯片就可能出问题——要么浪费了一半的核，要么核数不够导致数据丢失。</p>
-<h4>7.1.5.2 sswap 的正确做法</h4>
+<p><strong>(2) sswap 的正确做法</strong></p>
 <p>sswap 在 Host 侧通过 <code>aclrtGetDeviceInfo</code> 动态获取核数：</p>
 <pre class=""><code>static uint32_t GetVectorCoreCount()
 {
@@ -141,7 +141,7 @@ TQueBind&lt;QuePosition::VECIN, QuePosition::VECOUT, 1&gt; inQueueY_;</code></pr
 <pre class=""><code>uint32_t coreNum = ascendcPlatform.GetCoreNumAiv();
 uint64_t ubSize;
 ascendcPlatform.GetCoreMemSize(platform_ascendc::CoreMemType::UB, ubSize);</code></pre>
-<h4>7.1.5.3 反例</h4>
+<p><strong>(3) 反例</strong></p>
 <pre class=""><code>// ❌ 错误：硬编码
 constexpr uint32_t CORE_NUM = 32;
 constexpr uint32_t UB_SIZE = 248 * 1024;
@@ -152,12 +152,12 @@ uint64_t ubSize;
 ascendcPlatform.GetCoreMemSize(platform_ascendc::CoreMemType::UB, ubSize);</code></pre>
 <h3>7.1.6 流水线同步遗漏</h3>
 <p>在多流水线协同工作时，同步是保证数据正确性的关键。忘记同步或同步配对错误，轻则数据竞争（读到还没搬完的脏数据），重则死锁（两个流水线互相等待）。</p>
-<h4>7.1.6.1 传统方式：SetFlag/WaitFlag</h4>
+<p><strong>(1) 传统方式：SetFlag/WaitFlag</strong></p>
 <p>在 arch22（A5 以前的架构）上，你需要手动管理 <code>SET_FLAG</code> 和 <code>WAIT_FLAG</code>。以 arch22 的 sswap 为例：</p>
 <pre class=""><code>SET_FLAG(MTE2, MTE3, event_id);   // 通知 MTE3：MTE2 搬完了
 WAIT_FLAG(MTE2, MTE3, event_id);  // MTE3 等待 MTE2 搬完</code></pre>
 <p>如果忘记 <code>SET_FLAG</code>，MTE3 会永远等下去（死锁）；如果忘记 <code>WAIT_FLAG</code>，MTE3 可能在数据还没搬完时就开始读（数据竞争）。</p>
-<h4>7.1.6.2 A5 的简化：TQueBind 隐式同步</h4>
+<p><strong>(2) A5 的简化：TQueBind 隐式同步</strong></p>
 <p>在 arch35（A5）上，TQueBind 的 <code>EnQue</code>/<code>DeQue</code> 机制自动处理了流水线间的同步。sswap 的 arch35 实现中，你完全看不到 <code>SET_FLAG</code> 和 <code>WAIT_FLAG</code>——<code>EnQue</code> 会自动通知下游流水线"数据准备好了"，<code>DeQue</code> 会自动等待上游流水线"数据搬完了再读"。</p>
 <p>这是 A5 相比 A5 以前的架构的一个重要改进：把容易出错的显式同步，变成了不容易出错的隐式同步。</p>
 <h3>7.1.7 编码规范要点</h3>

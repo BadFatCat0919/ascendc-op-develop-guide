@@ -61,15 +61,15 @@
 
 <h3>7.2.3 向量寄存器操作</h3>
 
-<h4>7.2.3.1 寄存器组</h4>
+<p><strong>(1) 寄存器组</strong></p>
 <p>RegBase 模式提供了五类专用寄存器，构成完整的向量寄存器体系：</p>
 <table><thead><tr><th>寄存器类型</th><th>用途</th><th>说明</th></tr></thead><tbody><tr><td>向量寄存器（VR）</td><td>存放向量数据，是主要的计算载体</td><td>每条 VL=256B，承载实际计算数据</td></tr><tr><td>VFScalar</td><td>标量寄存器，存放标量操作数</td><td>用于标量广播、立即数等场景</td></tr><tr><td>地址寄存器</td><td>存放 UB 地址，用于 Load/Store</td><td>指向 UB 中的数据位置</td></tr><tr><td>对齐寄存器</td><td>存放对齐信息，辅助非对齐访问</td><td>配合地址寄存器处理非 32B 对齐数据</td></tr><tr><td>掩码寄存器</td><td>存放 mask，控制哪些元素参与计算</td><td>实现条件计算和尾部处理</td></tr></tbody></table>
 
-<h4>7.2.3.2 MicroAPI &mdash; 细粒度寄存器操作</h4>
+<p><strong>(2) MicroAPI &mdash; 细粒度寄存器操作</strong></p>
 <p>RegBase 提供了比 MemBase 更细粒度的 API，称为 MicroAPI。MemBase 的 API 以 <code>block</code> / <code>repeat</code> 参数控制批量操作，而 MicroAPI 允许你直接操作寄存器的某几个 lane，或者手动控制寄存器的复用策略。代码形态从 MemBase 的批量参数变为 RegBase 的 for-loop 显式循环：</p>
 <table><thead><tr><th>维度</th><th>MemBase</th><th>RegBase (MicroAPI)</th></tr></thead><tbody><tr><td>操作粒度</td><td>block/repeat 批量</td><td>逐元素 / 逐 lane 精细控制</td></tr><tr><td>代码形态</td><td>API 调用 + 参数</td><td>for-loop 显式循环</td></tr><tr><td>中间数据</td><td>驻留 UB</td><td>驻留寄存器</td></tr><tr><td>寄存器管理</td><td>编译器自动</td><td>开发者手动 + __VEC_SCOPE__</td></tr></tbody></table>
 
-<h4>7.2.3.3 OOO 双发 &mdash; 乱序执行</h4>
+<p><strong>(3) OOO 双发 &mdash; 乱序执行</strong></p>
 <p>A5 的 Vector 单元支持 <strong>Out-of-Order 双发射</strong>：两条没有数据依赖的指令可以在同一个时钟周期同时发射。这在 MemBase 模式下由编译器自动调度，而在 RegBase 模式下你可以手动安排指令顺序来最大化双发射的利用率。</p>
 <p>OOO 双发对 Vector 算力的提升是显著的。以 Ascend950PR PCIE 为例，Vector FP16 基础算力为 23.7T，启用 RegBase OOO 双发后翻倍至 47T。Server 版本从 27T 提升至 54T。</p>
 <p>要充分利用 OOO 双发，需要将无依赖的指令交错排列：</p>
@@ -105,7 +105,7 @@ __VEC_SCOPE__ {
 }</code></pre>
 <p>上面两个 <code>__VEC_SCOPE__</code> 块各自独立分配寄存器，第一个块结束后其寄存器被释放，第二个块可以复用同一组物理寄存器。</p>
 
-<h4>7.2.4.1 完整代码示例</h4>
+<p><strong>(1) 完整代码示例</strong></p>
 <p>下面是一个更完整的 RegBase 示例，展示了向量加法的完整流程：</p>
 <pre><code class="language-cpp">__aicore__ inline void VectorAddRegBase(
     const LocalTensor&lt;float&gt;&amp; ubA,

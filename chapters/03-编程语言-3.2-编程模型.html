@@ -55,19 +55,19 @@
 <p>每个核通过 <code>AscendC::GetBlockIdx()</code> 获取自己的编号，再结合 Tiling 参数算出自己该处理哪段数据。这就是 SPMD 的全部含义——代码共享，数据分工。</p>
 <p>SPMD 是<strong>外层</strong>的多核并行模型。在每个核<strong>内部</strong>，还可以选择 SIMD 或 SIMT 作为单核的计算方式。因此昇腾的编程模型可以理解为两层嵌套：<strong>SPMD（多核）嵌套 SIMD/SIMT（单核）</strong>。</p>
 <div class="sswap-callout"><p>以 swap 算子为例，Host 侧获取可用的 Vector 核数，然后将 n 个元素均分给各个核。每个核拿到自己的编号后，算出自己负责的数据范围，只处理自己负责的那段数据。这就是典型的 SPMD。</p></div>
-<h4>3.2.2.1 SPMD vs MPMD</h4>
+<p><strong>(1) SPMD vs MPMD</strong></p>
 <table><thead><tr><th>维度</th><th>SPMD（Ascend C）</th><th>MPMD（PyPTO）</th></tr></thead><tbody><tr><td>程序</td><td>所有核运行同一份代码</td><td>不同核运行不同代码</td></tr><tr><td>编程复杂度</td><td>低</td><td>高</td></tr><tr><td>灵活性</td><td>中（通过 if/else 区分行为）</td><td>高</td></tr><tr><td>昇腾支持</td><td>Ascend C 默认模型</td><td>通过 <a href="https://gitcode.com/cann/pypto">PyPTO</a> 框架支持</td></tr><tr><td>适用场景</td><td>单个算子开发</td><td>复杂融合算子、整网模型开发</td></tr></tbody></table>
 <p><strong>SPMD 是 Ascend C 算子开发的基础</strong>，日常开发单个算子时只需要掌握 SPMD 就够了。如果你的需求更复杂——比如需要不同核运行不同的计算逻辑（MPMD），或者要开发复杂的融合算子乃至整个模型网络，可以考虑使用 <a href="https://gitcode.com/cann/pypto">PyPTO</a>（Parallel Tensor/Tile Operation）框架。PyPTO 采用基于 Tile 的编程模型，通过多层次编译优化，将 Python 代码编译为高效的 NPU 可执行代码，并以 MPMD 方式调度到设备上的处理器核。</p>
 <h3>3.2.3 SIMD：传统向量编程</h3>
 <p>SIMD 的核心思想是"一条指令处理多个数据"。Vector 单元是一个 128 bit 宽的 SIMD 单元，一条 Add 指令就可以同时完成 64 个 float 的加法。</p>
 <p>类比：想象你弟弟打了一辆网约车，车上一共 4 个座位。不管坐满 4 个人还是只坐 1 个人，对司机来说操作都是一样的——踩油门、打方向盘、到目的地，花的时间也固定。这就是 SIMD——一条指令（一趟车）同时处理多个数据（多个乘客），不管实际装了多少数据，执行时间都一样。传统的 CPU 就相当于只有 1 个座位的车，每次只能拉 1 个乘客，要拉 64 个乘客就得跑 64 趟。而 Vector 单元是一辆 64 座的大巴，一趟全拉走。</p>
-<h4>3.2.3.1 SIMD 的两个子模型</h4>
+<p><strong>(1) SIMD 的两个子模型</strong></p>
 <p>SIMD 在昇腾上进一步分为两个子模型，区别在于中间计算结果存放在哪里：</p>
 <table><thead><tr><th>子模型</th><th>别名</th><th>中间数据位置</th><th>适用架构</th></tr></thead><tbody><tr><td><strong>MemBase</strong></td><td>Basic API</td><td>UB（Unified Buffer）</td><td>所有架构</td></tr><tr><td><strong>RegBase</strong></td><td>VF Fusion API</td><td>寄存器</td><td>仅 A5</td></tr></tbody></table>
 <p>MemBase 是经典模式，所有架构通用；RegBase 是 A5 新增的高性能模式，适合多步融合计算。下面分别讲解。</p>
 <h3>3.2.4 SIMD-MemBase：经典模式</h3>
 <p>MemBase 是最基础、最通用的编程模式。它的核心特征很简单：所有中间数据都存储在 UB（Unified Buffer）中。</p>
-<h4>3.2.4.1 编程流程</h4>
+<p><strong>(1) 编程流程</strong></p>
 <pre class=""><code>1. 从 GM 搬数据到 UB (DataCopy, MTE2)
 2. 在 UB 上做计算 (Add/Mul/Reduce...)
 3. 从 UB 搬结果回 GM (DataCopy, MTE3)</code></pre>
@@ -77,10 +77,10 @@
 <h3>3.2.5 SIMD-RegBase：寄存器级计算（A5 新增）</h3>
 <p>RegBase 是 A5 新增的高性能编程模式。它的核心特征是：中间计算结果保存在<strong>寄存器</strong>中，而不是 UB。</p>
 <p>为什么要这样做？因为在多步融合计算中，MemBase 模式下每一步都要把中间结果写回 UB、下一步再读出来，UB 的读写带宽成为瓶颈。RegBase 让中间结果留在寄存器里，下一步直接从寄存器读取，完全绕过了 UB 的带宽限制。只有最开始的数据搬入和最终的结果搬出才需要访问 UB。</p>
-<h4>3.2.5.1 RegBase vs MemBase</h4>
+<p><strong>(1) RegBase vs MemBase</strong></p>
 <table><thead><tr><th>维度</th><th>MemBase</th><th>RegBase</th></tr></thead><tbody><tr><td>中间数据位置</td><td>UB</td><td>寄存器</td></tr><tr><td>UB 访问次数</td><td>每步都读写</td><td>仅首尾读写</td></tr><tr><td>多步融合效率</td><td>低</td><td>高</td></tr><tr><td>指令双发</td><td>不支持</td><td>支持（OOO 双发）</td></tr><tr><td>非 32B 对齐</td><td>不支持</td><td>支持</td></tr><tr><td>架构支持</td><td>所有</td><td>仅 A5</td></tr><tr><td>编程复杂度</td><td>低</td><td>中</td></tr></tbody></table>
 <p>RegBase 还有一个独特优势：<strong>指令双发</strong>（Out-of-Order 双发）。硬件可以在一个时钟周期内同时发射两条不相关的指令，进一步提升计算单元的利用率。此外，RegBase 支持非 32B 对齐的数据访问，这在处理某些特殊数据布局时非常有用。</p>
-<h4>3.2.5.2 RegBase 代码形态</h4>
+<p><strong>(2) RegBase 代码形态</strong></p>
 <p>RegBase 的代码风格与 MemBase 有明显不同。MemBase 使用 block/repeat 参数来描述批量操作（"这条指令重复执行 N 次"），而 RegBase 使用 for-loop 显式循环（程序员自己写循环，每次处理一小块数据）。</p>
 <p>RegBase 使用 <code>__VEC_SCOPE__</code> 声明向量寄存器的作用域，使用 <code>__simd_vf__</code> 声明 VF（Vector Function）函数。这些关键字告诉编译器：这个函数内部的变量应该分配到向量寄存器中，而不是 UB。</p>
 <h3>3.2.6 SIMT：线程级并行（A5 新增）</h3>
@@ -90,20 +90,20 @@
 <p><strong>Q：SIMT 比 SIMD 更先进，是不是应该优先用 SIMT？</strong></p>
 <p>A：不是。SIMT 和 SIMD 各有适用场景。SIMD（大巴）适合规整的大块数据，一条指令处理多个元素，效率极高。SIMT（各自开车）适合离散、不规则的数据访问，灵活但调度成本更高。选择哪种取决于算子的数据访问模式，而不是哪个更"先进"。</p>
 </blockquote>
-<h4>3.2.6.1 SIMT 线程层次</h4>
+<p><strong>(1) SIMT 线程层次</strong></p>
 <table><thead><tr><th>层级</th><th>概念</th><th>说明</th><th>设置方式</th></tr></thead><tbody><tr><td>启动核数</td><td>Block 数量</td><td>启动多少个 AI Core</td><td>Tiling 侧 <code>SetBlockDim</code></td></tr><tr><td>启动线程数</td><td>单核线程数</td><td>每个 AI Core 内部启动多少线程</td><td>Kernel 侧 <code>constexpr</code> 常量</td></tr><tr><td>Warp</td><td>32 线程分组</td><td>硬件自动将 32 个线程分为一组</td><td>硬件自动分组</td></tr></tbody></table>
 <p>Warp 的概念——硬件自动将 32 个线程分为一组，组内线程同步执行同一条指令。</p>
-<h4>3.2.6.2 SIMT 内存空间</h4>
+<p><strong>(2) SIMT 内存空间</strong></p>
 <table><thead><tr><th>内存</th><th>说明</th><th>访问修饰符</th></tr></thead><tbody><tr><td>寄存器/栈</td><td>线程私有</td><td>默认</td></tr><tr><td>UB</td><td>核内共享</td><td><code>__ubuf__</code></td></tr><tr><td>GM</td><td>全局内存</td><td><code>__gm__</code></td></tr></tbody></table>
 <p>SIMT 的一个重要特性是<strong>支持直接读写 GM</strong>，不需要像 SIMD 那样显式调用 DataCopy 搬入搬出。这意味着你可以像写普通 C++ 代码一样直接通过指针访问全局内存，编程体验更直观。</p>
 <p>SIMT 模式下可用的 UB 容量为 256KB - 8KB（系统预留）- 32KB（DCache，SIMT 模式下的数据缓存，详见 <a href="07-进阶指南-7.3-SIMT混合编程.html">7.3</a>）= 216KB。</p>
-<h4>3.2.6.3 SIMT 适用场景</h4>
+<p><strong>(3) SIMT 适用场景</strong></p>
 <p>SIMT 擅长处理离散、不规则的访问模式：</p>
 <ul>
 <li><strong>适合</strong>：Gather/Scatter（离散地址读写）、Hash 计算、随机数生成、排序（支持原子操作）、稀疏计算。</li>
 <li><strong>不适合</strong>：大块 dense 矩阵乘（用 SIMD + Cube 更高效）、长向量的顺序计算（SIMD 的宽向量更合适）。</li>
 </ul>
-<h4>3.2.6.4 SIMT 函数调用层级</h4>
+<p><strong>(4) SIMT 函数调用层级</strong></p>
 <div style="margin:20px 0;text-align:center">
 <svg viewBox="0 0 700 240" style="width:100%;max-width:700px" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif">
   <defs>
@@ -132,10 +132,10 @@
 </div>
 <p>SIMT 和 SIMD 的 VF（Vector Function）不能跨模式调用——SIMT 的 VF 函数只能被 SIMT 代码调用，SIMD 的 VF 函数只能被 SIMD 代码调用。如果需要在 SIMT 代码中调用 SIMD 的能力，需要通过 <code>asc_vf_call</code> 机制进行模式切换。</p>
 <h3>3.2.7 编程模型选型指南</h3>
-<h4>3.2.7.1 按架构选择</h4>
+<p><strong>(1) 按架构选择</strong></p>
 <table><thead><tr><th>架构</th><th>可用模型</th></tr></thead><tbody><tr><td>A5 以前 (arch22, DAV_2201)</td><td>SIMD-MemBase</td></tr><tr><td>A5 (arch35, DAV_3510)</td><td>SIMD-MemBase + SIMD-RegBase + SIMT</td></tr></tbody></table>
 <p>A5 以前的架构只有 SIMD-MemBase 一种选择，没有选型烦恼。A5 有三种模型可选，需要根据算子特点做出合理选择。</p>
-<h4>3.2.7.2 按算子类型选择</h4>
+<p><strong>(2) 按算子类型选择</strong></p>
 <table><thead><tr><th>算子类型</th><th>推荐模型</th><th>原因</th></tr></thead><tbody><tr><td>简单逐元素 (Add/Mul)</td><td>SIMD-MemBase</td><td>简单直接，所有架构通用</td></tr><tr><td>多步融合 (Gelu+Cast)</td><td>SIMD-RegBase</td><td>减少 UB 读写，性能更好</td></tr><tr><td>矩阵乘 (MatMul)</td><td>SIMD + Cube</td><td>Cube 单元最高效</td></tr><tr><td>离散访问 (Gather)</td><td>SIMT</td><td>支持 GM 直接访问</td></tr><tr><td>排序/Hash</td><td>SIMT</td><td>支持原子操作和线程级控制</td></tr></tbody></table>
 <div class="sswap-callout"><p>swap 算子选择 SIMD-MemBase 的原因很直接——它是纯数据搬运算子，没有多步融合计算（不需要 RegBase），没有离散访问（不需要 SIMT），只需要把数据从 GM 搬入 UB 再交叉写回 GM。MemBase 的流水线工具恰好提供了搬入-搬出的完整管理能力，是最合适的选择。</p></div>
 <h3>参考链接</h3>

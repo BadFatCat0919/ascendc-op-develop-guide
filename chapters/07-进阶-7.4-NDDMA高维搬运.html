@@ -56,11 +56,11 @@
 
 <h3>7.4.2 适用场景</h3>
 
-<h4>7.4.2.1 last-axis 较短时</h4>
+<p><strong>(1) last-axis 较短时</strong></p>
 <p>NDDMA 特别适合 <strong>last-axis 长度较短</strong>的场景。比如一个形状为 <code>[N, D]</code> 的张量，如果 <code>D = 16</code>（last axis 很短），传统 DataCopy 每次只能搬 16 个元素（FP32 下仅 64B），并行度很低，计算效率仅 16/64 = 25%。</p>
 <p>通过 NDDMA 可以先做转置，把 D 轴转置到高轴凑足并行度后再计算，最后通过 Transpose / DataCopyPad 搬出。</p>
 
-<h4>7.4.2.2 典型适用场景</h4>
+<p><strong>(2) 典型适用场景</strong></p>
 <ul>
 <li><strong>GEMM 分块搬运</strong> &mdash; 矩阵分块时的多维 stride 访问</li>
 <li><strong>Attention QKV 切片</strong> &mdash; 从大张量中提取 Q/K/V 切片</li>
@@ -78,7 +78,7 @@
 <li><strong>搬出</strong>：通过 Transpose + DataCopyPad 将结果转置回原始维度顺序并搬出到 GM</li>
 </ol>
 
-<h4>7.4.3.1 代码示例</h4>
+<p><strong>(1) 代码示例</strong></p>
 <p>以形状为 <code>[N, D]</code>（D=16，FP32）的张量归约为例，展示 NDDMA 的使用方式：</p>
 <pre><code class="language-cpp">__aicore__ inline void ReduceShortLastAxis(
     const LocalTensor&lt;float&gt;&amp; ubSrc,

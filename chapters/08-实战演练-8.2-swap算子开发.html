@@ -443,13 +443,13 @@ void sswap_kernel_do(
 
 <h2>8.2.7 关键设计决策</h2>
 
-<h3>8.2.7.1 为什么用单 Buffer 而不是双 Buffer（ping-pong）？</h3>
+<h3>8.2.7.1 单 Buffer 的选择原因</h3>
 
 <p>双 Buffer（ping-pong）的目的是让搬运和计算重叠执行：当 Vector 单元在处理 ping Buffer 的数据时，MTE 同时向 pong Buffer 搬运下一批数据。</p>
 
 <p>但 swap 算子<strong>没有 Vector 计算阶段</strong>。它的整个流程只有 MTE2（GM&rarr;UB）和 MTE3（UB&rarr;GM），没有中间的 Vector 计算可以与搬运重叠。因此双 Buffer 没有任何收益，反而浪费一半的 UB 空间。使用单 Buffer 可以让 tileSize 更大，减少迭代次数。</p>
 
-<h3>8.2.7.2 为什么用交叉写回而不是临时变量？</h3>
+<h3>8.2.7.2 交叉写回的选择原因</h3>
 
 <p>一种直觉做法是：读入 x 和 y，在 UB 中交换，然后写回。但这需要额外的临时 Buffer 来暂存数据。交叉写回的技巧是：</p>
 

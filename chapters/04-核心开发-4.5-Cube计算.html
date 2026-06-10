@@ -17,12 +17,12 @@
 <p>如果说 Vector 单元是"逐个加工零件"的流水线工人，那 Cube 单元就是"一次搬一车砖"的重型机械。Cube 是昇腾 NPU 的矩阵乘加（MAC）计算单元，内部是一个 16×16×16 的 MAC 阵列，每个时钟周期可以完成一次 16×16 的矩阵乘法。</p>
 <p>Cube 的算力远大于 Vector。以 A5 (950PR Server) 为例，Vector 的 FP16 算力是 54T，而 Cube 的 BF16/FP16 算力高达 432T——差了将近 8 倍。这是因为矩阵乘是深度学习中计算密度最高的操作（全连接层、注意力机制、卷积等本质上都是矩阵乘），芯片设计时把大部分晶体管面积给了 Cube。</p>
 <p>不过，<strong>不是所有算子都需要 Cube</strong>。我们的贯穿示例 swap 就是一个鲜明的对比：swap 是纯数据搬运型算子，只用到 MTE2/MTE3 搬运引擎，完全不涉及 Cube 计算。而矩阵乘（MatMul）、卷积（Conv2D）、注意力（Attention）等算子则是 Cube 的主力用户。理解这两类算子的区别，有助于你在设计 Tiling 和流水线时做出正确的选择。</p>
-<h4>4.5.1.1 A5 Cube 算力</h4>
+<p><strong>(1) A5 Cube 算力</strong></p>
 <table><thead><tr><th>芯片</th><th>核数</th><th>频率</th><th>BF16/FP16</th><th>FP8</th><th>MXFP4</th></tr></thead><tbody><tr><td>A2 (910B2)</td><td>24</td><td>1.8 GHz</td><td>353T</td><td>-</td><td>-</td></tr><tr><td>A5 (950PR PCIE)</td><td>28</td><td>1.65 GHz</td><td>378T</td><td>757T</td><td>1514T</td></tr><tr><td>A5 (950PR Server)</td><td>32</td><td>1.65 GHz</td><td>432T</td><td>865T</td><td>1730T</td></tr></tbody></table>
 <p>A5 相比 A2 新增了 FP8 和 MXFP4 低精度支持，算力翻倍甚至翻四倍。这对于大模型推理场景（如 LLM 的 KV-Cache 量化）非常关键。</p>
 <h3>4.5.2 分块矩阵乘原理</h3>
 <p>大矩阵乘 <code>C[M,N] = A[M,K] × B[K,N]</code> 不可能一次性塞进 Cube 的 16×16 阵列里。就像搬一车砖，一次只能搬 16 块，需要分多次搬。Cube 的做法是把大矩阵切成 16×16 的小块（Tile），每次计算一个小块，累加到输出矩阵的对应位置。</p>
-<h4>4.5.2.1 基本块（Tile）</h4>
+<p><strong>(1) 基本块（Tile）</strong></p>
 <pre class=""><code>C[M,N] = A[M,K] × B[K,N]
 
 切分为：
@@ -30,7 +30,7 @@ C[m,n] = Σ A[m,k] × B[k,n]
 
 其中 m, n, k 是基本块大小，通常为 16 的倍数</code></pre>
 <p>每个基本块的大小是 16 的倍数（因为 Cube 阵列是 16×16 的），多个基本块的计算结果累加起来，就得到了完整的输出矩阵。</p>
-<h4>4.5.2.2 三层循环</h4>
+<p><strong>(2) 三层循环</strong></p>
 <p>分块矩阵乘的核心是一个三层嵌套循环：</p>
 <pre class=""><code>for each k_block:        // K 维度循环（受 L0A/L0B 容量限制）
     for each m_block:    // M 维度循环（受 L0C 容量限制）
@@ -48,7 +48,7 @@ C[m,n] = Σ A[m,k] × B[k,n]
 <li><strong>L0B</strong>：存放右矩阵 B 的当前块。另一个"原料托盘"。</li>
 <li><strong>L0C</strong>：存放输出矩阵 C 的累加结果。像一个"成品托盘"，每次矩阵乘的结果都累加到这里。</li>
 </ul>
-<h4>4.5.3.1 数据流</h4>
+<p><strong>(1) 数据流</strong></p>
 <p>数据从 GM 出发，经过 L1 中转，最终到达 L0A/L0B，在 Cube 中计算后写入 L0C，最后搬出到 UB 或 GM：</p>
 <div style="margin:20px 0;text-align:center">
 <svg viewBox="0 0 700 280" style="width:100%;max-width:700px" xmlns="http://www.w3.org/2000/svg">
@@ -86,13 +86,13 @@ C[m,n] = Σ A[m,k] × B[k,n]
 </svg>
 </div>
 <p>注意这条路径比 swap 复杂得多。swap 只需要 GM↔UB 两条路径，而矩阵乘需要 GM→L1→L0A/L0B→L0C→UB→GM 一整条链路，涉及 MTE2、MTE1、MTE3 三个搬运引擎的协调。</p>
-<h4>4.5.3.2 容量限制</h4>
+<p><strong>(2) 容量限制</strong></p>
 <table><thead><tr><th>Buffer</th><th>容量</th><th>可存放的 FP16 矩阵大小</th></tr></thead><tbody><tr><td>L0A</td><td>64 KB</td><td>16 × 2048 或 128 × 256</td></tr><tr><td>L0B</td><td>64 KB</td><td>16 × 2048 或 128 × 256</td></tr><tr><td>L0C</td><td>128 KB (A2) / 256 KB (A5)</td><td>128 × 128 (FP32 累加)</td></tr></tbody></table>
 <p>L0A 和 L0B 各 64KB，L0C 在 A5 上有 256KB（是 A2 的两倍）。L0C 更大是因为输出通常用 FP32 累加（即使输入是 FP16），每个元素占 4 字节而不是 2 字节。</p>
 <p>这些容量限制直接决定了 Tiling 中 K/M/N 维度的块大小上限。比如 L0A 只能放 64KB，如果你选择 FP16 输入，那 <code>m × k × 2 ≤ 65536</code>，即 <code>m × k ≤ 32768</code>。</p>
 <h3>4.5.4 MatMul API</h3>
 <p>Ascend C 提供了高层的 MatMul API，封装了 Cube 计算的底层细节。开发者不需要手动管理 L0A/L0B/L0C 的分配和搬运，只需要调用几个函数就能完成矩阵乘。</p>
-<h4>4.5.4.1 基本用法</h4>
+<p><strong>(1) 基本用法</strong></p>
 <pre class=""><code>// 从 L1 搬入 L0A/L0B
 CopyIn(leftMatrix, rightMatrix);
 // 执行矩阵乘
@@ -100,7 +100,7 @@ Matmul(outputMatrix, leftMatrix, rightMatrix);
 // 从 L0C 搬出
 CopyOut(outputMatrix);</code></pre>
 <p>这三步对应了 Cube 计算的完整生命周期：搬入→计算→搬出。<code>CopyIn</code> 负责把数据从 L1 搬到 L0A 和 L0B，<code>Matmul</code> 执行矩阵乘并把结果累加到 L0C，<code>CopyOut</code> 把 L0C 的结果搬到 UB 或 GM。</p>
-<h4>4.5.4.2 融合算子</h4>
+<p><strong>(2) 融合算子</strong></p>
 <p>为了进一步提升性能，Ascend C 还提供了一些融合算子，把矩阵乘和后处理操作合并成一步执行：</p>
 <ul>
 <li><strong>MatmulLeakyRelu</strong>：矩阵乘 + LeakyReLU 激活函数融合。省去了把中间结果搬到 UB 做 ReLU 再搬回来的开销。</li>
