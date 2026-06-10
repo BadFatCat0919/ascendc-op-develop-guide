@@ -105,7 +105,14 @@ inQueueY_.FreeTensor(yIn);</code></pre>
 <p>swap 只用到了两条路径：GM→UB（MTE2 搬入）和 UB→GM（MTE3 搬出）。这两条路径分别由 MTE2 和 MTE3 引擎驱动，可以并行执行——也就是说，MTE2 在搬入下一轮数据的同时，MTE3 可以搬出上一轮的结果。这就是流水线并行的基础。</p>
 <p>A5 相比之前的架构新增了两条重要通路：L0C→UB 和 UB↔L1。这意味着 Cube 的计算结果可以直接送到 Vector 做后处理，Vector 的中间结果也可以直接送给 Cube 做下一轮矩阵乘，不需要绕道 GM。这大大提升了混合计算场景的效率。</p>
 <h3>4.3.7 内存对齐详解</h3>
-<p>32B 对齐是昇腾 NPU 的硬性要求，不是建议，是必须遵守的规则。违反对齐要求会导致两种后果：一种是 DataCopy 直接报错（运行时异常），另一种更隐蔽——不报错但数据错位，导致精度问题。</p>
+<p>昇腾 NPU 的内存访问有一个硬性要求：<strong>数据必须 32 字节（32B）对齐</strong>。这意味着每次从 Global Memory 搬运数据到 UB 时，搬运的起始地址和数据长度都必须是 32B 的整数倍。这不是建议，是必须遵守的规则。违反对齐要求会导致两种后果：一种是 DataCopy 直接报错（运行时异常），另一种更隐蔽——不报错但数据错位，导致精度问题。</p>
+<p>为什么是 32B？因为 NPU 的 MTE（Memory Transfer Engine）一次搬运的最小粒度就是 32 字节——就像你在狗西购物凑满减，满 199 减 30，你购物车里 198 块的东西得硬凑个 1 块钱的数据线才能享受优惠。MTE 也一样，不够 32 字节的数据得用"填充物"补齐才能发车。</p>
+<p>对齐粒度的计算方式：</p>
+<pre class=""><code>对齐粒度（元素个数）= 32B / 每个元素的字节数</code></pre>
+<table><thead><tr><th>数据类型</th><th>每元素字节数</th><th>对齐粒度（元素个数）</th></tr></thead><tbody><tr><td>FP32 (float)</td><td>4B</td><td>8 个元素</td></tr><tr><td>FP16 (half)</td><td>2B</td><td>16 个元素</td></tr><tr><td>BF16</td><td>2B</td><td>16 个元素</td></tr><tr><td>INT8</td><td>1B</td><td>32 个元素</td></tr></tbody></table>
+<p>对齐后长度的计算公式：</p>
+<pre class=""><code>对齐后长度 = ceil(原始长度 / 对齐粒度) × 对齐粒度</code></pre>
+<p><strong>以 swap 算子为例</strong>，如果使用 FP32（float）类型，每个 float 占 4 字节，所以对齐粒度 = 32 / 4 = <strong>8 个 float</strong>。如果向量长度不是 8 的倍数，就需要在末尾补齐（padding）到 8 的倍数才能用 DataCopy 搬运。</p>
 <p>对齐要求涉及两个方面：</p>
 <ol>
 <li><strong>地址对齐</strong>：UB 中 Buffer 的起始地址必须是 32B 的倍数。通过 <code>InitBuffer</code> 分配的 Buffer 自动满足这个要求。</li>
@@ -116,6 +123,10 @@ inQueueY_.FreeTensor(yIn);</code></pre>
 <li><strong>Tiling 阶段对齐</strong>：在切分时就把每轮的数据量对齐到 32B 边界，尾块单独处理。swap 的切分粒度都做了对齐。</li>
 <li><strong>DataCopyPad 填充</strong>：对于尾块，用 DataCopyPad 自动补齐不足的部分。swap 在尾部元素数不是 8 的倍数时使用了这种方式。</li>
 </ul>
+<blockquote>
+<p><strong>Q：对齐填充（padding）的数据会影响计算结果吗？</strong></p>
+<p>A：不会。填充的数据只是用来凑够 32B 搬运粒度的"占位符"，搬运时会一起搬到 UB，但计算时算子会根据实际的向量长度（Tiling 参数中传入）忽略这些填充元素。写回结果时也只写回实际长度的数据，填充部分不会写回 Global Memory。</p>
+</blockquote>
 <p>详细的对齐规则速查表见 <a href="附录-A-数据类型速查表.html">附录 B：对齐规则速查</a>。</p>
 <p>更多关于内存优化的技巧（如 L1 Bank 冲突消除、Full Load），详见 <a href="06-调试与优化-6.2-性能优化.html">6.2 性能优化</a>。</p>
 <h3>参考链接</h3>
@@ -163,6 +174,12 @@ renderQuiz('quiz', [
     options: ["MTE1 和 MTE2", "MTE2（GM→UB 搬入）和 MTE3（UB→GM 搬出）", "MTE1 和 MTE3", "只用 MTE2"],
     answer: 1,
     explanation: "swap 是纯搬运算子，数据路径是 GM→UB（MTE2 搬入）和 UB→GM（MTE3 搬出）。这两条路径可以并行执行，是流水线并行的基础。"
+  },
+  {
+    question: "NPU 要求数据 32B 对齐，就像在狗西购物凑满减。对于 FP16（half）类型，对齐粒度是多少个元素？如果原始向量长度为 100 个 FP16 元素，对齐后需要多少个元素？",
+    options: ["8 个，对齐后 104 个", "16 个，对齐后 112 个", "32 个，对齐后 128 个", "16 个，对齐后 100 个（不需要对齐）"],
+    answer: 1,
+    explanation: "FP16 每个元素 2 字节，对齐粒度 = 32B / 2B = 16 个元素。原始长度 100 不是 16 的倍数，向上对齐：ceil(100/16) × 16 = 7 × 16 = 112 个元素。多出的 12 个元素是填充（padding），搬运时一起搬但计算时忽略。"
   }
 ]);
 </script>

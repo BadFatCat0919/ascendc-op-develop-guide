@@ -80,20 +80,7 @@
 <p><strong>Q：为什么 Attention 要用 BSND 而不是 BSH？</strong></p>
 <p>A：因为 Multi-Head Attention 需要把输入拆成多个 Head 分别计算。BSH 格式把 NumHeads 和 HeadDim 合并成了 Hidden 维，无法区分不同的 Head。BSND 格式显式地保留了 NumHeads 维，让 Kernel 可以按 Head 并行处理——每个 AI Core 处理一个或几个 Head，实现多核并行。</p>
 </blockquote>
-<h3>1.2.4 对齐要求</h3>
-<p>昇腾 NPU 的内存访问有一个硬性要求：<strong>数据必须 32 字节（32B）对齐</strong>。这意味着每次从 Global Memory 搬运数据到 UB 时，搬运的起始地址和数据长度都必须是 32B 的整数倍。</p>
-<p>为什么是 32B？因为 NPU 的 MTE（Memory Transfer Engine）一次搬运的最小粒度就是 32 字节——就像你在狗西购物凑满减，满 199 减 30，你购物车里 198 块的东西得硬凑个 1 块钱的数据线才能享受优惠。MTE 也一样，不够 32 字节的数据得用"填充物"补齐才能发车。</p>
-<p>对齐粒度的计算方式：</p>
-<pre class=""><code>对齐粒度（元素个数）= 32B / 每个元素的字节数</code></pre>
-<table><thead><tr><th>数据类型</th><th>每元素字节数</th><th>对齐粒度（元素个数）</th></tr></thead><tbody><tr><td>FP32 (float)</td><td>4B</td><td>8 个元素</td></tr><tr><td>FP16 (half)</td><td>2B</td><td>16 个元素</td></tr><tr><td>BF16</td><td>2B</td><td>16 个元素</td></tr><tr><td>INT8</td><td>1B</td><td>32 个元素</td></tr></tbody></table>
-<p>对齐后长度的计算公式：</p>
-<pre class=""><code>对齐后长度 = ceil(原始长度 / 对齐粒度) × 对齐粒度</code></pre>
-<p><strong>以 swap 算子为例</strong>，如果使用 FP32（float）类型，每个 float 占 4 字节，所以对齐粒度 = 32 / 4 = <strong>8 个 float</strong>。如果向量长度不是 8 的倍数，就需要在末尾补齐（padding）到 8 的倍数才能用数据搬运指令（Ascend C 中叫 <code>DataCopy</code>，详见 <a href="04-核心开发-4.3-内存管理与数据搬运.html">4.3</a>）搬运。</p>
-<blockquote>
-<p><strong>Q：对齐填充（padding）的数据会影响计算结果吗？</strong></p>
-<p>A：不会。填充的数据只是用来凑够 32B 搬运粒度的"占位符"，搬运时会一起搬到 UB，但计算时算子会根据实际的向量长度（Tiling 参数中传入）忽略这些填充元素。写回结果时也只写回实际长度的数据，填充部分不会写回 Global Memory。</p>
-</blockquote>
-<p>更多对齐规则的细节见 <a href="附录-A-数据类型速查表.html">附录 B：对齐规则速查</a>。</p>
+<p>关于数据搬运时的 <strong>32B 对齐要求</strong>（对齐粒度计算、填充策略等），这是和 NPU 硬件绑定的知识，将在 <a href="04-核心开发-4.3-内存管理与数据搬运.html">4.3.7 内存对齐详解</a> 中详细介绍。</p>
 <h3>参考链接</h3>
 <ul>
 <li><a href="https://hiascend.com/document/redirect/CannCommunityAscendCApi">Ascend C API 文档 — 数据类型</a></li>
@@ -112,12 +99,6 @@ renderQuiz('quiz', [
     options: ["NCHW（PyTorch 默认）", "NHWC（TensorFlow 默认）", "ND（Row-major，行优先）", "NC1HWC0（5HD 专用格式）"],
     answer: 2,
     explanation: "ND 格式是 Ascend C 开发中最常用的格式。它不限制维度数和维度含义，数据按行优先（Row-major）顺序连续存放——就像 C 语言中二维数组 a[i][j] 的存储方式。NCHW 和 NHWC 分别是 PyTorch 和 TensorFlow 的默认格式，而 5HD 是昇腾 NPU 专用格式，只在卷积等需要匹配 Cube 计算粒度的场景使用。"
-  },
-  {
-    question: "NPU 要求数据 32B 对齐，就像在狗西购物凑满减。对于 FP16（half）类型，对齐粒度是多少个元素？如果原始向量长度为 100 个 FP16 元素，对齐后需要多少个元素？",
-    options: ["8 个，对齐后 104 个", "16 个，对齐后 112 个", "32 个，对齐后 128 个", "16 个，对齐后 100 个（不需要对齐）"],
-    answer: 1,
-    explanation: "FP16 每个元素 2 字节，对齐粒度 = 32B / 2B = 16 个元素。原始长度 100 不是 16 的倍数，向上对齐：ceil(100/16) × 16 = 7 × 16 = 112 个元素。多出的 12 个元素是填充（padding），搬运时一起搬但计算时忽略。"
   },
   {
     question: "格式转换（如 NCHW → 5HD）是有开销的。以下哪种做法在算子设计中是合理的？",
