@@ -13,16 +13,17 @@
 <div class="content">
 <div class="meta-bar"><a href="../index.html">&larr; 返回目录</a></div>
 <h1>B. 专有名词速查表</h1>
-<p>Ascend C 开发中涉及的所有专有名词速查，包含中英文术语，按音序排列便于查找。</p>
+<p>Ascend C 开发中涉及的所有专有名词速查，中英文统一按首字母排列。</p>
 <table>
 <thead><tr>
-<th>音序</th>
+<th>首字母</th>
 <th>术语</th>
 <th>英文全称</th>
 <th>解释</th>
 </tr></thead>
 <tbody>
-<tr><td rowspan="8"><strong>A</strong></td><td><code>ACL</code></td><td>Ascend Computing Language</td><td>昇腾计算语言，CANN 提供的基础编程接口</td></tr>
+<tr><td rowspan="8"><strong>A</strong></td>
+<td><code>ACL</code></td><td>Ascend Computing Language</td><td>昇腾计算语言，CANN 提供的基础编程接口</td></tr>
 <tr><td><code>aclblas</code></td><td>—</td><td>ops-blas 仓定义的 BLAS 算子上层接口</td></tr>
 <tr><td><code>aclnn</code></td><td>—</td><td>Ascend C 算子的标准调用接口，前缀为 aclnn 的 C 函数</td></tr>
 <tr><td><code>AI Core</code></td><td>—</td><td>昇腾 NPU 的基本计算单元，包含 Cube / Vector / Scalar 三大计算单元</td></tr>
@@ -30,83 +31,121 @@
 <tr><td><code>AIV</code></td><td>AI Vector</td><td>AI Core 中负责向量计算的单元</td></tr>
 <tr><td><code>Ascend C</code></td><td>—</td><td>华为昇腾 NPU 上的 C++ 算子开发框架</td></tr>
 <tr><td><code>ATC</code></td><td>Ascend Tensor Compiler</td><td>离线模型编译工具</td></tr>
-<tr><td rowspan="2"><strong>B</strong></td><td><code>BF16</code></td><td>Brain Float 16</td><td>16 位浮点格式，8 位指数 + 7 位尾数，动态范围同 FP32</td></tr>
-<tr><td><code>BufferID</code></td><td>—</td><td>A5 引入的同步机制，硬件自动追踪 Buffer 依赖关系</td></tr>
-<tr><td rowspan="2"><strong>B</strong>（中文）</td><td>搬运</td><td>Data Movement</td><td>在 GM 和 UB 之间搬运数据的过程，由 MTE 引擎驱动</td></tr>
+
+<tr><td rowspan="4"><strong>B</strong></td>
+<td>搬运 / 数据搬运</td><td>Data Movement</td><td>在 GM 和 UB 之间搬运数据的过程，由 MTE 引擎驱动</td></tr>
 <tr><td>搬运引擎</td><td>Memory Transfer Engine (MTE)</td><td>负责数据搬运的硬件引擎，包括 MTE1/MTE2/MTE3</td></tr>
-<tr><td rowspan="5"><strong>C</strong></td><td><code>CANN</code></td><td>Compute Architecture for Neural Networks</td><td>昇腾统一计算架构</td></tr>
+<tr><td><code>BF16</code></td><td>Brain Float 16</td><td>16 位浮点格式，8 位指数 + 7 位尾数，动态范围同 FP32</td></tr>
+<tr><td><code>BufferID</code></td><td>—</td><td>A5 引入的同步机制，硬件自动追踪 Buffer 依赖关系</td></tr>
+
+<tr><td rowspan="7"><strong>C</strong></td>
+<td><code>CANN</code></td><td>Compute Architecture for Neural Networks</td><td>昇腾统一计算架构</td></tr>
 <tr><td><code>CCE</code></td><td>C Cube Engine</td><td>华为早期底层编程框架，直接操作 Cube / Vector 单元；也指连接上层编程语言和底层硬件的中间表示（CCE 指令）</td></tr>
 <tr><td><code>CCU</code></td><td>Collective Communication Unit</td><td>A5 的通算融合单元，通信不占用 AI Core 算力</td></tr>
-<tr><td><code>Cube</code></td><td>—</td><td>AI Core 中的矩阵乘加计算单元，16×16×16 MAC 阵列</td></tr>
 <tr><td>乘加运算</td><td>MAC (Multiply-Accumulate)</td><td>一次乘法和一次加法的组合运算</td></tr>
-<tr><td rowspan="2"><strong>C</strong>（中文）</td><td>存储层次</td><td>Memory Hierarchy</td><td>GM → L2 → L1 → L0A/L0B/L0C → UB 的多级存储结构</td></tr>
 <tr><td>重排</td><td>Data Reordering</td><td>将数据从一种排布格式转换为另一种格式的过程</td></tr>
-<tr><td rowspan="5"><strong>D</strong></td><td><code>Da Vinci 核</code></td><td>—</td><td>昇腾 AI Core 的架构名称</td></tr>
+<tr><td>存储层次</td><td>Memory Hierarchy</td><td>GM → L2 → L1 → L0A/L0B/L0C → UB 的多级存储结构</td></tr>
+<tr><td><code>Cube</code></td><td>—</td><td>AI Core 中的矩阵乘加计算单元，16×16×16 MAC 阵列</td></tr>
+
+<tr><td rowspan="7"><strong>D</strong></td>
+<td><code>Da Vinci 核</code></td><td>—</td><td>昇腾 AI Core 的架构名称</td></tr>
 <tr><td><code>DataCopy</code></td><td>—</td><td>Ascend C 数据搬运核心 API</td></tr>
 <tr><td><code>DataCopyPad</code></td><td>—</td><td>带填充的数据搬运 API，处理不对齐数据</td></tr>
 <tr><td><code>DAV_2201</code></td><td>—</td><td>A2 / A3 芯片的架构号 (NpuArch)</td></tr>
 <tr><td><code>DAV_3510</code></td><td>—</td><td>A5 芯片的架构号 (NpuArch)</td></tr>
-<tr><td rowspan="2"><strong>D</strong>（中文）</td><td>对齐</td><td>Alignment</td><td>数据地址或长度必须是 32B 的整数倍，否则无法搬运</td></tr>
+<tr><td>对齐</td><td>Alignment</td><td>数据地址或长度必须是 32B 的整数倍，否则无法搬运</td></tr>
 <tr><td>多核切分</td><td>Multi-core Partitioning</td><td>将总数据量分配给多个 AI Core 并行处理的策略</td></tr>
-<tr><td><strong>E</strong></td><td><code>ELEMENTS_PER_BLOCK</code></td><td>—</td><td>32B 对齐下的最少元素数，FP32 为 8</td></tr>
-<tr><td rowspan="3"><strong>F</strong></td><td><code>FixPipe</code></td><td>—</td><td>Cube 输出后的后处理单元，支持量化 / 反量化 / Bias 加法</td></tr>
+
+<tr><td><strong>E</strong></td>
+<td><code>ELEMENTS_PER_BLOCK</code></td><td>—</td><td>32B 对齐下的最少元素数，FP32 为 8</td></tr>
+
+<tr><td rowspan="6"><strong>F</strong></td>
+<td>反量化</td><td>Dequantization</td><td>将低精度数据（如 INT8）恢复为高精度数据（如 FP32）的过程</td></tr>
+<tr><td>填充</td><td>Padding</td><td>在数据末尾补齐元素以满足对齐要求</td></tr>
+<tr><td><code>FixPipe</code></td><td>—</td><td>Cube 输出后的后处理单元，支持量化 / 反量化 / Bias 加法</td></tr>
 <tr><td><code>FP8</code> / <code>FP16</code> / <code>FP32</code></td><td>Float Point 8/16/32</td><td>浮点数据类型，位宽分别为 8/16/32 位</td></tr>
 <tr><td><code>FracNZ</code></td><td>—</td><td>昇腾 NPU 专用数据排布格式，用于 Transformer QKV 权重</td></tr>
-<tr><td rowspan="3"><strong>F</strong>（中文）</td><td>反量化</td><td>Dequantization</td><td>将低精度数据（如 INT8）恢复为高精度数据（如 FP32）的过程</td></tr>
-<tr><td>填充</td><td>Padding</td><td>在数据末尾补齐元素以满足对齐要求</td></tr>
 <tr><td>融合算子</td><td>Fused Operator</td><td>将多个小算子合并成一个大算子，减少数据搬运开销</td></tr>
-<tr><td><strong>G</strong></td><td><code>GM</code></td><td>Global Memory</td><td>全局内存，片外 HBM，容量大但延迟高</td></tr>
-<tr><td rowspan="2"><strong>G</strong>（中文）</td><td>归约</td><td>Reduction</td><td>将多个数据聚合为单个数据的操作，如求和、求最大值</td></tr>
-<tr><td>全局内存</td><td>Global Memory (GM)</td><td>片外 HBM，容量大但延迟高，所有 AI Core 共享</td></tr>
-<tr><td rowspan="2"><strong>H</strong></td><td><code>HiF8</code></td><td>—</td><td>华为自定义 8-bit 浮点格式，指数位和尾数位可配置</td></tr>
+
+<tr><td rowspan="2"><strong>G</strong></td>
+<td><code>GM</code> / 全局内存</td><td>Global Memory</td><td>全局内存，片外 HBM，容量大但延迟高，所有 AI Core 共享</td></tr>
+<tr><td>归约</td><td>Reduction</td><td>将多个数据聚合为单个数据的操作，如求和、求最大值</td></tr>
+
+<tr><td rowspan="3"><strong>H</strong></td>
+<td>核函数</td><td>Kernel Function</td><td>运行在 NPU AI Core 上的函数，包含 Host 和 Kernel 两部分代码</td></tr>
+<tr><td><code>HiF8</code></td><td>—</td><td>华为自定义 8-bit 浮点格式，指数位和尾数位可配置</td></tr>
 <tr><td><code>Host</code></td><td>—</td><td>CPU 侧代码，负责参数校验、Tiling 计算、启动 Kernel</td></tr>
-<tr><td rowspan="2"><strong>H</strong>（中文）</td><td>核函数</td><td>Kernel Function</td><td>运行在 NPU AI Core 上的函数，包含 Host 和 Kernel 两部分代码</td></tr>
-<tr><td>汇编指令</td><td>Assembly Instructions</td><td>最底层的编程方式，直接编写 NPU 的二进制指令</td></tr>
-<tr><td rowspan="2"><strong>J</strong></td><td><code>Kernel</code></td><td>—</td><td>运行在 NPU AI Core 上的核函数</td></tr>
-<tr><td>精度标准</td><td>Precision Standard</td><td>算子输出与 golden 结果的误差容限，分为 L0/L1/L2 三个等级</td></tr>
-<tr><td rowspan="7"><strong>L</strong></td><td><code>L0A</code></td><td>—</td><td>Cube 左矩阵操作数缓冲区，64KB</td></tr>
+
+<tr><td><strong>J</strong></td>
+<td>精度标准</td><td>Precision Standard</td><td>算子输出与 golden 结果的误差容限，分为 L0/L1/L2 三个等级</td></tr>
+
+<tr><td><strong>K</strong></td>
+<td><code>Kernel</code></td><td>—</td><td>运行在 NPU AI Core 上的核函数</td></tr>
+
+<tr><td rowspan="7"><strong>L</strong></td>
+<td><code>L0A</code></td><td>—</td><td>Cube 左矩阵操作数缓冲区，64KB</td></tr>
 <tr><td><code>L0B</code></td><td>—</td><td>Cube 右矩阵操作数缓冲区，64KB</td></tr>
 <tr><td><code>L0C</code></td><td>—</td><td>Cube 输出缓冲区，A2 为 128KB，A5 为 256KB</td></tr>
 <tr><td><code>L1</code></td><td>—</td><td>每核 512KB 的 Cube 输入缓存</td></tr>
 <tr><td><code>L2</code></td><td>—</td><td>跨核共享缓存</td></tr>
 <tr><td>量化</td><td>Quantization</td><td>将高精度数据（如 FP32）转换为低精度数据（如 INT8）的过程</td></tr>
 <tr><td>流水线</td><td>Pipeline</td><td>搬运和计算重叠执行的并行策略，提升效率</td></tr>
-<tr><td rowspan="4"><strong>M</strong></td><td><code>mask</code></td><td>—</td><td>Vector 指令的位掩码，控制哪些元素参与计算</td></tr>
+
+<tr><td rowspan="6"><strong>M</strong></td>
+<td><code>mask</code></td><td>—</td><td>Vector 指令的位掩码，控制哪些元素参与计算</td></tr>
+<tr><td>脉动阵列</td><td>Systolic Array</td><td>Cube 的核心结构，数据像波浪一样流过乘加单元</td></tr>
 <tr><td><code>MemBase</code></td><td>—</td><td>SIMD 编程子模型，中间数据存储在 UB 中</td></tr>
+<tr><td>模拟执行</td><td>Simulation</td><td>在无 NPU 硬件的环境下模拟算子执行，用于功能验证</td></tr>
 <tr><td><code>MPMD</code></td><td>Multiple Program Multiple Data</td><td>多程序多数据，不同核运行不同代码</td></tr>
 <tr><td><code>MTE</code> / <code>MTE1</code> / <code>MTE2</code> / <code>MTE3</code></td><td>Memory Transfer Engine</td><td>数据搬运引擎，MTE1 核内搬运，MTE2 从 GM 搬入，MTE3 搬出到 GM</td></tr>
-<tr><td rowspan="2"><strong>M</strong>（中文）</td><td>脉动阵列</td><td>Systolic Array</td><td>Cube 的核心结构，数据像波浪一样流过乘加单元</td></tr>
-<tr><td>模拟执行</td><td>Simulation</td><td>在无 NPU 硬件的环境下模拟算子执行，用于功能验证</td></tr>
-<tr><td rowspan="3"><strong>N</strong></td><td><code>NC1HWC0</code></td><td>5HD</td><td>昇腾 NPU 专用数据排布格式，用于卷积输入</td></tr>
+
+<tr><td rowspan="3"><strong>N</strong></td>
+<td><code>NC1HWC0</code></td><td>5HD</td><td>昇腾 NPU 专用数据排布格式，用于卷积输入</td></tr>
 <tr><td><code>NCHW</code> / <code>NHWC</code> / <code>ND</code></td><td>—</td><td>数据排布格式，分别对应 PyTorch 默认、TensorFlow 默认、最通用格式</td></tr>
 <tr><td><code>NDDMA</code></td><td>N-Dimensional DMA</td><td>A5 新增的高维 DMA 指令</td></tr>
-<tr><td rowspan="2"><strong>O</strong></td><td><code>opbase</code></td><td>—</td><td>所有算子仓依赖的基础框架库</td></tr>
+
+<tr><td rowspan="2"><strong>O</strong></td>
+<td><code>opbase</code></td><td>—</td><td>所有算子仓依赖的基础框架库</td></tr>
 <tr><td><code>ops-blas</code> / <code>ops-math</code> / <code>ops-nn</code></td><td>—</td><td>算子代码仓，分别对应线性代数、数学运算、神经网络算子</td></tr>
-<tr><td rowspan="2"><strong>P</strong></td><td><code>Pipe</code></td><td>—</td><td>执行单元的指令流水线</td></tr>
+
+<tr><td rowspan="2"><strong>P</strong></td>
+<td><code>Pipe</code></td><td>—</td><td>执行单元的指令流水线</td></tr>
 <tr><td><code>PyPTO</code></td><td>Parallel Tensor/Tile Operation</td><td>MPMD 编程框架</td></tr>
-<tr><td rowspan="2"><strong>Q</strong></td><td>切分策略</td><td>Tiling Strategy</td><td>决定每个 AI Core 处理哪些数据的策略，包括多核切分、UB 切分、循环切分</td></tr>
-<tr><td>全局内存</td><td>Global Memory (GM)</td><td>片外 HBM，容量大但延迟高，所有 AI Core 共享</td></tr>
-<tr><td rowspan="2"><strong>R</strong></td><td><code>RegBase</code></td><td>—</td><td>SIMD 编程子模型（A5 新增），中间数据存储在寄存器中</td></tr>
+
+<tr><td><strong>Q</strong></td>
+<td>切分策略</td><td>Tiling Strategy</td><td>决定每个 AI Core 处理哪些数据的策略，包括多核切分、UB 切分、循环切分</td></tr>
+
+<tr><td rowspan="2"><strong>R</strong></td>
+<td><code>RegBase</code></td><td>—</td><td>SIMD 编程子模型（A5 新增），中间数据存储在寄存器中</td></tr>
 <tr><td><code>repeat</code></td><td>—</td><td>Vector 指令的重复执行机制</td></tr>
-<tr><td rowspan="5"><strong>S</strong></td><td><code>Scalar</code></td><td>—</td><td>AI Core 中负责控制流和地址计算的单元</td></tr>
+
+<tr><td rowspan="5"><strong>S</strong></td>
+<td>算子</td><td>Operator</td><td>对张量执行的数学运算，包含 Host 和 Kernel 两部分代码，调度 NPU 完成计算</td></tr>
+<tr><td><code>Scalar</code></td><td>—</td><td>AI Core 中负责控制流和地址计算的单元</td></tr>
+<tr><td>数据排布</td><td>Data Layout</td><td>多维张量在内存中的存储顺序，如 NCHW、NHWC、ND 等</td></tr>
 <tr><td><code>SIMD</code></td><td>Single Instruction Multiple Data</td><td>单指令多数据编程模型</td></tr>
 <tr><td><code>SIMT</code></td><td>Single Instruction Multiple Threads</td><td>单指令多线程编程模型（A5 新增）</td></tr>
-<tr><td><code>SPMD</code></td><td>Single Program Multiple Data</td><td>单程序多数据，Ascend C 默认多核模型</td></tr>
+
+<tr><td rowspan="5"><strong>S</strong>（续）</td>
+<td><code>SPMD</code></td><td>Single Program Multiple Data</td><td>单程序多数据，Ascend C 默认多核模型</td></tr>
 <tr><td><code>sswap</code></td><td>—</td><td>BLAS Level-1 向量交换算子</td></tr>
-<tr><td rowspan="4"><strong>S</strong>（中文）</td><td>算子</td><td>Operator</td><td>对张量执行的数学运算，包含 Host 和 Kernel 两部分代码，调度 NPU 完成计算</td></tr>
-<tr><td>数据搬运</td><td>Data Movement</td><td>在 GM 和 UB 之间搬运数据的过程，由 MTE 引擎驱动</td></tr>
-<tr><td>数据排布</td><td>Data Layout</td><td>多维张量在内存中的存储顺序，如 NCHW、NHWC、ND 等</td></tr>
-<tr><td>同步机制</td><td>Synchronization</td><td>协调不同执行单元（Pipe）之间的依赖关系，如 SetFlag/WaitFlag、BufferID</td></tr>
-<tr><td rowspan="3"><strong>T</strong></td><td><code>TBE</code></td><td>Tensor Boost Engine</td><td>基于 Python DSL + TVM 的编程框架</td></tr>
+<tr><td>同步</td><td>Synchronization</td><td>协调不同执行单元（Pipe）之间的依赖关系，如 SetFlag/WaitFlag、BufferID</td></tr>
+
+<tr><td rowspan="4"><strong>T</strong></td>
+<td><code>TBE</code></td><td>Tensor Boost Engine</td><td>基于 Python DSL + TVM 的编程框架</td></tr>
 <tr><td><code>Tiling</code> / <code>TilingData</code></td><td>—</td><td>数据切分策略及对应的结构体，决定每个 AI Core 处理哪些数据</td></tr>
 <tr><td><code>TPipe</code> / <code>TQue</code> / <code>TQueBind</code></td><td>—</td><td>Ascend C 流水线和队列管理工具，TQueBind 支持输入输出共用</td></tr>
-<tr><td rowspan="2"><strong>T</strong>（中文）</td><td>同步</td><td>Synchronization</td><td>协调不同执行单元之间的依赖关系，确保数据一致性</td></tr>
 <tr><td>统一缓冲区</td><td>Unified Buffer (UB)</td><td>每个 AI Core 的片上高速缓存，用于 Vector 计算</td></tr>
-<tr><td rowspan="2"><strong>U</strong></td><td><code>UB</code></td><td>Unified Buffer</td><td>统一缓冲区，Vector 计算的主战场，A5 为 248KB</td></tr>
-<tr><td>统一缓冲区</td><td>Unified Buffer (UB)</td><td>每个 AI Core 的片上高速缓存，用于 Vector 计算</td></tr>
-<tr><td rowspan="2"><strong>V</strong></td><td><code>Vector</code></td><td>—</td><td>AI Core 中的向量计算单元，256 Bytes 宽</td></tr>
+
+<tr><td><strong>U</strong></td>
+<td><code>UB</code></td><td>Unified Buffer</td><td>统一缓冲区，Vector 计算的主战场，A5 为 248KB</td></tr>
+
+<tr><td rowspan="2"><strong>V</strong></td>
+<td><code>Vector</code></td><td>—</td><td>AI Core 中的向量计算单元，256 Bytes 宽</td></tr>
 <tr><td>向量计算</td><td>Vector Computation</td><td>对一组数据同时执行相同操作的计算方式</td></tr>
-<tr><td rowspan="3"><strong>W</strong></td><td><code>Warp</code></td><td>—</td><td>SIMT 模式下 32 线程的分组单位</td></tr>
+
+<tr><td rowspan="3"><strong>W</strong></td>
+<td><code>Warp</code></td><td>—</td><td>SIMT 模式下 32 线程的分组单位</td></tr>
 <tr><td>尾块</td><td>Tail Block</td><td>数据切分后剩余的部分，通常分配给最后一个核处理</td></tr>
 <tr><td>伪量化</td><td>Fake Quantization</td><td>训练时模拟量化误差的技术，前向做量化→反量化，反向用 STE</td></tr>
 </tbody>
