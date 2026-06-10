@@ -12,7 +12,7 @@
 <main class="main">
 <div class="content">
 <div class="meta-bar"><a href="../index.html">&larr; 返回目录</a></div>
-<h1>7.5 CCU 通算融合</h1>
+<h1>7.6 CCU 通算融合</h1>
 
 <p><strong>CCU（Collective Communication Unit）</strong> 是 A5（DAV_3510）在 IO-Die 上新增的专用通信引擎。在分布式训练中，AllReduce、AllGather 等集合通信操作通常需要占用 AI Core 来完成数据搬运和归约&mdash;&mdash;这意味着通信和计算在抢同一块算力。</p>
 <p>CCU 的出现改变了这个局面：<strong>通信操作由 CCU 独立完成，不占用 AI Core 的计算资源。</strong> 这意味着你可以在 AI Core 做 MatMul 的同时，让 CCU 在后台做 AllReduce，两者完全并行。</p>

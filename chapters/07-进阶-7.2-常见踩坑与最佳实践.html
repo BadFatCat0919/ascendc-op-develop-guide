@@ -12,7 +12,7 @@
 <main class="main">
 <div class="content">
 <div class="meta-bar"><a href="../index.html">← 返回目录</a></div>
-<h1>7.1 常见踩坑与最佳实践</h1>
+<h1>7.2 常见踩坑与最佳实践</h1>
 <p>本文以 sswap 算子（arch35）为贯穿示例。sswap 是 BLAS Level-1 算子，功能是交换两个向量的对应元素——纯数据搬运，不涉及 Vector 计算，使用 Single Buffer 和 TQueBind 流水线。</p>
 <h3>7.2.1 对齐问题</h3>
 <p>对齐问题是 Ascend C 开发中最常见、也最容易让人抓狂的坑。根本原因在于 Da Vinci 核的 MTE（Memory Transfer Engine）搬运数据时，硬件要求每次搬运的长度必须是 32 字节的整数倍。你可以把它想象成"集装箱装车"——每辆车只能装整箱，散货必须凑齐一整箱才能发。</p>

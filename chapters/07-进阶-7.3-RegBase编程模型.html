@@ -12,7 +12,7 @@
 <main class="main">
 <div class="content">
 <div class="meta-bar"><a href="../index.html">&larr; 返回目录</a></div>
-<h1>7.2 RegBase 编程模型</h1>
+<h1>7.3 RegBase 编程模型</h1>
 
 <p>A5（DAV_3510）在 Vector 单元上引入了 <strong>RegBase</strong> 编程模型，与传统 MemBase 并存。RegBase 的核心思想是：<strong>中间数据存储在寄存器而非 UB</strong>，数据从 UB 加载到寄存器组中，所有计算都在寄存器上完成，最后再写回 UB。这类似于 GPU 的 PTX 或 CPU 的 intrinsics 编程风格。</p>
 

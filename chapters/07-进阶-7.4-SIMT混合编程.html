@@ -12,7 +12,7 @@
 <main class="main">
 <div class="content">
 <div class="meta-bar"><a href="../index.html">&larr; 返回目录</a></div>
-<h1>7.3 SIMT 混合编程</h1>
+<h1>7.4 SIMT 混合编程</h1>
 
 <p>传统的 Ascend C 算子使用 <strong>SIMD</strong> 模式&mdash;&mdash;一个核内的所有计算单元（Vector、Scalar、MTE）协同处理同一份数据。A5（DAV_3510）引入了 <strong>SIMT</strong>（Single Instruction Multiple Threads）模式，让你可以用线程并行处理数据，编程范式从"矢量编程（VF 内连续计算）"变为"标量编程（线程视角）"。</p>
 <p>更强大的是，A5 支持在同一个 Kernel 中<strong>混合使用 SIMT 和 SIMD</strong>：</p>

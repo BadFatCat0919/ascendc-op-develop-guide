@@ -12,7 +12,7 @@
 <main class="main">
 <div class="content">
 <div class="meta-bar"><a href="../index.html">&larr; 返回目录</a></div>
-<h1>7.4 NDDMA 高维搬运</h1>
+<h1>7.5 NDDMA 高维搬运</h1>
 
 <p>传统的 <code>DataCopy</code> 是一维搬运&mdash;&mdash;从 GM 的一段连续地址搬到 UB 的一段连续地址。但在深度学习中，很多场景需要搬运多维张量的某个切片，或者在搬运的同时做转置。传统方式需要多次 DataCopy 配合手动地址计算，代码复杂且效率低。</p>
 <p>A5（DAV_3510）新增的 <strong>NDDMA（N-Dimensional DMA）</strong> 指令支持高维数据搬运，可以在一次 DMA 操作中完成多维 stride 访问和转置。NDDMA 配合 DAV_3510 新增的 ND-DMA Cache，大幅提升离散访问与转置效率。</p>
