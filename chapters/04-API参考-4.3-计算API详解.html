@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4.3 计算 API 详解 - AscendC Guide</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<nav class="sidebar"><div class="sidebar-header"><h2><a href="../index.html" style="color:inherit;text-decoration:none">AscendC Guide</a></h2><p>算子开发从入门到精通</p></div><ul class="sidebar-nav"><li class="chapter-group"><span class="chapter-title">第1章 基础概念</span><ul class="article-list"><li><a href="01-基础概念-1.1-什么是算子与AscendC.html">1.1 什么是算子与 Ascend C</a></li><li><a href="01-基础概念-1.2-数据类型排布与量化.html">1.2 数据类型、排布与量化</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第2章 硬件与编程模型</span><ul class="article-list"><li><a href="02-硬件与编程模型-2.1-A5硬件架构.html">2.1 A5 硬件架构</a></li><li><a href="02-硬件与编程模型-2.2-编程模型概述.html">2.2 编程模型概述</a></li><li><a href="02-硬件与编程模型-2.3-算子结构.html">2.3 算子结构</a></li><li><a href="02-硬件与编程模型-2.4-直调开发方式.html">2.4 直调开发方式</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第3章 核心开发</span><ul class="article-list"><li><a href="03-核心开发-3.1-Tiling设计.html">3.1 Tiling 设计</a></li><li><a href="03-核心开发-3.2-内存管理与数据搬运.html">3.2 内存管理与数据搬运</a></li><li><a href="03-核心开发-3.3-Vector计算.html">3.3 Vector 计算</a></li><li><a href="03-核心开发-3.4-Cube计算.html">3.4 Cube 计算</a></li><li><a href="03-核心开发-3.5-同步与流水线.html">3.5 同步与流水线</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第4章 API 参考</span><ul class="article-list"><li><a href="04-API参考-4.1-AscendC常用API概览.html">4.1 AscendC 常用 API 概览</a></li><li><a href="04-API参考-4.2-数据搬运API详解.html">4.2 数据搬运 API 详解</a></li><li><a href="04-API参考-4.3-计算API详解.html" class="active">4.3 计算 API 详解</a></li><li><a href="04-API参考-4.4-ACL运行时API.html">4.4 ACL 运行时 API</a></li><li><a href="04-API参考-4.5-同步与队列API详解.html">4.5 同步与队列 API 详解</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第5章 实战演练</span><ul class="article-list"><li><a href="04-实战演练-4.1-CANN安装与配置.html">5.1 CANN 安装与配置</a></li><li><a href="04-实战演练-4.2-编译器与仿真器.html">5.2 编译器与仿真器</a></li><li><a href="04-实战演练-4.3-开发环境检查清单.html">5.3 开发环境检查清单</a></li><li><a href="04-实战演练-4.4-获取与编译算子代码.html">5.4 获取与编译算子代码</a></li><li><a href="04-实战演练-4.5-运行与查看结果.html">5.5 运行与查看结果</a></li><li><a href="04-实战演练-4.6-修改与重新编译.html">5.6 修改与重新编译</a></li><li><a href="04-实战演练-4.7-swap算子需求分析.html">5.7 swap 算子需求分析</a></li><li><a href="04-实战演练-4.8-swap算子Tiling设计.html">5.8 swap 算子 Tiling 设计</a></li><li><a href="04-实战演练-4.9-swap算子Kernel实现.html">5.9 swap 算子 Kernel 实现</a></li><li><a href="04-实战演练-4.10-swap算子Host实现.html">5.10 swap 算子 Host 实现</a></li><li><a href="04-实战演练-4.11-swap算子编译与测试.html">5.11 swap 算子编译与测试</a></li><li><a href="04-实战演练-4.12-add算子需求分析.html">5.12 add 算子需求分析</a></li><li><a href="04-实战演练-4.13-add算子Tiling设计.html">5.13 add 算子 Tiling 设计</a></li><li><a href="04-实战演练-4.14-add算子Kernel实现.html">5.14 add 算子 Kernel 实现</a></li><li><a href="04-实战演练-4.15-add算子框架集成.html">5.15 add 算子框架集成</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第6章 调试与优化</span><ul class="article-list"><li><a href="05-调试与优化-5.1-精度不对怎么办.html">6.1 精度不对怎么办</a></li><li><a href="05-调试与优化-5.2-性能不达标怎么办.html">6.2 性能不达标怎么办</a></li><li><a href="05-调试与优化-5.3-算子精度标准.html">6.3 算子精度标准</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第7章 进阶</span><ul class="article-list"><li><a href="06-进阶-6.1-常见踩坑与最佳实践.html">7.1 常见踩坑与最佳实践</a></li><li><a href="06-进阶-6.2-RegBase编程模型.html">7.2 RegBase 编程模型</a></li><li><a href="06-进阶-6.3-SIMT混合编程.html">7.3 SIMT 混合编程</a></li><li><a href="06-进阶-6.4-NDDMA高维搬运.html">7.4 NDDMA 高维搬运</a></li><li><a href="06-进阶-6.5-CCU通算融合.html">7.5 CCU 通算融合</a></li><li><a href="06-进阶-6.6-跨架构兼容.html">7.6 跨架构兼容</a></li></ul></li><li class="chapter-group"><span class="chapter-title">附录</span><ul class="article-list"><li><a href="附录-A-数据类型速查表.html">A. 数据类型速查表</a></li><li><a href="附录-B-对齐规则速查.html">B. 对齐规则速查</a></li><li><a href="附录-C-错误码速查.html">C. 错误码速查</a></li></ul></li></ul></nav>
+<main class="main">
+<div class="content">
+<div class="meta-bar"><a href="../index.html">← 返回目录</a></div>
+
+<h1>4.3 计算 API 详解</h1>
+
+<p>本节详细介绍 Ascend C 的计算类 API，包括向量算术运算、向量数学函数、标量运算、归约运算、类型转换和矩阵计算。这些 API 是算子 Kernel 中执行实际计算的核心接口。</p>
+
+<h2>4.3.1 向量算术运算</h2>
+
+<p>向量算术运算 API 对两个输入 Tensor 的对应元素执行二元运算，由 Vector 单元执行。所有 API 共享相同的调用模式。</p>
+
+<h3>通用签名</h3>
+<pre><code class="language-cpp">template &lt;typename T&gt;
+__aicore__ inline void Add(const LocalTensor&lt;T&gt;&amp; dst,
+                            const LocalTensor&lt;T&gt;&amp; src0,
+                            const LocalTensor&lt;T&gt;&amp; src1,
+                            const uint32_t calCount,
+                            const uint8_t repeatTimes,
+                            const RepeatParams&amp; repeatParams);</code></pre>
+
+<table>
+<thead><tr><th>参数</th><th>类型</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>dst</td><td>LocalTensor&lt;T&gt;</td><td>输出 Tensor（UB 上）</td></tr>
+<tr><td>src0</td><td>LocalTensor&lt;T&gt;</td><td>第一个输入 Tensor</td></tr>
+<tr><td>src1</td><td>LocalTensor&lt;T&gt;</td><td>第二个输入 Tensor</td></tr>
+<tr><td>calCount</td><td>uint32_t</td><td>要处理的元素总数</td></tr>
+<tr><td>repeatTimes</td><td>uint8_t</td><td>向量指令重复次数（最大 255）</td></tr>
+<tr><td>repeatParams</td><td>RepeatParams</td><td>源和目标的地址步进参数</td></tr>
+</tbody>
+</table>
+
+<h3>RepeatParams 结构</h3>
+<pre><code class="language-cpp">struct RepeatParams {
+    uint16_t dstRepStride;
+    uint8_t src0RepStride;
+    uint8_t src1RepStride;
+    uint16_t dstBlkStride;
+    uint8_t src0BlkStride;
+    uint8_t src1BlkStride;
+};</code></pre>
+
+<table>
+<thead><tr><th>字段</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>dstRepStride</td><td>目标 Tensor 的 repeat 间步长（单位：128 字节）</td></tr>
+<tr><td>src0RepStride</td><td>源 Tensor 0 的 repeat 间步长</td></tr>
+<tr><td>src1RepStride</td><td>源 Tensor 1 的 repeat 间步长</td></tr>
+<tr><td>dstBlkStride</td><td>目标 Tensor 的块内步长</td></tr>
+<tr><td>src0BlkStride</td><td>源 Tensor 0 的块内步长</td></tr>
+<tr><td>src1BlkStride</td><td>源 Tensor 1 的块内步长</td></tr>
+</tbody>
+</table>
+
+<h3>repeat 次数计算</h3>
+
+<p>每次 repeat 处理 256 字节数据。repeat 次数的计算公式：</p>
+
+<pre><code class="language-cpp">repeatTimes = ceil(calCount * sizeof(T) / 256)</code></pre>
+
+<table>
+<thead><tr><th>数据类型</th><th>每 repeat 元素数</th><th>示例：1024 元素</th></tr></thead>
+<tbody>
+<tr><td>FP16 / BF16</td><td>128</td><td>1024 / 128 = 8 次 repeat</td></tr>
+<tr><td>FP32 / INT32</td><td>64</td><td>1024 / 64 = 16 次 repeat</td></tr>
+<tr><td>INT8</td><td>256</td><td>1024 / 256 = 4 次 repeat</td></tr>
+</tbody>
+</table>
+
+<h3>常用算术 API 对照</h3>
+
+<table>
+<thead><tr><th>API</th><th>运算</th><th>数学表达</th></tr></thead>
+<tbody>
+<tr><td><code>Add</code></td><td>逐元素加</td><td>dst[i] = src0[i] + src1[i]</td></tr>
+<tr><td><code>Sub</code></td><td>逐元素减</td><td>dst[i] = src0[i] - src1[i]</td></tr>
+<tr><td><code>Mul</code></td><td>逐元素乘</td><td>dst[i] = src0[i] * src1[i]</td></tr>
+<tr><td><code>Div</code></td><td>逐元素除</td><td>dst[i] = src0[i] / src1[i]</td></tr>
+<tr><td><code>Max</code></td><td>逐元素取大</td><td>dst[i] = max(src0[i], src1[i])</td></tr>
+<tr><td><code>Min</code></td><td>逐元素取小</td><td>dst[i] = min(src0[i], src1[i])</td></tr>
+</tbody>
+</table>
+
+<h3>使用示例</h3>
+<pre><code class="language-cpp">RepeatParams rp = {1, 1, 1, 8, 8, 8};
+Add(dst, src0, src1, 1024, 8, rp);
+Sub(dst, src0, src1, 1024, 8, rp);
+Mul(dst, src0, src1, 512, 4, rp);</code></pre>
+
+<h2>4.3.2 向量数学函数</h2>
+
+<p>向量数学函数对单个输入 Tensor 的每个元素执行一元运算。</p>
+
+<h3>通用签名（一元运算）</h3>
+<pre><code class="language-cpp">template &lt;typename T&gt;
+__aicore__ inline void Exp(const LocalTensor&lt;T&gt;&amp; dst,
+                            const LocalTensor&lt;T&gt;&amp; src,
+                            const uint32_t calCount,
+                            const uint8_t repeatTimes,
+                            const RepeatParams&amp; repeatParams);</code></pre>
+
+<table>
+<thead><tr><th>API</th><th>运算</th><th>数学表达</th><th>输入类型要求</th></tr></thead>
+<tbody>
+<tr><td><code>Abs</code></td><td>绝对值</td><td>dst[i] = |src[i]|</td><td>FP16/FP32/BF16</td></tr>
+<tr><td><code>Exp</code></td><td>指数</td><td>dst[i] = e^src[i]</td><td>FP16/FP32</td></tr>
+<tr><td><code>Ln</code></td><td>自然对数</td><td>dst[i] = ln(src[i])</td><td>FP16/FP32</td></tr>
+<tr><td><code>Sqrt</code></td><td>平方根</td><td>dst[i] = sqrt(src[i])</td><td>FP16/FP32</td></tr>
+<tr><td><code>Reciprocal</code></td><td>倒数</td><td>dst[i] = 1/src[i]</td><td>FP16/FP32</td></tr>
+</tbody>
+</table>
+
+<h3>使用示例</h3>
+<pre><code class="language-cpp">RepeatParams rp = {1, 1, 8, 8};
+Exp(dst, src, 128, 1, rp);
+Sqrt(dst, src, 256, 2, rp);
+Abs(dst, src, 128, 1, rp);</code></pre>
+
+<h2>4.3.3 标量运算</h2>
+
+<p>标量运算 API 将一个向量与一个标量值进行运算，常用于缩放、偏移等操作。</p>
+
+<h3>Adds</h3>
+<pre><code class="language-cpp">template &lt;typename T&gt;
+__aicore__ inline void Adds(const LocalTensor&lt;T&gt;&amp; dst,
+                             const LocalTensor&lt;T&gt;&amp; src,
+                             const T scalarValue,
+                             const uint32_t calCount,
+                             const uint8_t repeatTimes,
+                             const RepeatParams&amp; repeatParams);</code></pre>
+
+<h3>Muls</h3>
+<pre><code class="language-cpp">template &lt;typename T&gt;
+__aicore__ inline void Muls(const LocalTensor&lt;T&gt;&amp; dst,
+                             const LocalTensor&lt;T&gt;&amp; src,
+                             const T scalarValue,
+                             const uint32_t calCount,
+                             const uint8_t repeatTimes,
+                             const RepeatParams&amp; repeatParams);</code></pre>
+
+<table>
+<thead><tr><th>API</th><th>运算</th><th>数学表达</th></tr></thead>
+<tbody>
+<tr><td><code>Adds</code></td><td>向量 + 标量</td><td>dst[i] = src[i] + scalar</td></tr>
+<tr><td><code>Muls</code></td><td>向量 × 标量</td><td>dst[i] = src[i] * scalar</td></tr>
+</tbody>
+</table>
+
+<h3>使用示例</h3>
+<pre><code class="language-cpp">RepeatParams rp = {1, 1, 8, 8};
+Adds(dst, src, 1.0f, 128, 1, rp);
+Muls(dst, src, 0.5f, 256, 2, rp);</code></pre>
+
+<h2>4.3.4 归约运算</h2>
+
+<p>归约运算将多个元素聚合为更少的结果。Ascend C 提供三种基本归约操作。</p>
+
+<h3>函数签名</h3>
+<pre><code class="language-cpp">template &lt;typename T&gt;
+__aicore__ inline void ReduceSum(const LocalTensor&lt;T&gt;&amp; dst,
+                                  const LocalTensor&lt;T&gt;&amp; src,
+                                  const LocalTensor&lt;T&gt;&amp; work,
+                                  const uint32_t calCount);</code></pre>
+
+<table>
+<thead><tr><th>API</th><th>功能</th><th>输出</th></tr></thead>
+<tbody>
+<tr><td><code>ReduceSum</code></td><td>求和</td><td>dst[0] = sum(src[0..N-1])</td></tr>
+<tr><td><code>ReduceMax</code></td><td>求最大值</td><td>dst[0] = max(src[0..N-1])</td></tr>
+<tr><td><code>ReduceMin</code></td><td>求最小值</td><td>dst[0] = min(src[0..N-1])</td></tr>
+</tbody>
+</table>
+
+<p>归约 API 需要一个 work Buffer 用于中间计算结果。work Buffer 的大小取决于数据类型和 calCount。</p>
+
+<h3>两阶段归约模式</h3>
+
+<p>在多核场景中，归约通常采用两阶段模式：</p>
+<ol>
+<li><strong>核内归约</strong>：每个 AI Core 对自己的 tile 做局部归约</li>
+<li><strong>跨核归约</strong>：所有核将中间结果写入 GM workspace，由一个核做全局归约</li>
+</ol>
+
+<h2>4.3.5 类型转换（Cast）</h2>
+
+<h3>函数签名</h3>
+<pre><code class="language-cpp">template &lt;typename DST_T, typename SRC_T&gt;
+__aicore__ inline void Cast(const LocalTensor&lt;DST_T&gt;&amp; dst,
+                             const LocalTensor&lt;SRC_T&gt;&amp; src,
+                             const uint32_t calCount,
+                             const uint8_t repeatTimes,
+                             const RepeatParams&amp; repeatParams);</code></pre>
+
+<h3>支持的转换路径</h3>
+
+<table>
+<thead><tr><th>源类型</th><th>目标类型</th><th>精度影响</th></tr></thead>
+<tbody>
+<tr><td>FP32</td><td>FP16</td><td>精度损失（10 位尾数）</td></tr>
+<tr><td>FP32</td><td>BF16</td><td>精度损失（7 位尾数）</td></tr>
+<tr><td>FP16</td><td>FP32</td><td>无损</td></tr>
+<tr><td>BF16</td><td>FP32</td><td>无损</td></tr>
+<tr><td>FP16</td><td>BF16</td><td>需要先转 FP32 中转</td></tr>
+<tr><td>FP32</td><td>INT8/INT32</td><td>截断</td></tr>
+<tr><td>INT8/INT32</td><td>FP32</td><td>无损</td></tr>
+</tbody>
+</table>
+
+<h3>精度注意事项</h3>
+
+<p>FP16 → BF16 不能直接转换，因为两者的指数位宽度不同。正确做法是先 Cast 到 FP32（保留完整精度），再从 FP32 Cast 到 BF16：</p>
+<pre><code class="language-cpp">Cast(tmpFp32, srcFp16, count, repeat, rp);
+Cast(dstBf16, tmpFp32, count, repeat, rp);</code></pre>
+
+<h2>4.3.6 矩阵计算</h2>
+
+<h3>Matmul</h3>
+<pre><code class="language-cpp">template &lt;typename T&gt;
+__aicore__ inline void Matmul(const LocalTensor&lt;T&gt;&amp; dstL0C,
+                               const LocalTensor&lt;T&gt;&amp; srcL0A,
+                               const LocalTensor&lt;T&gt;&amp; srcL0B,
+                               const MatmulConfig&amp; config);</code></pre>
+
+<p>Matmul 驱动 Cube 单元执行矩阵乘法 C = A × B。输入数据必须在 L0A 和 L0B 中，输出在 L0C 中。矩阵维度必须是 16 的倍数（FP16）。</p>
+
+<h3>MatmulLeakyRelu</h3>
+<pre><code class="language-cpp">template &lt;typename T&gt;
+__aicore__ inline void MatmulLeakyRelu(const LocalTensor&lt;T&gt;&amp; dstL0C,
+                                        const LocalTensor&lt;T&gt;&amp; srcL0A,
+                                        const LocalTensor&lt;T&gt;&amp; srcL0B,
+                                        const MatmulConfig&amp; config,
+                                        const float alpha);</code></pre>
+
+<p>将矩阵乘法与 LeakyReLU 激活函数融合为一条指令，减少后处理开销。alpha 是 LeakyReLU 的负半轴斜率。</p>
+
+<h3>FixPipe</h3>
+<pre><code class="language-cpp">template &lt;typename DST_T, typename SRC_T&gt;
+__aicore__ inline void FixPipe(const LocalTensor&lt;DST_T&gt;&amp; dst,
+                                const LocalTensor&lt;SRC_T&gt;&amp; src,
+                                const uint32_t calCount,
+                                const uint8_t repeatTimes,
+                                const FixPipeParams&amp; params);</code></pre>
+
+<p>FixPipe 对 Cube 输出（L0C）做后处理，包括精度转换（FP32→FP16）、量化（浮点→INT8）等。它是 Cube 流水线的最后一个阶段。</p>
+
+<h2>Q&amp;A</h2>
+
+<div class="warning-callout">
+<p><strong>Q：repeatTimes 的最大值是多少？超过怎么办？</strong></p>
+<p>A：repeatTimes 是 uint8_t 类型，最大值为 255。如果需要处理的数据超过 255 次 repeat 的容量（255 × 256B = 65280B），需要拆分为多次调用。例如处理 2048 个 FP32 元素（8192B = 32 次 repeat），不需要拆分；但处理 20000 个 FP32 元素（80000B ≈ 313 次 repeat），需要拆成两次调用。</p>
+</div>
+
+<div class="warning-callout">
+<p><strong>Q：RepeatParams 中的 stride 参数如何设置？</strong></p>
+<p>A：在最简单的连续数据场景中，repStride 设为 repeatTimes 的值（或 1，取决于数据布局），blkStride 设为 8。具体取值取决于 UB 中数据的排列方式。如果数据是连续排列的，通常 repStride = repeatTimes，blkStride = 8（表示块内步长为 8 个 128B 块 = 1024B = 4 次 repeat 的容量）。</p>
+</div>
+
+<div class="warning-callout">
+<p><strong>Q：为什么 FP16 → BF16 不能直接转换？</strong></p>
+<p>A：FP16 和 BF16 的指数位宽度不同（FP16 有 5 位指数，BF16 有 8 位指数），尾数位也不同（FP16 有 10 位，BF16 有 7 位）。直接转换会丢失指数范围信息。正确做法是先转 FP32（保留完整精度），再从 FP32 转 BF16。</p>
+</div>
+
+<h2>参考链接</h2>
+<ul>
+<li><a href="https://hiascend.com/document/redirect/CannCommunityAscendCApi">Ascend C API 参考 — Vector 计算</a></li>
+<li><a href="https://hiascend.com/document/redirect/CannCommunityAscendCApi">Ascend C API 参考 — Cube 计算</a></li>
+<li><a href="03-核心开发-3.3-Vector计算.html">3.3 Vector 计算</a></li>
+<li><a href="03-核心开发-3.4-Cube计算.html">3.4 Cube 计算</a></li>
+</ul>
+
+<div id="quiz"></div>
+
+<div class="page-nav"><a href="04-API参考-4.2-数据搬运API详解.html" class="nav-prev"><span class="nav-label">&larr; 上一篇</span><span class="nav-title">4.2 数据搬运 API 详解</span></a><a href="04-API参考-4.4-ACL运行时API.html" class="nav-next"><span class="nav-label">下一篇 &rarr;</span><span class="nav-title">4.4 ACL 运行时 API</span></a></div>
+</div>
+</main>
+<script src="../js/quiz.js"></script>
+<script>
+renderQuiz('quiz', [
+  {
+    question: "处理 512 个 FP32 元素，需要多少次 repeat？",
+    options: ["2 次", "4 次", "8 次", "16 次"],
+    answer: 2,
+    explanation: "每次 repeat 处理 256 字节。512 个 FP32 元素 = 512 × 4 = 2048 字节。repeatTimes = ceil(2048 / 256) = 8 次。FP32 每次 repeat 处理 64 个元素，512 / 64 = 8。"
+  },
+  {
+    question: "要对向量中每个元素加上常数 2.0，应该使用哪个 API？",
+    options: ["Add(dst, src0, src1, len, repeat, rp)", "Adds(dst, src, 2.0f, len, repeat, rp)", "Muls(dst, src, 2.0f, len, repeat, rp)", "Exp(dst, src, len, repeat, rp)"],
+    answer: 1,
+    explanation: "Adds 是向量与标量的加法（dst[i] = src[i] + scalar），适用于每个元素加一个常数的场景。Add 需要两个输入向量，Muls 是乘法，Exp 是指数运算。"
+  },
+  {
+    question: "FixPipe 在 Cube 计算流水线中的作用是什么？",
+    options: ["将数据从 GM 搬到 L0A", "执行矩阵乘法", "对 Cube 输出（L0C）做后处理，如精度转换和量化", "同步多个 Pipe"],
+    answer: 2,
+    explanation: "FixPipe 是 Cube 流水线的最后一个阶段，对 L0C 中的计算结果做后处理，包括精度转换（如 FP32→FP16）和量化（如浮点→INT8）。它将处理后的结果输出到 UB。"
+  },
+  {
+    question: "repeatTimes 的最大值是多少？",
+    options: ["128", "255", "256", "无限制"],
+    answer: 1,
+    explanation: "repeatTimes 是 uint8_t 类型，最大值为 255。每次 repeat 处理 256 字节，所以单次调用最多处理 255 × 256 = 65280 字节。超过的部分需要拆分为多次调用。"
+  },
+  {
+    question: "将 FP16 数据转换为 BF16，正确的做法是什么？",
+    options: ["直接 Cast(dstBf16, srcFp16, count, repeat, rp)", "先 Cast 到 FP32，再 Cast 到 BF16", "使用 Adds 加 0 来转换", "FP16 和 BF16 完全兼容，不需要转换"],
+    answer: 1,
+    explanation: "FP16 和 BF16 的指数位宽度不同（FP16 有 5 位，BF16 有 8 位），不能直接转换。正确做法是先 Cast 到 FP32（保留完整精度），再从 FP32 Cast 到 BF16。"
+  }
+]);
+</script>
+</body>
+</html>

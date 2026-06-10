@@ -62,7 +62,7 @@
 <h3>格式转换路径</h3>
 <div style="margin:20px 0;text-align:center">
 <svg style="width:100%;max-width:510px" viewBox="0 0 510 210" xmlns="http://www.w3.org/2000/svg">
-<defs><marker id="ah4" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="#6366f1"/></marker></defs>
+<defs><marker id="ah4" markerWidth="6" markerHeight="4" refX="5" refY="2" orient="auto"><polygon points="0 0,6 2,0 4" fill="#6366f1"/></marker></defs>
 <rect x="10" y="10" width="140" height="36" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
 <text x="80" y="28" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="14" fill="#1e293b">NCHW</text>
 <line x1="150" y1="28" x2="276" y2="28" stroke="#6366f1" stroke-width="2" marker-end="url(#ah4)"/>
@@ -128,7 +128,7 @@
 <p>核心思想：在训练阶段，前向传播时做一次"量化→反量化"（模拟推理时的精度损失），让模型在训练过程中就学会适应这种噪声；反向传播时，梯度直接穿过量化操作（因为 <code>round()</code> 函数不可导，用 Straight-Through Estimator 近似为恒等映射）。</p>
 <div style="margin:20px 0;text-align:center">
 <svg style="width:100%;max-width:500px" viewBox="0 0 500 230" xmlns="http://www.w3.org/2000/svg">
-<defs><marker id="ah5" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="#6366f1"/></marker></defs>
+<defs><marker id="ah5" markerWidth="6" markerHeight="4" refX="5" refY="2" orient="auto"><polygon points="0 0,6 2,0 4" fill="#6366f1"/></marker></defs>
 <rect x="20" y="10" width="460" height="60" rx="8" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
 <text x="250" y="32" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="#1e293b">训练前向</text>
 <text x="250" y="52" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="13" fill="#64748b">x → fake_quantize(x) → x' ≈ x（带有量化噪声）</text>

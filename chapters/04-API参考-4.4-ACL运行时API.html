@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4.4 ACL 运行时 API - AscendC Guide</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<nav class="sidebar"><div class="sidebar-header"><h2><a href="../index.html" style="color:inherit;text-decoration:none">AscendC Guide</a></h2><p>算子开发从入门到精通</p></div><ul class="sidebar-nav"><li class="chapter-group"><span class="chapter-title">第1章 基础概念</span><ul class="article-list"><li><a href="01-基础概念-1.1-什么是算子与AscendC.html">1.1 什么是算子与 Ascend C</a></li><li><a href="01-基础概念-1.2-数据类型排布与量化.html">1.2 数据类型、排布与量化</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第2章 硬件与编程模型</span><ul class="article-list"><li><a href="02-硬件与编程模型-2.1-A5硬件架构.html">2.1 A5 硬件架构</a></li><li><a href="02-硬件与编程模型-2.2-编程模型概述.html">2.2 编程模型概述</a></li><li><a href="02-硬件与编程模型-2.3-算子结构.html">2.3 算子结构</a></li><li><a href="02-硬件与编程模型-2.4-直调开发方式.html">2.4 直调开发方式</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第3章 核心开发</span><ul class="article-list"><li><a href="03-核心开发-3.1-Tiling设计.html">3.1 Tiling 设计</a></li><li><a href="03-核心开发-3.2-内存管理与数据搬运.html">3.2 内存管理与数据搬运</a></li><li><a href="03-核心开发-3.3-Vector计算.html">3.3 Vector 计算</a></li><li><a href="03-核心开发-3.4-Cube计算.html">3.4 Cube 计算</a></li><li><a href="03-核心开发-3.5-同步与流水线.html">3.5 同步与流水线</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第4章 API 参考</span><ul class="article-list"><li><a href="04-API参考-4.1-AscendC常用API概览.html">4.1 AscendC 常用 API 概览</a></li><li><a href="04-API参考-4.2-数据搬运API详解.html">4.2 数据搬运 API 详解</a></li><li><a href="04-API参考-4.3-计算API详解.html">4.3 计算 API 详解</a></li><li><a href="04-API参考-4.4-ACL运行时API.html" class="active">4.4 ACL 运行时 API</a></li><li><a href="04-API参考-4.5-同步与队列API详解.html">4.5 同步与队列 API 详解</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第5章 实战演练</span><ul class="article-list"><li><a href="04-实战演练-4.1-CANN安装与配置.html">5.1 CANN 安装与配置</a></li><li><a href="04-实战演练-4.2-编译器与仿真器.html">5.2 编译器与仿真器</a></li><li><a href="04-实战演练-4.3-开发环境检查清单.html">5.3 开发环境检查清单</a></li><li><a href="04-实战演练-4.4-获取与编译算子代码.html">5.4 获取与编译算子代码</a></li><li><a href="04-实战演练-4.5-运行与查看结果.html">5.5 运行与查看结果</a></li><li><a href="04-实战演练-4.6-修改与重新编译.html">5.6 修改与重新编译</a></li><li><a href="04-实战演练-4.7-swap算子需求分析.html">5.7 swap 算子需求分析</a></li><li><a href="04-实战演练-4.8-swap算子Tiling设计.html">5.8 swap 算子 Tiling 设计</a></li><li><a href="04-实战演练-4.9-swap算子Kernel实现.html">5.9 swap 算子 Kernel 实现</a></li><li><a href="04-实战演练-4.10-swap算子Host实现.html">5.10 swap 算子 Host 实现</a></li><li><a href="04-实战演练-4.11-swap算子编译与测试.html">5.11 swap 算子编译与测试</a></li><li><a href="04-实战演练-4.12-add算子需求分析.html">5.12 add 算子需求分析</a></li><li><a href="04-实战演练-4.13-add算子Tiling设计.html">5.13 add 算子 Tiling 设计</a></li><li><a href="04-实战演练-4.14-add算子Kernel实现.html">5.14 add 算子 Kernel 实现</a></li><li><a href="04-实战演练-4.15-add算子框架集成.html">5.15 add 算子框架集成</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第6章 调试与优化</span><ul class="article-list"><li><a href="05-调试与优化-5.1-精度不对怎么办.html">6.1 精度不对怎么办</a></li><li><a href="05-调试与优化-5.2-性能不达标怎么办.html">6.2 性能不达标怎么办</a></li><li><a href="05-调试与优化-5.3-算子精度标准.html">6.3 算子精度标准</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第7章 进阶</span><ul class="article-list"><li><a href="06-进阶-6.1-常见踩坑与最佳实践.html">7.1 常见踩坑与最佳实践</a></li><li><a href="06-进阶-6.2-RegBase编程模型.html">7.2 RegBase 编程模型</a></li><li><a href="06-进阶-6.3-SIMT混合编程.html">7.3 SIMT 混合编程</a></li><li><a href="06-进阶-6.4-NDDMA高维搬运.html">7.4 NDDMA 高维搬运</a></li><li><a href="06-进阶-6.5-CCU通算融合.html">7.5 CCU 通算融合</a></li><li><a href="06-进阶-6.6-跨架构兼容.html">7.6 跨架构兼容</a></li></ul></li><li class="chapter-group"><span class="chapter-title">附录</span><ul class="article-list"><li><a href="附录-A-数据类型速查表.html">A. 数据类型速查表</a></li><li><a href="附录-B-对齐规则速查.html">B. 对齐规则速查</a></li><li><a href="附录-C-错误码速查.html">C. 错误码速查</a></li></ul></li></ul></nav>
+<main class="main">
+<div class="content">
+<div class="meta-bar"><a href="../index.html">← 返回目录</a></div>
+
+<h1>4.4 ACL 运行时 API</h1>
+
+<p>ACL（Ascend Computing Language）是昇腾 NPU 的运行时编程接口，类似于 CUDA 的 Runtime API。算子的 Host 侧代码通过 ACL 来管理设备、分配内存、控制执行流。本节系统介绍 ACL 的核心 API。</p>
+
+<!-- SVG: ACL 层次架构 -->
+<div style="text-align:center;margin:2em 0;">
+<svg viewBox="0 0 600 380" xmlns="http://www.w3.org/2000/svg" style="max-width:600px;width:100%;">
+  <defs>
+    <linearGradient id="gA1" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#4a90d9;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#357abd;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="gA2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#5cb85c;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#449d44;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="gA3" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f0ad4e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ec971f;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="gA4" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#d9534f;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#c9302c;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <text x="300" y="25" text-anchor="middle" font-size="15" font-weight="bold" fill="#333">ACL API 层次架构</text>
+  <rect x="50" y="45" width="500" height="50" rx="8" fill="url(#gA1)" />
+  <text x="300" y="75" text-anchor="middle" font-size="13" fill="white" font-weight="bold">用户应用 / Host 侧代码</text>
+  <rect x="50" y="115" width="500" height="60" rx="8" fill="url(#gA2)" />
+  <text x="300" y="143" text-anchor="middle" font-size="14" fill="white" font-weight="bold">ACL Runtime API</text>
+  <text x="300" y="163" text-anchor="middle" font-size="10" fill="white">初始化 | 设备管理 | 内存管理 | 流管理 | 事件管理 | 错误处理</text>
+  <polygon points="300,180 290,190 310,190" fill="#666" />
+  <rect x="50" y="195" width="500" height="50" rx="8" fill="url(#gA3)" />
+  <text x="300" y="225" text-anchor="middle" font-size="13" fill="white" font-weight="bold">昇腾驱动层（Device Driver）</text>
+  <polygon points="300,250 290,260 310,260" fill="#666" />
+  <rect x="50" y="265" width="500" height="50" rx="8" fill="url(#gA4)" />
+  <text x="300" y="295" text-anchor="middle" font-size="13" fill="white" font-weight="bold">NPU 硬件（AI Core + HBM）</text>
+  <rect x="100" y="335" width="400" height="35" rx="6" fill="#f8f9fa" stroke="#dee2e6" />
+  <text x="300" y="352" text-anchor="middle" font-size="10" fill="#555">ACL = Host 侧代码与 NPU 硬件之间的编程接口</text>
+  <text x="300" y="366" text-anchor="middle" font-size="10" fill="#555">类似 CUDA Runtime API 在 GPU 编程中的角色</text>
+</svg>
+</div>
+
+<h2>4.4.1 初始化与销毁</h2>
+
+<p>ACL 运行时在使用前必须初始化，使用完毕后必须销毁。这是所有 ACL 调用的前提。</p>
+
+<h3>aclInit</h3>
+<pre><code class="language-cpp">aclError aclInit(const char *configPath);</code></pre>
+
+<table>
+<thead><tr><th>参数</th><th>类型</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>configPath</td><td>const char*</td><td>配置文件路径，传 <code>nullptr</code> 使用默认配置</td></tr>
+</tbody>
+</table>
+
+<p><strong>返回值</strong>：<code>ACL_SUCCESS</code>（0）表示成功，其他值表示失败。</p>
+<p><strong>调用时机</strong>：程序启动时调用一次，在所有 ACL 操作之前。</p>
+
+<h3>aclFinalize</h3>
+<pre><code class="language-cpp">aclError aclFinalize();</code></pre>
+
+<p><strong>调用时机</strong>：程序退出前调用一次，在所有 ACL 操作之后。必须与 <code>aclInit</code> 成对出现。</p>
+
+<pre><code class="language-cpp">int main() {
+    aclInit(nullptr);
+    aclFinalize();
+    return 0;
+}</code></pre>
+
+<h2>4.4.2 设备管理</h2>
+
+<p>一个服务器可能有多张 NPU 卡，设备管理 API 用来选择当前要使用哪张卡。</p>
+
+<h3>aclrtSetDevice</h3>
+<pre><code class="language-cpp">aclError aclrtSetDevice(int32_t deviceId);</code></pre>
+
+<table>
+<thead><tr><th>参数</th><th>类型</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>deviceId</td><td>int32_t</td><td>设备 ID，从 0 开始编号</td></tr>
+</tbody>
+</table>
+
+<p><strong>作用</strong>：设置当前线程使用的 NPU 设备。后续的内存分配、Kernel 启动等操作都会在这个设备上执行。</p>
+
+<h3>aclrtResetDevice</h3>
+<pre><code class="language-cpp">aclError aclrtResetDevice(int32_t deviceId);</code></pre>
+
+<p><strong>作用</strong>：重置指定设备，释放该设备上的所有资源。必须与 <code>aclrtSetDevice</code> 成对使用。</p>
+
+<h3>aclrtGetDeviceCount</h3>
+<pre><code class="language-cpp">aclError aclrtGetDeviceCount(uint32_t *count);</code></pre>
+
+<p><strong>作用</strong>：获取当前可用的 NPU 设备数量。</p>
+
+<pre><code class="language-cpp">aclrtSetDevice(0);
+aclrtResetDevice(0);</code></pre>
+
+<div class="warning-callout">
+<p><strong>注意</strong>：<code>aclrtSetDevice</code> 是线程级的——每个线程可以设置不同的设备。如果你在多线程环境中使用，每个线程都需要单独调用 <code>aclrtSetDevice</code>。</p>
+</div>
+
+<h2>4.4.3 内存管理</h2>
+
+<p>内存管理是算子开发中使用频率最高的 ACL API 模块。Host 侧需要在 Device（NPU HBM）上分配内存来存放输入、输出和 Tiling 数据。</p>
+
+<h3>aclrtMalloc</h3>
+<pre><code class="language-cpp">aclError aclrtMalloc(void **devPtr, size_t size, aclrtMemMallocPolicy policy);</code></pre>
+
+<table>
+<thead><tr><th>参数</th><th>类型</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>devPtr</td><td>void**</td><td>输出参数，返回分配的 Device 内存地址</td></tr>
+<tr><td>size</td><td>size_t</td><td>分配的字节数</td></tr>
+<tr><td>policy</td><td>aclrtMemMallocPolicy</td><td>内存分配策略</td></tr>
+</tbody>
+</table>
+
+<table>
+<thead><tr><th>策略</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td><code>ACL_MEM_MALLOC_HUGE_FIRST</code></td><td>优先从 Huge Page 分配（推荐，性能更好）</td></tr>
+<tr><td><code>ACL_MEM_MALLOC_HUGE_ONLY</code></td><td>只从 Huge Page 分配，不够则失败</td></tr>
+<tr><td><code>ACL_MEM_MALLOC_NORMAL_ONLY</code></td><td>只从普通页分配</td></tr>
+</tbody>
+</table>
+
+<h3>aclrtMemcpy</h3>
+<pre><code class="language-cpp">aclError aclrtMemcpy(void *dst, size_t destMax,
+                      const void *src, size_t count,
+                      aclrtMemcpyKind kind);</code></pre>
+
+<table>
+<thead><tr><th>参数</th><th>类型</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>dst</td><td>void*</td><td>目标地址</td></tr>
+<tr><td>destMax</td><td>size_t</td><td>目标缓冲区大小（安全检查）</td></tr>
+<tr><td>src</td><td>const void*</td><td>源地址</td></tr>
+<tr><td>count</td><td>size_t</td><td>拷贝的字节数</td></tr>
+<tr><td>kind</td><td>aclrtMemcpyKind</td><td>拷贝方向</td></tr>
+</tbody>
+</table>
+
+<table>
+<thead><tr><th>枚举值</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td><code>ACL_MEMCPY_HOST_TO_DEVICE</code></td><td>CPU → NPU（把输入数据送到 Device）</td></tr>
+<tr><td><code>ACL_MEMCPY_DEVICE_TO_HOST</code></td><td>NPU → CPU（把计算结果取回 Host）</td></tr>
+<tr><td><code>ACL_MEMCPY_DEVICE_TO_DEVICE</code></td><td>NPU → NPU（Device 内部拷贝）</td></tr>
+<tr><td><code>ACL_MEMCPY_HOST_TO_HOST</code></td><td>CPU → CPU（一般不用）</td></tr>
+</tbody>
+</table>
+
+<h3>aclrtFree</h3>
+<pre><code class="language-cpp">aclError aclrtFree(void *devPtr, size_t size);</code></pre>
+
+<p><strong>作用</strong>：释放 <code>aclrtMalloc</code> 分配的 Device 内存。必须与 <code>aclrtMalloc</code> 成对使用。</p>
+
+<pre><code class="language-cpp">size_t dataSize = n * sizeof(float);
+float* devInput = nullptr;
+float* devOutput = nullptr;
+
+aclrtMalloc((void**)&amp;devInput, dataSize, ACL_MEM_MALLOC_HUGE_FIRST);
+aclrtMalloc((void**)&amp;devOutput, dataSize, ACL_MEM_MALLOC_HUGE_FIRST);
+
+aclrtMemcpy(devInput, dataSize, hostInput, dataSize, ACL_MEMCPY_HOST_TO_DEVICE);
+
+aclrtMemcpy(hostOutput, dataSize, devOutput, dataSize, ACL_MEMCPY_DEVICE_TO_HOST);
+
+aclrtFree(devInput, dataSize);
+aclrtFree(devOutput, dataSize);</code></pre>
+
+<!-- SVG: 内存管理流程 -->
+<div style="text-align:center;margin:2em 0;">
+<svg viewBox="0 0 700 400" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;width:100%;">
+  <defs>
+    <marker id="arrM" markerWidth="6" markerHeight="4" refX="5" refY="2" orient="auto">
+      <polygon points="0 0, 6 2, 0 4" fill="#555" />
+    </marker>
+  </defs>
+  <text x="350" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">ACL 内存管理全流程</text>
+
+  <rect x="30" y="45" width="200" height="320" rx="10" fill="#e3f2fd" stroke="#90caf9" stroke-width="2" />
+  <text x="130" y="70" text-anchor="middle" font-size="12" font-weight="bold" fill="#1565c0">Host 内存（CPU）</text>
+
+  <rect x="55" y="90" width="150" height="32" rx="5" fill="#bbdefb" stroke="#64b5f6" />
+  <text x="130" y="111" text-anchor="middle" font-size="10" fill="#333">hostInput[]</text>
+
+  <rect x="55" y="140" width="150" height="32" rx="5" fill="#bbdefb" stroke="#64b5f6" />
+  <text x="130" y="161" text-anchor="middle" font-size="10" fill="#333">hostOutput[]</text>
+
+  <rect x="55" y="195" width="150" height="32" rx="5" fill="#c8e6c9" stroke="#81c784" />
+  <text x="130" y="216" text-anchor="middle" font-size="10" fill="#333">tilingData</text>
+
+  <text x="130" y="260" text-anchor="middle" font-size="9" fill="#666">malloc() 分配</text>
+  <text x="130" y="275" text-anchor="middle" font-size="9" fill="#666">free() 释放</text>
+
+  <rect x="470" y="45" width="200" height="320" rx="10" fill="#fff3e0" stroke="#ffcc80" stroke-width="2" />
+  <text x="570" y="70" text-anchor="middle" font-size="12" font-weight="bold" fill="#e65100">Device 内存（HBM）</text>
+
+  <rect x="495" y="90" width="150" height="32" rx="5" fill="#ffe0b2" stroke="#ffb74d" />
+  <text x="570" y="111" text-anchor="middle" font-size="10" fill="#333">devInput</text>
+
+  <rect x="495" y="140" width="150" height="32" rx="5" fill="#ffe0b2" stroke="#ffb74d" />
+  <text x="570" y="161" text-anchor="middle" font-size="10" fill="#333">devOutput</text>
+
+  <rect x="495" y="195" width="150" height="32" rx="5" fill="#ffe0b2" stroke="#ffb74d" />
+  <text x="570" y="216" text-anchor="middle" font-size="10" fill="#333">tilingGm</text>
+
+  <text x="570" y="260" text-anchor="middle" font-size="9" fill="#666">aclrtMalloc() 分配</text>
+  <text x="570" y="275" text-anchor="middle" font-size="9" fill="#666">aclrtFree() 释放</text>
+
+  <line x1="210" y1="106" x2="490" y2="106" stroke="#4caf50" stroke-width="2" marker-end="url(#arrM)" />
+  <text x="350" y="99" text-anchor="middle" font-size="9" fill="#2e7d32" font-weight="bold">aclrtMemcpy HOST_TO_DEVICE</text>
+
+  <line x1="490" y1="156" x2="210" y2="156" stroke="#2196f3" stroke-width="2" marker-end="url(#arrM)" />
+  <text x="350" y="149" text-anchor="middle" font-size="9" fill="#1565c0" font-weight="bold">aclrtMemcpy DEVICE_TO_HOST</text>
+
+  <line x1="210" y1="211" x2="490" y2="211" stroke="#ff9800" stroke-width="2" marker-end="url(#arrM)" />
+  <text x="350" y="204" text-anchor="middle" font-size="9" fill="#e65100" font-weight="bold">aclrtMemcpy HOST_TO_DEVICE (Tiling)</text>
+
+  <rect x="250" y="305" width="200" height="35" rx="8" fill="#e8f5e9" stroke="#66bb6a" stroke-width="2" />
+  <text x="350" y="327" text-anchor="middle" font-size="11" font-weight="bold" fill="#2e7d32">Kernel &lt;&lt;&lt; &gt;&gt;&gt;</text>
+
+  <circle cx="350" cy="89" r="9" fill="#4caf50" />
+  <text x="350" y="93" text-anchor="middle" font-size="8" fill="white" font-weight="bold">1</text>
+  <circle cx="350" cy="139" r="9" fill="#2196f3" />
+  <text x="350" y="143" text-anchor="middle" font-size="8" fill="white" font-weight="bold">3</text>
+  <circle cx="350" cy="194" r="9" fill="#ff9800" />
+  <text x="350" y="198" text-anchor="middle" font-size="8" fill="white" font-weight="bold">2</text>
+
+  <rect x="100" y="360" width="500" height="25" rx="5" fill="#f5f5f5" stroke="#ddd" />
+  <text x="350" y="377" text-anchor="middle" font-size="9" fill="#555">步骤：① 拷贝输入 → ② 拷贝 Tiling → Kernel 执行 → ③ 拷贝结果回 Host</text>
+</svg>
+</div>
+
+<h2>4.4.4 流管理</h2>
+
+<p>Stream（流）是 NPU 上的异步执行队列。同一个 Stream 内的操作按提交顺序执行，不同 Stream 之间的操作可以并行。</p>
+
+<h3>aclrtCreateStream</h3>
+<pre><code class="language-cpp">aclError aclrtCreateStream(aclrtStream *stream);</code></pre>
+<p><strong>作用</strong>：创建一个新的执行流。</p>
+
+<h3>aclrtDestroyStream</h3>
+<pre><code class="language-cpp">aclError aclrtDestroyStream(aclrtStream stream);</code></pre>
+<p><strong>作用</strong>：销毁指定执行流，释放相关资源。</p>
+
+<h3>aclrtSynchronizeStream</h3>
+<pre><code class="language-cpp">aclError aclrtSynchronizeStream(aclrtStream stream);</code></pre>
+<p><strong>作用</strong>：阻塞等待指定 Stream 中的所有操作完成。Kernel 启动是异步的，必须用此 API 等待完成。</p>
+
+<pre><code class="language-cpp">aclrtStream stream = nullptr;
+aclrtCreateStream(&amp;stream);
+
+my_kernel&lt;&lt;&lt;coreNum, nullptr, stream&gt;&gt;&gt;(devA, devB, devC, tilingGm);
+
+aclrtSynchronizeStream(stream);
+
+aclrtMemcpy(hostOutput, size, devOutput, size, ACL_MEMCPY_DEVICE_TO_HOST);
+
+aclrtDestroyStream(stream);</code></pre>
+
+<div class="warning-callout">
+<p><strong>常见错误</strong>：启动 Kernel 后没有调用 <code>aclrtSynchronizeStream</code> 就直接拷贝结果。Kernel 是异步的，此时结果还没算完，拷贝回来的数据是未初始化的垃圾值。</p>
+</div>
+
+<h2>4.4.5 事件管理</h2>
+
+<p>Event（事件）用于流间同步——当一个 Stream 的操作依赖另一个 Stream 的结果时，用 Event 来建立依赖关系。</p>
+
+<h3>aclrtCreateEvent</h3>
+<pre><code class="language-cpp">aclError aclrtCreateEvent(aclrtEvent *event);</code></pre>
+
+<h3>aclrtRecordEvent</h3>
+<pre><code class="language-cpp">aclError aclrtRecordEvent(aclrtEvent event, aclrtStream stream);</code></pre>
+<p><strong>作用</strong>：在指定 Stream 中记录一个事件。当 Stream 执行到该事件时，事件被标记为"已完成"。</p>
+
+<h3>aclrtStreamWaitEvent</h3>
+<pre><code class="language-cpp">aclError aclrtStreamWaitEvent(aclrtStream stream, aclrtEvent event);</code></pre>
+<p><strong>作用</strong>：让指定 Stream 等待某个事件完成后才继续执行后续操作。</p>
+
+<h3>aclrtSynchronizeEvent</h3>
+<pre><code class="language-cpp">aclError aclrtSynchronizeEvent(aclrtEvent event);</code></pre>
+<p><strong>作用</strong>：阻塞等待指定事件完成。</p>
+
+<h3>aclrtDestroyEvent</h3>
+<pre><code class="language-cpp">aclError aclrtDestroyEvent(aclrtEvent event);</code></pre>
+
+<pre><code class="language-cpp">aclrtEvent event = nullptr;
+aclrtCreateEvent(&amp;event);
+
+kernelA&lt;&lt;&lt;coreNum, nullptr, streamA&gt;&gt;&gt;(...);
+aclrtRecordEvent(event, streamA);
+
+aclrtStreamWaitEvent(streamB, event);
+kernelB&lt;&lt;&lt;coreNum, nullptr, streamB&gt;&gt;&gt;(...);
+
+aclrtSynchronizeStream(streamA);
+aclrtSynchronizeStream(streamB);
+aclrtDestroyEvent(event);</code></pre>
+
+<!-- SVG: 流与事件时序图 -->
+<div style="text-align:center;margin:2em 0;">
+<svg viewBox="0 0 700 340" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;width:100%;">
+  <defs>
+    <marker id="arrS" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#555" />
+    </marker>
+    <marker id="arrSR" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#d32f2f" />
+    </marker>
+  </defs>
+  <text x="350" y="22" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">流与事件时序图</text>
+  <text x="350" y="330" text-anchor="middle" font-size="10" fill="#888">时间 →</text>
+
+  <text x="60" y="68" text-anchor="end" font-size="11" font-weight="bold" fill="#1565c0">Stream A</text>
+  <line x1="80" y1="63" x2="650" y2="63" stroke="#90caf9" stroke-width="2" />
+
+  <rect x="100" y="48" width="120" height="28" rx="5" fill="#bbdefb" stroke="#64b5f6" />
+  <text x="160" y="67" text-anchor="middle" font-size="9" fill="#333">kernelA &lt;&lt;&lt;&gt;&gt;&gt;</text>
+
+  <rect x="240" y="48" width="100" height="28" rx="5" fill="#fff9c4" stroke="#fdd835" />
+  <text x="290" y="67" text-anchor="middle" font-size="9" fill="#333">RecordEvent</text>
+
+  <text x="60" y="158" text-anchor="end" font-size="11" font-weight="bold" fill="#2e7d32">Stream B</text>
+  <line x1="80" y1="153" x2="650" y2="153" stroke="#a5d6a7" stroke-width="2" />
+
+  <rect x="240" y="138" width="110" height="28" rx="5" fill="#ffcdd2" stroke="#ef9a9a" />
+  <text x="295" y="157" text-anchor="middle" font-size="9" fill="#c62828">WaitEvent</text>
+
+  <rect x="370" y="138" width="120" height="28" rx="5" fill="#c8e6c9" stroke="#81c784" />
+  <text x="430" y="157" text-anchor="middle" font-size="9" fill="#333">kernelB &lt;&lt;&lt;&gt;&gt;&gt;</text>
+
+  <rect x="510" y="138" width="100" height="28" rx="5" fill="#c8e6c9" stroke="#81c784" />
+  <text x="560" y="157" text-anchor="middle" font-size="9" fill="#333">kernelC &lt;&lt;&lt;&gt;&gt;&gt;</text>
+
+  <line x1="290" y1="78" x2="290" y2="135" stroke="#d32f2f" stroke-width="2" stroke-dasharray="5" marker-end="url(#arrSR)" />
+  <text x="310" y="112" font-size="9" fill="#d32f2f" font-weight="bold">Event 依赖</text>
+
+  <text x="60" y="248" text-anchor="end" font-size="11" font-weight="bold" fill="#e65100">Host 线程</text>
+  <line x1="80" y1="243" x2="650" y2="243" stroke="#ffcc80" stroke-width="2" />
+
+  <rect x="100" y="228" width="80" height="28" rx="5" fill="#ffe0b2" stroke="#ffb74d" />
+  <text x="140" y="247" text-anchor="middle" font-size="9" fill="#333">启动 A</text>
+
+  <rect x="200" y="228" width="80" height="28" rx="5" fill="#ffe0b2" stroke="#ffb74d" />
+  <text x="240" y="247" text-anchor="middle" font-size="9" fill="#333">启动 B</text>
+
+  <rect x="420" y="228" width="120" height="28" rx="5" fill="#fff3e0" stroke="#ff9800" />
+  <text x="480" y="247" text-anchor="middle" font-size="9" fill="#333">SyncStream(A)</text>
+
+  <rect x="560" y="228" width="80" height="28" rx="5" fill="#fff3e0" stroke="#ff9800" />
+  <text x="600" y="247" text-anchor="middle" font-size="9" fill="#333">SyncStream(B)</text>
+
+  <rect x="80" y="280" width="560" height="40" rx="6" fill="#f5f5f5" stroke="#ddd" />
+  <text x="360" y="298" text-anchor="middle" font-size="9" fill="#555">Stream B 的 kernelB 必须等 Stream A 的 kernelA 完成后才能开始</text>
+  <text x="360" y="314" text-anchor="middle" font-size="9" fill="#555">Event 建立了跨 Stream 的依赖关系，保证数据正确性</text>
+</svg>
+</div>
+
+<h2>4.4.6 错误处理</h2>
+
+<h3>aclGetRecentErrMsg</h3>
+<pre><code class="language-cpp">const char* aclGetRecentErrMsg();</code></pre>
+<p><strong>作用</strong>：获取最近一次 ACL 错误的描述信息。</p>
+
+<h3>推荐的错误检查宏</h3>
+<pre><code class="language-cpp">#define ACL_CHECK(call) do { \
+    aclError ret = (call); \
+    if (ret != ACL_SUCCESS) { \
+        fprintf(stderr, "ACL Error at %s:%d - %s\n", \
+                __FILE__, __LINE__, aclGetRecentErrMsg()); \
+        exit(1); \
+    } \
+} while(0)</code></pre>
+
+<h3>常用错误码</h3>
+
+<table>
+<thead><tr><th>错误码</th><th>含义</th><th>常见原因</th></tr></thead>
+<tbody>
+<tr><td><code>ACL_SUCCESS</code> (0)</td><td>成功</td><td>—</td></tr>
+<tr><td><code>ACL_ERROR_INVALID_PARAM</code></td><td>参数无效</td><td>传了空指针、非法尺寸等</td></tr>
+<tr><td><code>ACL_ERROR_MEMORY_ALLOCATION</code></td><td>内存分配失败</td><td>HBM 空间不足</td></tr>
+<tr><td><code>ACL_ERROR_INTERNAL</code></td><td>内部错误</td><td>驱动异常、设备故障</td></tr>
+<tr><td><code>161xxx</code></td><td>运行时配置错误</td><td>环境变量缺失、版本不匹配</td></tr>
+<tr><td><code>361xxx</code></td><td>Tiling 错误</td><td>TilingData 计算有误</td></tr>
+<tr><td><code>561xxx</code></td><td>Kernel 查找失败</td><td>Kernel 名拼写错误或未编译</td></tr>
+</tbody>
+</table>
+
+<h2>4.4.7 最佳实践与资源生命周期</h2>
+
+<h3>资源管理原则</h3>
+<ol>
+<li><strong>成对使用</strong>：<code>aclInit/aclFinalize</code>、<code>aclrtSetDevice/aclrtResetDevice</code>、<code>aclrtMalloc/aclrtFree</code>、<code>aclrtCreateStream/aclrtDestroyStream</code> 必须成对出现。</li>
+<li><strong>释放顺序</strong>：先释放 Stream/Event，再释放内存，最后 ResetDevice 和 Finalize。顺序反了可能导致段错误。</li>
+<li><strong>检查返回值</strong>：每个 ACL API 都可能失败，务必检查返回值。推荐使用 <code>ACL_CHECK</code> 宏。</li>
+</ol>
+
+<!-- SVG: 资源生命周期嵌套图 -->
+<div style="text-align:center;margin:2em 0;">
+<svg viewBox="0 0 660 310" xmlns="http://www.w3.org/2000/svg" style="max-width:660px;width:100%;">
+  <defs>
+    <marker id="arrL" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#555" />
+    </marker>
+  </defs>
+  <text x="330" y="18" text-anchor="middle" font-size="13" font-weight="bold" fill="#333">ACL 资源生命周期（嵌套关系）</text>
+
+  <rect x="20" y="30" width="620" height="260" rx="12" fill="none" stroke="#1565c0" stroke-width="2.5" />
+  <text x="40" y="50" font-size="11" font-weight="bold" fill="#1565c0">aclInit(nullptr)</text>
+  <text x="530" y="282" font-size="11" font-weight="bold" fill="#1565c0">aclFinalize()</text>
+
+  <rect x="50" y="60" width="560" height="215" rx="10" fill="none" stroke="#e65100" stroke-width="2" />
+  <text x="70" y="80" font-size="10" font-weight="bold" fill="#e65100">aclrtSetDevice(0)</text>
+  <text x="490" y="268" font-size="10" font-weight="bold" fill="#e65100">aclrtResetDevice(0)</text>
+
+  <rect x="80" y="90" width="220" height="170" rx="8" fill="none" stroke="#2e7d32" stroke-width="1.5" />
+  <text x="100" y="108" font-size="9" font-weight="bold" fill="#2e7d32">aclrtMalloc(devA, ...)</text>
+  <text x="100" y="124" font-size="9" font-weight="bold" fill="#2e7d32">aclrtMalloc(devB, ...)</text>
+  <text x="100" y="140" font-size="9" font-weight="bold" fill="#2e7d32">aclrtMalloc(devC, ...)</text>
+  <text x="100" y="252" font-size="9" font-weight="bold" fill="#2e7d32">aclrtFree(devA/B/C, ...)</text>
+
+  <rect x="330" y="90" width="250" height="170" rx="8" fill="none" stroke="#6a1b9a" stroke-width="1.5" />
+  <text x="350" y="108" font-size="9" font-weight="bold" fill="#6a1b9a">aclrtCreateStream(&amp;stream)</text>
+  <text x="350" y="130" font-size="9" fill="#333">kernel&lt;&lt;&lt;cores,_,stream&gt;&gt;&gt;(args)</text>
+  <text x="350" y="150" font-size="9" fill="#333">aclrtSynchronizeStream(stream)</text>
+  <text x="350" y="170" font-size="9" fill="#333">aclrtMemcpy(hostC, ..., devC, ...)</text>
+  <text x="350" y="252" font-size="9" font-weight="bold" fill="#6a1b9a">aclrtDestroyStream(stream)</text>
+
+  <line x1="15" y1="40" x2="15" y2="280" stroke="#1565c0" stroke-width="2" marker-end="url(#arrL)" />
+  <text x="10" y="165" font-size="8" fill="#1565c0" transform="rotate(-90,10,165)">创建顺序 →</text>
+
+  <line x1="645" y1="280" x2="645" y2="40" stroke="#c62828" stroke-width="2" marker-end="url(#arrL)" />
+  <text x="650" y="165" font-size="8" fill="#c62828" transform="rotate(-90,650,165)">销毁顺序 →</text>
+
+  <rect x="130" y="296" width="400" height="13" rx="3" fill="#f5f5f5" />
+  <text x="330" y="306" text-anchor="middle" font-size="8" fill="#666">外层资源必须先于内层资源销毁（从内到外释放）</text>
+</svg>
+</div>
+
+<h3>完整 Host 侧模板</h3>
+
+<pre><code class="language-cpp">#include "acl/acl.h"
+#include &lt;cstdio&gt;
+#include &lt;cstdlib&gt;
+
+#define ACL_CHECK(call) do { \
+    aclError ret = (call); \
+    if (ret != ACL_SUCCESS) { \
+        fprintf(stderr, "ACL Error at %s:%d - %s\n", \
+                __FILE__, __LINE__, aclGetRecentErrMsg()); \
+        exit(1); \
+    } \
+} while(0)
+
+int main() {
+    const int n = 1024;
+    const size_t size = n * sizeof(float);
+
+    ACL_CHECK(aclInit(nullptr));
+    ACL_CHECK(aclrtSetDevice(0));
+
+    float* hostA = (float*)malloc(size);
+    float* hostB = (float*)malloc(size);
+    float* hostC = (float*)malloc(size);
+
+    void *devA = nullptr, *devB = nullptr, *devC = nullptr;
+    ACL_CHECK(aclrtMalloc(&amp;devA, size, ACL_MEM_MALLOC_HUGE_FIRST));
+    ACL_CHECK(aclrtMalloc(&amp;devB, size, ACL_MEM_MALLOC_HUGE_FIRST));
+    ACL_CHECK(aclrtMalloc(&amp;devC, size, ACL_MEM_MALLOC_HUGE_FIRST));
+
+    MyTilingData tilingData = { .totalLength = n, .tileSize = n };
+    void* tilingGm = nullptr;
+    ACL_CHECK(aclrtMalloc(&amp;tilingGm, sizeof(MyTilingData), ACL_MEM_MALLOC_HUGE_FIRST));
+    ACL_CHECK(aclrtMemcpy(tilingGm, sizeof(MyTilingData),
+                           &amp;tilingData, sizeof(MyTilingData),
+                           ACL_MEMCPY_HOST_TO_DEVICE));
+
+    ACL_CHECK(aclrtMemcpy(devA, size, hostA, size, ACL_MEMCPY_HOST_TO_DEVICE));
+    ACL_CHECK(aclrtMemcpy(devB, size, hostB, size, ACL_MEMCPY_HOST_TO_DEVICE));
+
+    aclrtStream stream = nullptr;
+    ACL_CHECK(aclrtCreateStream(&amp;stream));
+    my_kernel&lt;&lt;&lt;coreNum, nullptr, stream&gt;&gt;&gt;(devA, devB, devC, tilingGm);
+
+    ACL_CHECK(aclrtSynchronizeStream(stream));
+
+    ACL_CHECK(aclrtMemcpy(hostC, size, devC, size, ACL_MEMCPY_DEVICE_TO_HOST));
+
+    ACL_CHECK(aclrtDestroyStream(stream));
+    ACL_CHECK(aclrtFree(devA, size));
+    ACL_CHECK(aclrtFree(devB, size));
+    ACL_CHECK(aclrtFree(devC, size));
+    ACL_CHECK(aclrtFree(tilingGm, sizeof(MyTilingData)));
+    free(hostA); free(hostB); free(hostC);
+    ACL_CHECK(aclrtResetDevice(0));
+    ACL_CHECK(aclFinalize());
+
+    return 0;
+}</code></pre>
+
+<h2>Q&amp;A</h2>
+
+<div class="warning-callout">
+<p><strong>Q：ACL 和 CUDA Runtime API 有什么区别？</strong></p>
+<p>A：两者在概念上非常相似——都是 Host 侧管理 Device 的编程接口。主要区别在于：ACL 针对昇腾 NPU 的硬件特性设计（如 AI Core、HBM、多核并行），而 CUDA 针对 NVIDIA GPU。API 命名和参数有差异，但"初始化→选设备→分配内存→拷贝数据→启动 Kernel→同步→取回结果"的整体流程是一致的。</p>
+</div>
+
+<div class="warning-callout">
+<p><strong>Q：为什么推荐 <code>ACL_MEM_MALLOC_HUGE_FIRST</code>？</strong></p>
+<p>A：Huge Page（大页内存）使用更大的页表项（如 2MB 而非 4KB），减少了 TLB miss 的次数，从而提升了内存访问效率。<code>HUGE_FIRST</code> 优先使用大页，不够则回退到普通页，兼顾了性能和可靠性。</p>
+</div>
+
+<div class="warning-callout">
+<p><strong>Q：aclrtMemcpy 的 destMax 参数有什么用？</strong></p>
+<p>A：<code>destMax</code> 是目标缓冲区的最大容量，用于安全检查——防止拷贝数据超过目标缓冲区大小导致越界写入。通常设置为与 <code>count</code> 相同的值。</p>
+</div>
+
+<h2>参考链接</h2>
+<ul>
+<li><a href="https://hiascend.com/document/redirect/CannCommunityAscendCApi">ACL Runtime API 参考</a></li>
+<li><a href="https://www.hiascend.com/cann/ascend-c">Ascend C 主页</a></li>
+<li><a href="附录-C-错误码速查.html">附录 C：错误码速查</a></li>
+</ul>
+
+<div id="quiz"></div>
+
+<div class="page-nav"><a href="04-API参考-4.3-计算API详解.html" class="nav-prev"><span class="nav-label">&larr; 上一篇</span><span class="nav-title">4.3 计算 API 详解</span></a><a href="04-API参考-4.5-同步与队列API详解.html" class="nav-next"><span class="nav-label">下一篇 &rarr;</span><span class="nav-title">4.5 同步与队列 API 详解</span></a></div>
+</div>
+</main>
+<script src="../js/quiz.js"></script>
+<script>
+renderQuiz('quiz', [
+  {
+    question: "aclrtMemcpy 中 ACL_MEMCPY_HOST_TO_DEVICE 表示什么方向的拷贝？",
+    options: ["NPU → CPU", "CPU → NPU", "NPU → NPU", "CPU → CPU"],
+    answer: 1,
+    explanation: "ACL_MEMCPY_HOST_TO_DEVICE 表示从 Host（CPU）拷贝到 Device（NPU）。Host 是主机端（CPU），Device 是设备端（NPU）。反过来是 ACL_MEMCPY_DEVICE_TO_HOST。"
+  },
+  {
+    question: "启动 Kernel 后，为什么必须调用 aclrtSynchronizeStream 才能拷贝结果？",
+    options: ["因为 Kernel 执行太快需要减速", "因为 Kernel 是异步执行的，启动后立即返回，结果可能还没算完", "因为 aclrtMemcpy 需要 Stream 参数", "因为 Device 内存需要锁定"],
+    answer: 1,
+    explanation: "Kernel 启动（<<<>>>）是异步的——调用后立即返回，不等 Kernel 执行完。必须用 aclrtSynchronizeStream 阻塞等待 Kernel 完成，否则拷贝到的是未初始化的数据。"
+  },
+  {
+    question: "以下哪组 ACL API 调用顺序是正确的？",
+    options: [
+      "aclFinalize → aclInit → aclrtSetDevice → aclrtResetDevice",
+      "aclInit → aclrtSetDevice → ... 操作 ... → aclrtResetDevice → aclFinalize",
+      "aclrtSetDevice → aclInit → ... 操作 ... → aclFinalize → aclrtResetDevice",
+      "aclInit → aclrtResetDevice → aclrtSetDevice → aclFinalize"
+    ],
+    answer: 1,
+    explanation: "正确的顺序是：先 aclInit 初始化运行时，再 aclrtSetDevice 选择设备，然后执行各种操作，最后 aclrtResetDevice 释放设备资源，aclFinalize 销毁运行时。"
+  },
+  {
+    question: "错误码 561xxx 通常表示什么问题？",
+    options: ["内存不足", "Tiling 计算错误", "Kernel 查找失败（Kernel 名拼写错误或未编译）", "设备未初始化"],
+    answer: 2,
+    explanation: "561xxx 错误码段表示 Kernel 查找失败，常见原因包括 Kernel 名拼写错误、Kernel 未编译或编译产物未正确部署。161xxx 是运行时配置错误，361xxx 是 Tiling 错误。"
+  },
+  {
+    question: "以下哪个是正确的 ACL 资源释放顺序？",
+    options: [
+      "aclFinalize → aclrtFree → aclrtDestroyStream → aclrtResetDevice",
+      "aclrtDestroyStream → aclrtFree → aclrtResetDevice → aclFinalize",
+      "aclrtResetDevice → aclrtFree → aclrtDestroyStream → aclFinalize",
+      "aclrtFree → aclFinalize → aclrtDestroyStream → aclrtResetDevice"
+    ],
+    answer: 1,
+    explanation: "正确的释放顺序是：先释放 Stream/Event，再释放内存，再重置设备，最后销毁运行时。按依赖关系从内到外释放，避免访问已失效的资源。"
+  }
+]);
+</script>
+</body>
+</html>

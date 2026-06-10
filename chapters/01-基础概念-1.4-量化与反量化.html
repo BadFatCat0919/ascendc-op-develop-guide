@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1.4 量化与反量化 - AscendC Guide</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<nav class="sidebar"><div class="sidebar-header"><h2><a href="../index.html" style="color:inherit;text-decoration:none">AscendC Guide</a></h2><p>算子开发从入门到精通</p></div><ul class="sidebar-nav"><li class="chapter-group"><span class="chapter-title">第1章 基础概念</span><ul class="article-list"><li><a href="01-基础概念-1.1-什么是算子.html">1.1 什么是算子</a></li><li><a href="01-基础概念-1.2-数据排布格式.html">1.2 数据排布格式</a></li><li><a href="01-基础概念-1.3-数据类型.html">1.3 数据类型</a></li><li><a href="01-基础概念-1.4-量化与反量化.html" class="active">1.4 量化与反量化</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第2章 编程语言</span><ul class="article-list"><li><a href="02-编程语言-2.1-昇腾编程语言.html">2.1 昇腾编程语言</a></li><li><a href="02-编程语言-2.2-编程模型.html">2.2 编程模型</a></li><li><a href="02-编程语言-2.3-Ascend软件栈.html">2.3 Ascend 软件栈</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第3章 昇腾硬件</span><ul class="article-list"><li><a href="03-昇腾硬件-3.1-A5通用架构.html">3.1 A5 通用架构</a></li><li><a href="03-昇腾硬件-3.2-A5新特性.html">3.2 A5 新特性</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第4章 算子结构</span><ul class="article-list"><li><a href="04-算子结构-4.1-算子结构.html">4.1 算子结构</a></li><li><a href="04-算子结构-4.2-直调开发方式.html">4.2 直调开发方式</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第5章 核心开发</span><ul class="article-list"><li><a href="05-核心开发-5.1-Tiling设计.html">5.1 Tiling 设计</a></li><li><a href="05-核心开发-5.2-内存管理与数据搬运.html">5.2 内存管理与数据搬运</a></li><li><a href="05-核心开发-5.3-Vector计算.html">5.3 Vector 计算</a></li><li><a href="05-核心开发-5.4-Cube计算.html">5.4 Cube 计算</a></li><li><a href="05-核心开发-5.5-同步与流水线.html">5.5 同步与流水线</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第6章 API 参考</span><ul class="article-list"><li><a href="06-API参考-6.1-AscendC常用API概览.html">6.1 Ascend C 常用 API 概览</a></li><li><a href="06-API参考-6.2-数据搬运API详解.html">6.2 数据搬运 API 详解</a></li><li><a href="06-API参考-6.3-计算API详解.html">6.3 计算 API 详解</a></li><li><a href="06-API参考-6.4-ACL运行时API.html">6.4 ACL 运行时 API</a></li><li><a href="06-API参考-6.5-同步与队列API详解.html">6.5 同步与队列 API 详解</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第7章 实战演练</span><ul class="article-list"><li><a href="07-实战演练-7.1-CANN安装与配置.html">7.1 CANN 安装与配置</a></li><li><a href="07-实战演练-7.2-编译器与仿真器.html">7.2 编译器与仿真器</a></li><li><a href="07-实战演练-7.3-开发环境检查清单.html">7.3 开发环境检查清单</a></li><li><a href="07-实战演练-7.4-获取与编译算子代码.html">7.4 获取与编译算子代码</a></li><li><a href="07-实战演练-7.5-运行与查看结果.html">7.5 运行与查看结果</a></li><li><a href="07-实战演练-7.6-修改与重新编译.html">7.6 修改与重新编译</a></li><li><a href="07-实战演练-7.7-swap算子需求分析.html">7.7 swap 算子需求分析</a></li><li><a href="07-实战演练-7.8-swap算子Tiling设计.html">7.8 swap 算子 Tiling 设计</a></li><li><a href="07-实战演练-7.9-swap算子Kernel实现.html">7.9 swap 算子 Kernel 实现</a></li><li><a href="07-实战演练-7.10-swap算子Host实现.html">7.10 swap 算子 Host 实现</a></li><li><a href="07-实战演练-7.11-swap算子编译与测试.html">7.11 swap 算子编译与测试</a></li><li><a href="07-实战演练-7.12-add算子需求分析.html">7.12 add 算子需求分析</a></li><li><a href="07-实战演练-7.13-add算子Tiling设计.html">7.13 add 算子 Tiling 设计</a></li><li><a href="07-实战演练-7.14-add算子Kernel实现.html">7.14 add 算子 Kernel 实现</a></li><li><a href="07-实战演练-7.15-add算子框架集成.html">7.15 add 算子框架集成</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第8章 调试与优化</span><ul class="article-list"><li><a href="08-调试与优化-8.1-精度不对怎么办.html">8.1 精度不对怎么办</a></li><li><a href="08-调试与优化-8.2-性能不达标怎么办.html">8.2 性能不达标怎么办</a></li><li><a href="08-调试与优化-8.3-算子精度标准.html">8.3 算子精度标准</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第9章 进阶</span><ul class="article-list"><li><a href="09-进阶-9.1-常见踩坑与最佳实践.html">9.1 常见踩坑与最佳实践</a></li><li><a href="09-进阶-9.2-RegBase编程模型.html">9.2 RegBase 编程模型</a></li><li><a href="09-进阶-9.3-SIMT混合编程.html">9.3 SIMT 混合编程</a></li><li><a href="09-进阶-9.4-NDDMA高维搬运.html">9.4 NDDMA 高维搬运</a></li><li><a href="09-进阶-9.5-CCU通算融合.html">9.5 CCU 通算融合</a></li><li><a href="09-进阶-9.6-跨架构兼容.html">9.6 跨架构兼容</a></li></ul></li><li class="chapter-group"><span class="chapter-title">附录</span><ul class="article-list"><li><a href="附录-A-数据类型速查表.html">附录 A 数据类型速查表</a></li><li><a href="附录-B-对齐规则速查.html">附录 B 对齐规则速查</a></li><li><a href="附录-C-错误码速查.html">附录 C 错误码速查</a></li></ul></li></ul></nav>
+<main class="main">
+<div class="content">
+<div class="meta-bar"><a href="../index.html">← 返回目录</a></div>
+<h2>1.4.1 量化（Quantization）</h2>
+<p>量化是将高精度数据（如 FP32）映射到低精度数据（如 INT8）的技术。目的是<strong>减小模型体积、加速推理</strong>。</p>
+<p>类比一下：一幅 2400 万像素的照片（FP32）占 70MB，压缩成 JPEG（INT8）只占 3MB，虽然损失了一些细节，但人眼看起来差别不大。</p>
+<h3>量化公式</h3>
+<pre class=""><code>q = round(x / scale) + zero_point</code></pre>
+<p>其中 <code>scale</code>（缩放因子）的计算方式为：</p>
+<pre class=""><code>scale = (max_val - min_val) / (qmax - qmin)</code></pre>
+<p><code>max_val</code> 和 <code>min_val</code> 是原始数据的范围，<code>qmax</code> 和 <code>qmin</code> 是目标量化类型的范围（如 INT8 是 -128 到 127）。</p>
+<p><strong>计算示例</strong>：假设一组 FP32 权重值的范围是 [-1.0, 1.0]，要量化为 INT8（范围 -128 到 127）：</p>
+<pre class=""><code>scale = (1.0 - (-1.0)) / (127 - (-128)) = 2.0 / 255 ≈ 0.00784
+若 x = 0.5：q = round(0.5 / 0.00784) + 0 = round(63.78) = 64
+若 x = -0.3：q = round(-0.3 / 0.00784) + 0 = round(-38.27) = -38</code></pre>
+<h3>对称 vs 非对称</h3>
+<table><thead><tr><th>类型</th><th>zero_point</th><th>量化范围</th><th>适用场景</th></tr></thead><tbody><tr><td>对称量化</td><td>0</td><td>[-max, max]</td><td>权重（通常以 0 为中心对称分布）</td></tr><tr><td>非对称量化</td><td>≠0</td><td>[min, max]</td><td>激活值（ReLU 输出全为非负，不对称）</td></tr></tbody></table>
+<p>对称量化更简单高效（不需要处理 zero_point），但要求数据分布以 0 为中心。非对称量化更灵活，但计算时需要额外处理 zero_point 的偏移。</p>
+<h3>按粒度分类</h3>
+<p>量化的"粒度"指的是多少元素共享一组 scale 和 zero_point：</p>
+<ul>
+<li><strong>Per-tensor</strong>：整个张量共享一组 scale/zero_point。最粗糙，精度损失最大，但实现最简单。</li>
+<li><strong>Per-channel</strong>：每个输出通道一组 scale/zero_point。精度更好，是权重量化的常用方案。</li>
+<li><strong>Per-group</strong>：每 G 个元素一组 scale/zero_point（如 G=128）。精度最好，是大模型量化的主流方案（如 GPTQ、AWQ 都用分组量化）。</li>
+</ul>
+<blockquote>
+<p><strong>Q：Per-group 量化的 G 值怎么选？越小精度越好，为什么不直接用 G=1？</strong></p>
+<p>A：G=1 意味着每个元素都有自己的 scale 和 zero_point，那就等于没有量化——每个数还是要额外存一个 FP32 的 scale，体积反而更大了。实际工程中 G 的选择是精度和效率的平衡：G=128 是大模型量化的主流选择（GPTQ、AWQ），它在精度损失很小的同时，128 个元素共享一个 scale 的开销可以忽略不计。G=32 精度更好但开销翻倍，G=64 是两者之间的折中。</p>
+</blockquote>
+<h2>1.4.2 反量化（Dequantization）</h2>
+<p>反量化是量化的逆过程——把低精度数据还原回高精度：</p>
+<pre class=""><code>x_approx = (q - zero_point) × scale</code></pre>
+<p>注意这里写的是 <code>x_approx</code> 而不是 <code>x</code>，因为反量化是<strong>有损的</strong>——量化时 <code>round()</code> 操作引入了舍入误差，反量化无法恢复原始值。精度损失的大小取决于量化方案：粒度越细（Per-group &lt; Per-channel &lt; Per-tensor），损失越小。</p>
+<p><strong>计算示例</strong>：接上面的例子，已知 INT8 量化值 q = 64，zero_point = 0，scale = 0.00784：</p>
+<pre class=""><code>x_approx = (64 - 0) × 0.00784 = 0.50176</code></pre>
+<p>原始值 x = 0.5，反量化后得到 0.50176，误差约 0.002——这就是量化引入的舍入误差。</p>
+<p>在实际推理流程中，量化和反量化经常成对出现：输入用 INT8 计算（快），输出反量化回 FP16/FP32（准）。</p>
+<h2>1.4.3 伪量化（Fake Quantization）</h2>
+<p>伪量化是一种<strong>训练时模拟量化误差</strong>的技术，也叫"量化感知训练（Quantization-Aware Training, QAT）"。</p>
+<p>核心思想：在训练阶段，前向传播时做一次"量化→反量化"（模拟推理时的精度损失），让模型在训练过程中就学会适应这种噪声；反向传播时，梯度直接穿过量化操作（因为 <code>round()</code> 函数不可导，用 Straight-Through Estimator 近似为恒等映射）。</p>
+<div style="margin:20px 0;text-align:center">
+<svg style="width:100%;max-width:500px" viewBox="0 0 500 230" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="ah5" markerWidth="6" markerHeight="4" refX="5" refY="2" orient="auto"><polygon points="0 0,6 2,0 4" fill="#6366f1"/></marker></defs>
+<rect x="20" y="10" width="460" height="60" rx="8" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+<text x="250" y="32" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="#1e293b">训练前向</text>
+<text x="250" y="52" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="13" fill="#64748b">x → fake_quantize(x) → x' ≈ x（带有量化噪声）</text>
+<line x1="250" y1="70" x2="250" y2="81" stroke="#6366f1" stroke-width="2" marker-end="url(#ah5)"/>
+<rect x="20" y="85" width="460" height="60" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+<text x="250" y="107" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="#1e293b">训练反向</text>
+<text x="250" y="127" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="13" fill="#64748b">梯度直接穿过（STE，Straight-Through Estimator）</text>
+<line x1="250" y1="145" x2="250" y2="156" stroke="#6366f1" stroke-width="2" marker-end="url(#ah5)"/>
+<rect x="20" y="160" width="460" height="60" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+<text x="250" y="182" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="14" font-weight="bold" fill="#1e293b">推理时</text>
+<text x="250" y="202" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="13" fill="#64748b">真正用 INT8 计算，享受加速</text>
+</svg>
+</div>
+<p>这样训练出来的模型，在真正部署为 INT8 推理时，精度损失会比"训练后直接量化（PTQ）"小很多。</p>
+<blockquote>
+<p><strong>Q：伪量化（QAT）和训练后量化（PTQ）有什么区别？什么时候该用哪个？</strong></p>
+<p>A：<strong>PTQ（Post-Training Quantization）</strong>是模型训练完成后，直接拿 FP32 权重做量化，不需要重新训练。优点是简单快速（几分钟搞定），缺点是精度损失可能较大。<strong>QAT（Quantization-Aware Training）</strong>是在训练过程中就模拟量化误差，让模型学会适应，精度损失更小，但需要重新训练（耗时较长）。实际工程中通常先试 PTQ，如果精度不达标再上 QAT。</p>
+</blockquote>
+<blockquote>
+<p><strong>Q：反向传播时 round() 函数不可导，STE 是怎么处理的？</strong></p>
+<p>A：STE（Straight-Through Estimator）的做法很简单粗暴——反向传播时假装 round() 不存在，把梯度直接传过去（相当于把 round() 当作恒等函数 y=x 来求导，dy/dx = 1）。这在数学上并不严格，但实践中效果很好——模型能"感知"到量化噪声的存在并学会适应，同时梯度更新不会因为 round() 的不可导而中断。</p>
+</blockquote>
+<h2>参考链接</h2>
+<ul>
+<li><a href="https://hiascend.com/document/redirect/CannCommunityAscendCApi">Ascend C API 文档 — 数据类型</a></li>
+<li><a href="https://hiascend.com/document/redirect/CannCommunityOpdevAscendC">Ascend C 编程指南 — 数据类型</a></li>
+</ul>
+<div id="quiz"></div>
+<div class="page-nav"><a href="01-基础概念-1.3-数据类型.html" class="nav-prev"><span class="nav-label">&larr; 上一篇</span><span class="nav-title">1.3 数据类型</span></a><a href="02-编程语言-2.1-昇腾编程语言.html" class="nav-next"><span class="nav-label">下一篇 &rarr;</span><span class="nav-title">2.1 昇腾编程语言</span></a></div>
+</div>
+</main>
+<script src="../js/quiz.js"></script>
+<script>
+renderQuiz('quiz', [
+  {
+    question: "量化公式为 q = round(x / scale) + zero_point。已知一组 FP32 数据范围为 [-2.0, 2.0]，量化为 INT8（-128 到 127），采用对称量化（zero_point = 0）。当 x = 1.5 时，量化值 q 是多少？",
+    options: ["96", "48", "64", "127"],
+    answer: 0,
+    explanation: "先算 scale = (2.0 - (-2.0)) / (127 - (-128)) = 4.0 / 255 ≈ 0.01569。然后 q = round(1.5 / 0.01569) + 0 = round(95.6) = 96。对称量化的 zero_point = 0，所以不需要加偏移。"
+  },
+  {
+    question: "反量化公式为 x_approx = (q - zero_point) × scale。已知某 INT8 量化值 q = 50，zero_point = -10，scale = 0.02，反量化后的近似值是多少？",
+    options: ["1.0", "1.2", "0.8", "1.4"],
+    answer: 1,
+    explanation: "代入公式：x_approx = (50 - (-10)) × 0.02 = 60 × 0.02 = 1.2。反量化是量化的逆过程，但因为量化时 round() 操作引入了舍入误差，反量化无法恢复原始值，是有损的。粒度越细（Per-group < Per-channel < Per-tensor），损失越小。"
+  },
+  {
+    question: "对称量化和非对称量化的关键区别是什么？以下哪个场景最适合用非对称量化？",
+    options: ["权重矩阵（通常以 0 为中心对称分布）", "ReLU 激活输出（全为非负值，分布不对称）", "梯度值（忽大忽小，正负都有）", "偏置向量（通常接近 0）"],
+    answer: 1,
+    explanation: "对称量化的 zero_point = 0，量化范围是 [-max, max]，适用于以 0 为中心对称分布的数据（如权重）。非对称量化的 zero_point ≠ 0，量化范围是 [min, max]，适用于不对称分布的数据。ReLU 输出全为非负值（min ≥ 0），如果用对称量化会浪费一半的量化范围（负数部分），所以用非对称量化更合理。"
+  },
+  {
+    question: "伪量化（Fake Quantization / QAT）的核心思想是什么？反向传播时如何处理 round() 函数不可导的问题？",
+    options: ["前向传播跳过量化，反向传播正常计算梯度", "前向传播做量化→反量化模拟噪声，反向传播用 STE 让梯度直接穿过", "前向传播和反向传播都不做量化", "用数值微分替代 round() 的梯度"],
+    answer: 1,
+    explanation: "伪量化的核心是：前向传播时做一次「量化→反量化」（模拟推理时的精度损失），让模型学会适应量化噪声；反向传播时用 STE（Straight-Through Estimator）让梯度直接穿过 round() 操作（假装 round() 是恒等函数 y=x，dy/dx=1）。这样训练出来的模型在真正部署为 INT8 推理时，精度损失比 PTQ 小很多。"
+  }
+]);
+</script>
+</body>
+</html>
