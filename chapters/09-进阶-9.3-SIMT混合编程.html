@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>9.3 SIMT 混合编程 - AscendC Guide</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<nav class="sidebar"><div class="sidebar-header"><h2><a href="../index.html" style="color:inherit;text-decoration:none">AscendC Guide</a></h2><p>算子开发从入门到精通</p></div><ul class="sidebar-nav"><li class="chapter-group"><span class="chapter-title">第1章 基础概念</span><ul class="article-list"><li><a href="01-基础概念-1.1-什么是算子.html">1.1 什么是算子</a></li><li><a href="01-基础概念-1.2-数据排布格式.html">1.2 数据排布格式</a></li><li><a href="01-基础概念-1.3-数据类型.html">1.3 数据类型</a></li><li><a href="01-基础概念-1.4-量化与反量化.html">1.4 量化与反量化</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第2章 编程语言</span><ul class="article-list"><li><a href="02-编程语言-2.1-昇腾编程语言.html">2.1 昇腾编程语言</a></li><li><a href="02-编程语言-2.2-编程模型.html">2.2 编程模型</a></li><li><a href="02-编程语言-2.3-Ascend软件栈.html">2.3 Ascend 软件栈</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第3章 昇腾硬件</span><ul class="article-list"><li><a href="03-昇腾硬件-3.1-A5通用架构.html">3.1 A5 通用架构</a></li><li><a href="03-昇腾硬件-3.2-A5新特性.html">3.2 A5 新特性</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第5章 核心开发</span><ul class="article-list"><li><a href="05-核心开发-5.1-Tiling设计.html">5.1 Tiling 设计</a></li><li><a href="05-核心开发-5.2-内存管理与数据搬运.html">5.2 内存管理与数据搬运</a></li><li><a href="05-核心开发-5.3-Vector计算.html">5.3 Vector 计算</a></li><li><a href="05-核心开发-5.4-Cube计算.html">5.4 Cube 计算</a></li><li><a href="05-核心开发-5.5-同步与流水线.html">5.5 同步与流水线</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第6章 API 参考</span><ul class="article-list"><li><a href="06-API参考-6.1-AscendC常用API概览.html">6.1 Ascend C 常用 API 概览</a></li><li><a href="06-API参考-6.2-数据搬运API详解.html">6.2 数据搬运 API 详解</a></li><li><a href="06-API参考-6.3-计算API详解.html">6.3 计算 API 详解</a></li><li><a href="06-API参考-6.4-ACL运行时API.html">6.4 ACL 运行时 API</a></li><li><a href="06-API参考-6.5-同步与队列API详解.html">6.5 同步与队列 API 详解</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第7章 实战演练</span><ul class="article-list"><li><a href="07-实战演练-7.1-CANN安装与配置.html">7.1 CANN 安装与配置</a></li><li><a href="07-实战演练-7.2-编译器与仿真器.html">7.2 编译器与仿真器</a></li><li><a href="07-实战演练-7.3-开发环境检查清单.html">7.3 开发环境检查清单</a></li><li><a href="07-实战演练-7.4-获取与编译算子代码.html">7.4 获取与编译算子代码</a></li><li><a href="07-实战演练-7.5-运行与查看结果.html">7.5 运行与查看结果</a></li><li><a href="07-实战演练-7.6-修改与重新编译.html">7.6 修改与重新编译</a></li><li><a href="07-实战演练-7.7-swap算子需求分析.html">7.7 swap 算子需求分析</a></li><li><a href="07-实战演练-7.8-swap算子Tiling设计.html">7.8 swap 算子 Tiling 设计</a></li><li><a href="07-实战演练-7.9-swap算子Kernel实现.html">7.9 swap 算子 Kernel 实现</a></li><li><a href="07-实战演练-7.10-swap算子Host实现.html">7.10 swap 算子 Host 实现</a></li><li><a href="07-实战演练-7.11-swap算子编译与测试.html">7.11 swap 算子编译与测试</a></li><li><a href="07-实战演练-7.12-add算子需求分析.html">7.12 add 算子需求分析</a></li><li><a href="07-实战演练-7.13-add算子Tiling设计.html">7.13 add 算子 Tiling 设计</a></li><li><a href="07-实战演练-7.14-add算子Kernel实现.html">7.14 add 算子 Kernel 实现</a></li><li><a href="07-实战演练-7.15-add算子框架集成.html">7.15 add 算子框架集成</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第8章 调试与优化</span><ul class="article-list"><li><a href="08-调试与优化-8.1-精度不对怎么办.html">8.1 精度不对怎么办</a></li><li><a href="08-调试与优化-8.2-性能不达标怎么办.html">8.2 性能不达标怎么办</a></li><li><a href="08-调试与优化-8.3-算子精度标准.html">8.3 算子精度标准</a></li></ul></li><li class="chapter-group"><span class="chapter-title">第9章 进阶</span><ul class="article-list"><li><a href="09-进阶-9.1-常见踩坑与最佳实践.html">9.1 常见踩坑与最佳实践</a></li><li><a href="09-进阶-9.2-RegBase编程模型.html">9.2 RegBase 编程模型</a></li><li><a href="09-进阶-9.3-SIMT混合编程.html" class="active">9.3 SIMT 混合编程</a></li><li><a href="09-进阶-9.4-NDDMA高维搬运.html">9.4 NDDMA 高维搬运</a></li><li><a href="09-进阶-9.5-CCU通算融合.html">9.5 CCU 通算融合</a></li><li><a href="09-进阶-9.6-跨架构兼容.html">9.6 跨架构兼容</a></li></ul></li><li class="chapter-group"><span class="chapter-title">附录</span><ul class="article-list"><li><a href="附录-A-数据类型速查表.html">A. 数据类型速查表</a></li><li><a href="附录-B-对齐规则速查.html">B. 对齐规则速查</a></li><li><a href="附录-C-错误码速查.html">C. 错误码速查</a></li></ul></li></ul></nav>
+<main class="main">
+<div class="content">
+<div class="meta-bar"><a href="../index.html">&larr; 返回目录</a></div>
+
+<p>传统的 Ascend C 算子使用 <strong>SIMD</strong> 模式&mdash;&mdash;一个核内的所有计算单元（Vector、Scalar、MTE）协同处理同一份数据。A5（DAV_3510）引入了 <strong>SIMT</strong>（Single Instruction Multiple Threads）模式，让你可以用线程并行处理数据，编程范式从"矢量编程（VF 内连续计算）"变为"标量编程（线程视角）"。</p>
+<p>更强大的是，A5 支持在同一个 Kernel 中<strong>混合使用 SIMT 和 SIMD</strong>：</p>
+<ul>
+<li><strong>SIMT 部分</strong>适合处理离散内存访问（如 Gather/Scatter）和分支密集的逻辑。</li>
+<li><strong>SIMD 部分</strong>适合处理密集的向量计算和规整的数据搬运。</li>
+</ul>
+
+<h2>SIMT vs SIMD 对比</h2>
+
+<svg viewBox="0 0 720 320" xmlns="http://www.w3.org/2000/svg" style="max-width:720px;display:block;margin:1.5rem auto">
+  <defs>
+    <linearGradient id="simdG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#5c6bc0"/><stop offset="100%" stop-color="#3f51b5"/></linearGradient>
+    <linearGradient id="simtG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#26a69a"/><stop offset="100%" stop-color="#00897b"/></linearGradient>
+  </defs>
+  <!-- SIMD -->
+  <rect x="15" y="15" width="330" height="290" rx="12" fill="#ede7f6" stroke="#b39ddb" stroke-width="1.5"/>
+  <text x="180" y="45" text-anchor="middle" font-size="18" font-weight="bold" fill="#4527a0">SIMD 模式</text>
+  <text x="180" y="70" text-anchor="middle" font-size="12" fill="#7e57c2">矢量编程 &middot; VF 内连续计算</text>
+  <rect x="40" y="85" width="280" height="36" rx="6" fill="url(#simdG)"/>
+  <text x="180" y="108" text-anchor="middle" font-size="12" fill="#fff">单条指令处理整条向量</text>
+  <rect x="40" y="130" width="280" height="36" rx="6" fill="#e8eaf6" stroke="#9fa8da" stroke-width="1"/>
+  <text x="180" y="153" text-anchor="middle" font-size="12" fill="#283593">控制逻辑：软件展开循环</text>
+  <rect x="40" y="175" width="280" height="36" rx="6" fill="#e8eaf6" stroke="#9fa8da" stroke-width="1"/>
+  <text x="180" y="198" text-anchor="middle" font-size="12" fill="#283593">GM 访问：需先搬入 UB</text>
+  <rect x="40" y="220" width="280" height="36" rx="6" fill="#e8eaf6" stroke="#9fa8da" stroke-width="1"/>
+  <text x="180" y="243" text-anchor="middle" font-size="12" fill="#283593">寄存器：矢量寄存器（per-VF）</text>
+  <rect x="40" y="265" width="280" height="28" rx="4" fill="#c5cae9"/>
+  <text x="180" y="284" text-anchor="middle" font-size="11" fill="#1a237e">适合：密集向量计算、规整搬运</text>
+  <!-- SIMT -->
+  <rect x="375" y="15" width="330" height="290" rx="12" fill="#e0f2f1" stroke="#80cbc4" stroke-width="1.5"/>
+  <text x="540" y="45" text-anchor="middle" font-size="18" font-weight="bold" fill="#00695c">SIMT 模式</text>
+  <text x="540" y="70" text-anchor="middle" font-size="12" fill="#26a69a">标量编程 &middot; 线程视角</text>
+  <rect x="400" y="85" width="280" height="36" rx="6" fill="url(#simtG)"/>
+  <text x="540" y="108" text-anchor="middle" font-size="12" fill="#fff">多线程并行，每线程处理一个元素</text>
+  <rect x="400" y="130" width="280" height="36" rx="6" fill="#e0f2f1" stroke="#80cbc4" stroke-width="1"/>
+  <text x="540" y="153" text-anchor="middle" font-size="12" fill="#004d40">控制逻辑：Warp Scheduler 硬件调度</text>
+  <rect x="400" y="175" width="280" height="36" rx="6" fill="#e0f2f1" stroke="#80cbc4" stroke-width="1"/>
+  <text x="540" y="198" text-anchor="middle" font-size="12" fill="#004d40">GM 访问：支持直接访问（DCache）</text>
+  <rect x="400" y="220" width="280" height="36" rx="6" fill="#e0f2f1" stroke="#80cbc4" stroke-width="1"/>
+  <text x="540" y="243" text-anchor="middle" font-size="12" fill="#004d40">寄存器：标量寄存器（per-Thread）</text>
+  <rect x="400" y="265" width="280" height="28" rx="4" fill="#b2dfdb"/>
+  <text x="540" y="284" text-anchor="middle" font-size="11" fill="#004d40">适合：Gather/Scatter、分支密集逻辑</text>
+</svg>
+
+<table><thead><tr><th>维度</th><th>SIMT</th><th>SIMD</th></tr></thead><tbody><tr><td>编程范式</td><td>标量编程（线程视角）</td><td>矢量编程（VF 内连续计算）</td></tr><tr><td>控制逻辑</td><td>Warp Scheduler 硬件分支调度</td><td>软件展开循环</td></tr><tr><td>GM 离散访问</td><td><strong>支持直接访问</strong>（核内 DCache）</td><td>不支持，需先搬入 UB</td></tr><tr><td>寄存器类型</td><td>标量寄存器（per-Thread）</td><td>矢量寄存器（per-VF）</td></tr><tr><td>寄存器组织</td><td>128 KB 寄存器堆，按线程并发数切分</td><td>多条 VL=256 B 矢量寄存器</td></tr></tbody></table>
+<p>SIMT 独有硬件（DAV_3510 新增）：Warp Scheduler（每 AIV 4 个）、SIMT Register File、SIMT DCache（最大 128KB，复用 UB 作 Cacheline，128B 粒度）。SIMD/SIMT 共享：ALU / ICache / Unified Buffer。</p>
+
+<h2>线程层次结构</h2>
+
+<svg viewBox="0 0 660 280" xmlns="http://www.w3.org/2000/svg" style="max-width:660px;display:block;margin:1.5rem auto">
+  <!-- Grid / Blocks -->
+  <rect x="20" y="20" width="620" height="60" rx="8" fill="#e3f2fd" stroke="#90caf9" stroke-width="1.5"/>
+  <text x="330" y="40" text-anchor="middle" font-size="11" fill="#1565c0">Grid（启动核数）</text>
+  <rect x="40" y="48" width="120" height="24" rx="4" fill="#42a5f5"/><text x="100" y="65" text-anchor="middle" font-size="11" fill="#fff">Block 0</text>
+  <rect x="170" y="48" width="120" height="24" rx="4" fill="#42a5f5"/><text x="230" y="65" text-anchor="middle" font-size="11" fill="#fff">Block 1</text>
+  <rect x="300" y="48" width="120" height="24" rx="4" fill="#42a5f5"/><text x="360" y="65" text-anchor="middle" font-size="11" fill="#fff">Block 2</text>
+  <text x="460" y="65" font-size="14" fill="#90a4ae">...</text>
+  <rect x="500" y="48" width="120" height="24" rx="4" fill="#42a5f5"/><text x="560" y="65" text-anchor="middle" font-size="11" fill="#fff">Block N</text>
+  <!-- Block detail -->
+  <rect x="20" y="100" width="620" height="70" rx="8" fill="#e8f5e9" stroke="#a5d6a7" stroke-width="1.5"/>
+  <text x="330" y="118" text-anchor="middle" font-size="11" fill="#2e7d32">单核线程（启动线程数，编译期 constexpr）</text>
+  <rect x="40" y="126" width="85" height="34" rx="4" fill="#66bb6a"/><text x="82" y="148" text-anchor="middle" font-size="10" fill="#fff">Warp 0</text>
+  <rect x="135" y="126" width="85" height="34" rx="4" fill="#66bb6a"/><text x="177" y="148" text-anchor="middle" font-size="10" fill="#fff">Warp 1</text>
+  <rect x="230" y="126" width="85" height="34" rx="4" fill="#66bb6a"/><text x="272" y="148" text-anchor="middle" font-size="10" fill="#fff">Warp 2</text>
+  <text x="340" y="148" font-size="14" fill="#a5d6a7">...</text>
+  <rect x="370" y="126" width="85" height="34" rx="4" fill="#66bb6a"/><text x="412" y="148" text-anchor="middle" font-size="10" fill="#fff">Warp K</text>
+  <rect x="475" y="126" width="150" height="34" rx="4" fill="#c8e6c9" stroke="#81c784" stroke-width="1"/>
+  <text x="550" y="148" text-anchor="middle" font-size="10" fill="#2e7d32">最大 2048 线程/核</text>
+  <!-- Warp detail -->
+  <rect x="20" y="190" width="620" height="70" rx="8" fill="#fff3e0" stroke="#ffcc80" stroke-width="1.5"/>
+  <text x="330" y="208" text-anchor="middle" font-size="11" fill="#e65100">Warp（32 线程，硬件调度最小单位）</text>
+  <g font-size="9" fill="#fff">
+    <rect x="40" y="218" width="16" height="30" rx="2" fill="#ff9800"/><text x="48" y="238" text-anchor="middle">T0</text>
+    <rect x="60" y="218" width="16" height="30" rx="2" fill="#ff9800"/><text x="68" y="238" text-anchor="middle">T1</text>
+    <rect x="80" y="218" width="16" height="30" rx="2" fill="#ff9800"/><text x="88" y="238" text-anchor="middle">T2</text>
+    <text x="106" y="238" font-size="12" fill="#ffcc80">...</text>
+    <rect x="120" y="218" width="16" height="30" rx="2" fill="#ff9800"/><text x="128" y="238" text-anchor="middle">T31</text>
+  </g>
+  <rect x="170" y="218" width="200" height="30" rx="4" fill="#ffe0b2" stroke="#ffb74d" stroke-width="1"/>
+  <text x="270" y="238" text-anchor="middle" font-size="10" fill="#e65100">每 AIV 4 个 Warp Scheduler</text>
+  <rect x="400" y="218" width="220" height="30" rx="4" fill="#ffe0b2" stroke="#ffb74d" stroke-width="1"/>
+  <text x="510" y="238" text-anchor="middle" font-size="10" fill="#e65100">调度器编号 = warp_id % 4</text>
+</svg>
+
+<table><thead><tr><th>层级</th><th>概念</th><th>对应 CUDA</th><th>设置方式</th></tr></thead><tbody><tr><td>启动核数</td><td>Block 数量</td><td>Grid 中的 Block 数</td><td>tiling 侧 <code>SetBlockDim</code></td></tr><tr><td>启动线程数</td><td>单核线程数</td><td>单 Block 线程数</td><td>kernel 侧 <code>constexpr</code> 常量</td></tr><tr><td>Warp</td><td>32 线程分组</td><td>Warp</td><td>硬件自动分组</td></tr></tbody></table>
+<p><strong>核数（Block Dim）</strong>：通过 tiling 侧 <code>SetBlockDim</code> 接口设置，切分公式为 <code>总核数 = ceil(输出元素总数 / 单核最少处理元素数)</code>。</p>
+<p><strong>线程数</strong>：单核最大支持 2048 线程，<strong>必须在编译期确定</strong>（使用 <code>constexpr</code> 或字面量），禁止从 tiling 数据动态获取。<code>LAUNCH_BOUND(N)</code> 和 <code>Simt::Dim3(N)</code> 必须使用同一个编译期常量。默认值 1024。</p>
+<p><strong>Warp 调度</strong>：内部按 32 线程分组形成 warp，warp 是硬件调度的最小单位。每个 AIV 核包含 4 个 Warp Scheduler，调度器编号为 <code>warp_id % 4</code>。同一时刻一个 AIV 核只执行一个线程块任务，线程块内多个 Warp 被依次调度执行。</p>
+
+<h3>SIMT 内存空间</h3>
+<table><thead><tr><th>内存类型</th><th>说明</th><th>访问范围</th><th>地址空间修饰符</th></tr></thead><tbody><tr><td>寄存器和栈</td><td>每个线程独立</td><td>线程私有</td><td>无（默认）</td></tr><tr><td>Unified Buffer (UB)</td><td>本地内存</td><td>核内共享</td><td><code>__ubuf__</code></td></tr><tr><td>Global Memory (GM)</td><td>全局内存</td><td>所有线程可访问</td><td><code>__gm__</code></td></tr></tbody></table>
+<p><strong>寄存器和栈</strong>：每个线程独享一组寄存器，寄存器数量受线程数影响，超出寄存器容量的变量会栈溢出。</p>
+<p><strong>Unified Buffer (UB)</strong>：核内共享的本地内存，总量 256KB。SIMT 算子不能使用全部 UB 空间，需为 DCache 预留 &ge;32KB，实际可用 UB = 256KB - 8KB(预留) - 32KB(DCache) = <strong>216KB</strong>。在 SIMT VF 中通过 <code>__ubuf__</code> 指针访问。</p>
+<p><strong>Global Memory (GM)</strong>：所有核所有线程均可访问。SIMT VF <strong>支持直接读写 GM</strong>，无需显式 Load/Store，通过 <code>__gm__</code> 指针访问，在 kernel 入口通过 <code>GM_ADDR</code> 参数传入。这是 SIMT 相比 SIMD 的一大优势&mdash;&mdash;SIMD 模式下数据必须先搬入 UB 才能被计算单元访问。</p>
+
+<h3>SIMT 支持直接读写 GM</h3>
+<p>SIMT 模式下，线程可以通过 <code>__gm__</code> 指针直接读写 Global Memory，这是通过核内 DCache 实现的。DCache 最大 128KB，复用 UB 空间作为 Cacheline，以 128B 为粒度缓存 GM 数据。</p>
+<pre><code class="language-cpp">__simt_vf__ __aicore__ LAUNCH_BOUND(512) inline void GatherKernel(
+    __gm__ const float* src,
+    __gm__ float* dst,
+    __gm__ const int32_t* indices,
+    uint32_t count)
+{
+    uint32_t tid = Simt::GetThreadId();
+    uint32_t stride = Simt::GetBlockSize();
+    for (uint32_t i = tid; i &lt; count; i += stride) {
+        int32_t idx = indices[i];
+        dst[i] = src[idx];  // 直接读写 GM，DCache 自动缓存
+    }
+}</code></pre>
+<p>上述 Gather 示例中，每个线程通过 <code>indices</code> 读取不连续的地址，SIMT 的 DCache 会自动处理这些离散访问，无需手动搬入 UB。</p>
+
+<h2>混合编程声明方式</h2>
+
+<h3>SIMT 函数调用层级</h3>
+<p>混合编程中，函数调用遵循严格的层级结构：</p>
+<pre class="ascii-art"><code>核函数 (__global__ __aicore__)
+  ├── __aicore__ 函数
+  ├── SIMD VF (__simd_vf__) ← 通过 asc_vf_call 调用
+  │     └── __simd_callee__ 子函数
+  └── SIMT VF (__simt_vf__) ← 通过 VF_CALL 调用
+        └── __simt_callee__ 子函数</code></pre>
+<ul>
+<li><strong>核函数</strong>（<code>__global__ __aicore__</code>）：算子入口，由框架调用，负责 tiling 数据解析和场景分发</li>
+<li><strong>__aicore__ 函数</strong>：核内主逻辑函数，负责 UB buffer 初始化、GM 地址转换，调用 <code>Simt::VF_CALL</code> 启动 SIMT VF</li>
+<li><strong>SIMT VF</strong>（<code>__simt_vf__</code>）：线程级并行计算函数，每个线程独立执行，以 stride 间隔遍历数据</li>
+<li><strong>__simt_callee__</strong>：SIMT VF 内部的辅助函数，必须带修饰符</li>
+</ul>
+<p><strong>调用约束</strong>：<code>__simt_vf__</code> 内只能调用 <code>__simt_callee__</code> 函数和 <code>constexpr</code> 函数；<code>__simd_vf__</code> 内只能调用 <code>__simd_callee__</code> 函数和 <code>constexpr</code> 函数。不可跨模式调用（SIMT VF 不能调用 SIMD callee，反之亦然）。</p>
+
+<p>通过 <code>__global__ __aicore__</code> 声明混合核函数，DAV_3510 上提供 <code>__global__</code> 核函数语法和 <code>&lt;&lt;&lt;...&gt;&gt;&gt;</code> 启动方式（等价 CUDA 风格）。</p>
+
+<h2>VF_CALL vs asc_vf_call</h2>
+<table><thead><tr><th>调用方式</th><th>目标 VF 类型</th><th>使用场景</th></tr></thead><tbody><tr><td><code>Simt::VF_CALL</code></td><td>SIMT VF（<code>__simt_vf__</code>）</td><td>启动线程级并行计算</td></tr><tr><td><code>asc_vf_call</code></td><td>SIMD VF（<code>__simd_vf__</code>）</td><td>启动矢量级计算</td></tr></tbody></table>
+<p>在同一个 <code>__global__ __aicore__</code> 核函数中，可以先调用 <code>VF_CALL</code> 执行 SIMT 逻辑（如 Gather），再调用 <code>asc_vf_call</code> 执行 SIMD 逻辑（如密集 Vector 计算），实现混合编程。</p>
+
+<h3>LAUNCH_BOUND 与寄存器数量</h3>
+<p><code>LAUNCH_BOUND(N)</code> 限定每个 VF Block 使用的最大线程数，线程数直接影响每线程可用寄存器数：</p>
+<table><thead><tr><th>线程数范围</th><th>每线程可用寄存器数</th></tr></thead><tbody><tr><td>1025~2048</td><td>16</td></tr><tr><td>513~1024</td><td>32</td></tr><tr><td>257~512</td><td>64</td></tr><tr><td>1~256</td><td>127</td></tr></tbody></table>
+<p>选择合适的线程数需要根据算子的寄存器压力来决定。如果寄存器不够用，编译器会 spill 到 UB，性能反而会下降。</p>
+<table><thead><tr><th>算子类型</th><th>建议线程数</th><th>原因</th></tr></thead><tbody><tr><td>搬运类算子</td><td>2048 / 1024</td><td>内存带宽受限，更多线程隐藏延迟</td></tr><tr><td>计算类算子</td><td>512 / 1024</td><td>寄存器压力较大，需平衡并行度和寄存器</td></tr></tbody></table>
+
+<h2>典型场景</h2>
+<p><strong>场景一：SIMT 做控制流，SIMD 做数据计算。</strong> 用 SIMT 线程并行遍历稀疏矩阵的非零元素位置，然后调用 SIMD 的 Vector 指令做实际的乘加运算。</p>
+<p><strong>场景二：SIMT 处理 Gather/Scatter，SIMD 处理密集计算。</strong> Embedding 查表用 SIMT（地址不连续），后续的 LayerNorm 用 SIMD（数据连续）。</p>
+<p><strong>场景三：SIMT 处理分支密集逻辑。</strong> 如排序、Hash 插入、随机数生成等包含大量条件分支的操作，SIMT 的 Warp Scheduler 可以高效处理分支发散。</p>
+
+<h3>混合编程代码示例</h3>
+<pre><code class="language-cpp">__global__ __aicore__ void MixedKernel(
+    GM_ADDR input, GM_ADDR output,
+    GM_ADDR indices, GM_ADDR tiling)
+{
+    TilingData tilingData;
+    GET_TILING_DATA_WITH_STRUCT(tilingData, tiling);
+
+    __gm__ const float* gmInput = (__gm__ const float*)input;
+    __gm__ float* gmOutput = (__gm__ float*)output;
+    __gm__ const int32_t* gmIndices = (__gm__ const int32_t*)indices;
+
+    // SIMT 阶段：Gather 离散访问
+    Simt::VF_CALL&lt;GatherSimt, LAUNCH_BOUND_VAL&gt;(
+        gmInput, gmOutput, gmIndices, tilingData.elemCount);
+
+    // SIMD 阶段：密集 Vector 计算
+    asc_vf_call&lt;ComputeSimd&gt;(
+        ubInput, ubOutput, tilingData.elemCount);
+}
+
+__simt_vf__ __aicore__ LAUNCH_BOUND(512) inline void GatherSimt(
+    __gm__ const float* src,
+    __gm__ float* dst,
+    __gm__ const int32_t* indices,
+    uint32_t count)
+{
+    uint32_t tid = Simt::GetThreadId();
+    uint32_t stride = Simt::GetBlockSize();
+    for (uint32_t i = tid; i &lt; count; i += stride) {
+        dst[i] = src[indices[i]];
+    }
+}</code></pre>
+
+<h3>SIMT 适用与不适用场景</h3>
+<p><strong>适用场景</strong>：Gather/Scatter、Hash 插入、随机数、排序（含原子操作）。</p>
+<p><strong>不适用场景</strong>：</p>
+<ul>
+<li>大块 dense BF16/FP16 矩阵乘 / 卷积 &mdash; SIMD + Cube 流水更高效</li>
+<li>长向量顺序计算 &mdash; SIMD 矢量化指令吞吐更高</li>
+<li>DAV_3510 之前架构 &mdash; SIMT 硬件不存在，无法使用</li>
+</ul>
+
+<h2>Q&amp;A</h2>
+<details><summary>Q: SIMT 的线程数可以在运行时动态决定吗？</summary>
+<p>不可以。线程数必须在编译期确定，使用 <code>constexpr</code> 或字面量。<code>LAUNCH_BOUND(N)</code> 和 <code>Simt::Dim3(N)</code> 必须使用同一个编译期常量。如果需要不同线程数，需要编写多个 kernel 实例。</p>
+</details>
+<details><summary>Q: SIMT VF 内可以直接调用 SIMD 的 API 吗？</summary>
+<p>不可以。SIMT VF（<code>__simt_vf__</code>）内只能调用 <code>__simt_callee__</code> 函数和 <code>constexpr</code> 函数。要使用 SIMD 计算，需要在核函数中通过 <code>asc_vf_call</code> 单独调用 SIMD VF。</p>
+</details>
+<details><summary>Q: SIMT 模式下 UB 可用空间为什么减少了？</summary>
+<p>因为 SIMT 模式需要为 DCache 预留 &ge;32KB 的空间（DCache 复用 UB 空间作为 Cacheline）。实际可用 UB = 256KB - 8KB(预留) - 32KB(DCache) = 216KB。</p>
+</details>
+
+<div id="quiz"></div>
+<div class="page-nav"><a href="09-进阶-9.2-RegBase编程模型.html" class="nav-prev"><span class="nav-label">&larr; 上一篇</span><span class="nav-title">9.2 RegBase 编程模型</span></a><a href="09-进阶-9.4-NDDMA高维搬运.html" class="nav-next"><span class="nav-label">下一篇 &rarr;</span><span class="nav-title">9.4 NDDMA 高维搬运</span></a></div>
+</div>
+</main>
+<script src="../js/quiz.js"></script>
+<script>
+renderQuiz('quiz', [
+  {
+    question: "SIMT 混合编程中，SIMT 部分最适合处理什么场景？",
+    options: ["密集的向量计算", "离散内存访问（如 Gather/Scatter）和分支密集的逻辑", "规整的数据搬运", "矩阵乘法"],
+    answer: 1,
+    explanation: "SIMT 适合处理离散内存访问和分支密集的逻辑（如稀疏矩阵遍历、排序、Hash 插入），而 SIMD 适合密集的向量计算和规整的数据搬运。"
+  },
+  {
+    question: "SIMT 模式下，线程数设为 512 时，每个线程可用多少个寄存器？",
+    options: ["16", "32", "64", "127"],
+    answer: 2,
+    explanation: "LAUNCH_BOUND 与寄存器数量是 trade-off 关系：线程数 257~512 时，每线程可用 64 个寄存器。线程越多，每个线程分到的寄存器越少。"
+  },
+  {
+    question: "SIMT VF 与 SIMD VF 之间能否互相调用对方的 callee 函数？",
+    options: ["可以互相调用", "不可以，SIMT VF 只能调用 __simt_callee__，SIMD VF 只能调用 __simd_callee__", "只有 SIMD 可以调用 SIMT", "只有 SIMT 可以调用 SIMD"],
+    answer: 1,
+    explanation: "调用约束严格：__simt_vf__ 内只能调用 __simt_callee__ 和 constexpr 函数；__simd_vf__ 内只能调用 __simd_callee__ 和 constexpr 函数。不可跨模式调用。"
+  },
+  {
+    question: "VF_CALL 和 asc_vf_call 分别用于调用什么类型的 VF？",
+    options: ["都用于 SIMD VF", "都用于 SIMT VF", "VF_CALL 用于 SIMT VF，asc_vf_call 用于 SIMD VF", "VF_CALL 用于 SIMD VF，asc_vf_call 用于 SIMT VF"],
+    answer: 2,
+    explanation: "Simt::VF_CALL 用于启动 SIMT VF（__simt_vf__），asc_vf_call 用于启动 SIMD VF（__simd_vf__）。两者可以在同一个混合核函数中共存。"
+  },
+  {
+    question: "SIMT 模式下，SIMT 算子实际可用的 UB 空间是多少？",
+    options: ["256KB", "224KB", "216KB", "128KB"],
+    answer: 2,
+    explanation: "SIMT 算子可用 UB = 256KB - 8KB(预留) - 32KB(DCache) = 216KB。DCache 复用 UB 空间作为 Cacheline，需要预留至少 32KB。"
+  }
+]);
+</script>
+</body>
+</html>
