@@ -104,7 +104,6 @@
 <p>这些代码仓之间的关系可以这样理解：各个 <strong>ops-*</strong> 仓按算子类型分工；<strong>cann-samples</strong> 和 <strong>asc-devkit</strong> 是参考资料库，帮你快速上手。</p>
 <h3>3.3.3 框架对接</h3>
 <p>算子开发完成后，需要对接到上层框架才能在模型中使用。目前主要通过 PyTorch 对接：</p>
-<p><strong>(1) PyTorch（通过 torch_npu）</strong></p>
 <p>torch_npu 是 PyTorch 的昇腾适配插件，类似于 CUDA 版本的 PyTorch。它让 PyTorch 能够识别昇腾 NPU 设备（<code>torch.npu</code>），并自动将算子调度到 NPU 上执行。</p>
 <p>对接流程：算子代码（Ascend C）→ 编译为动态库 → 注册到 ACL Runtime → torch_npu 通过 ACL 调用算子 → PyTorch 模型中使用。</p>
 <h3>3.3.4 开发工具链</h3>

@@ -119,7 +119,6 @@
   <text x="490" y="300" fill="#64748b" font-size="13">每核 192~248KB，Vector 工作区</text>
 </svg>
 </div>
-<p><strong>(1) 各层存储容量</strong></p>
 <table><thead><tr><th>Buffer</th><th>A2 (910B2)</th><th>A5 (950PR)</th><th>用途</th></tr></thead><tbody><tr><td>GM</td><td>64 GB</td><td>112~128 GB</td><td>全局存储</td></tr><tr><td>L2</td><td>192 MB</td><td>112~128 MB</td><td>跨核共享</td></tr><tr><td>L1</td><td>512 KB</td><td>512 KB</td><td>Cube 输入缓存</td></tr><tr><td>L0A</td><td>64 KB</td><td>64 KB</td><td>Cube 左矩阵</td></tr><tr><td>L0B</td><td>64 KB</td><td>64 KB</td><td>Cube 右矩阵</td></tr><tr><td>L0C</td><td>128 KB</td><td><strong>256 KB</strong></td><td>Cube 输出（A5 翻倍）</td></tr><tr><td>UB</td><td>192 KB</td><td><strong>248 KB</strong></td><td>Vector 工作区</td></tr><tr><td>BT</td><td>1 KB</td><td><strong>4 KB</strong></td><td>FixPipe Bias</td></tr></tbody></table>
 <p>注意 A5 相比 A2 有两处显著增大：L0C 从 128 KB 翻倍到 256 KB（Cube 输出缓冲区更大，减少写回次数），UB 从 192 KB 增加到 248 KB（Vector 工作区更大，可以放更多中间数据）。</p>
 <blockquote>

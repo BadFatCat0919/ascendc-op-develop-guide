@@ -18,7 +18,6 @@
 <p>Vector 单元支持多种运算类型：算术运算（加减乘除）、比较运算（取大取小）、归约运算（求和求最值）、类型转换（FP32↔FP16↔BF16）等。它是逐元素算子（Add、Mul、Exp 等）的核心执行引擎。</p>
 <p>值得一提的是，<strong>并非所有算子都需要 Vector 计算</strong>。我们的贯穿示例 swap 就是一个典型的反例：swap 的功能是交换两个向量的对应元素，整个过程只涉及数据搬运（从 GM 搬到 UB，交换后再搬回 GM），完全不需要 Vector 单元参与。swap 的执行逻辑里只有 DataCopy 调用，没有任何 Add、Mul 之类的 Vector API。</p>
 <p>这提醒我们一个重要的设计原则：<strong>选择计算单元要看算子的实际需求</strong>。纯搬运型算子（swap、copy）、索引型算子（argmax）等，可能根本不需要 Vector 单元。把 Vector 留给真正需要它的算子，才能充分发挥芯片算力。</p>
-<p><strong>(1) A5 Vector 算力</strong></p>
 <table><thead><tr><th>芯片</th><th>Vector 核数</th><th>频率</th><th>FP16 算力</th></tr></thead><tbody><tr><td>A2 (910B2)</td><td>48</td><td>1.8 GHz</td><td>22T</td></tr><tr><td>A5 (950PR PCIE)</td><td>56</td><td>1.65 GHz</td><td>47T</td></tr><tr><td>A5 (950PR Server)</td><td>64</td><td>1.65 GHz</td><td>54T</td></tr></tbody></table>
 <h3>4.4.2 逐元素运算</h3>
 <p>逐元素运算是最简单的计算模式：对输入 Tensor 的每个元素独立地做相同的运算，输出 Tensor 的每个位置只依赖对应位置的输入。就像一条流水线上的工人，每个人只负责加工自己面前的零件，互不干扰。</p>

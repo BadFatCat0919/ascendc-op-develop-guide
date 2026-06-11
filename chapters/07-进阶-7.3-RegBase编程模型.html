@@ -105,7 +105,6 @@ __VEC_SCOPE__ {
 }</code></pre>
 <p>上面两个 <code>__VEC_SCOPE__</code> 块各自独立分配寄存器，第一个块结束后其寄存器被释放，第二个块可以复用同一组物理寄存器。</p>
 
-<p><strong>(1) 完整代码示例</strong></p>
 <p>下面是一个更完整的 RegBase 示例，展示了向量加法的完整流程：</p>
 <pre><code class="language-cpp">__aicore__ inline void VectorAddRegBase(
     const LocalTensor&lt;float&gt;&amp; ubA,

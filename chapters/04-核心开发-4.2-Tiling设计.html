@@ -13,7 +13,6 @@
 <div class="content">
 <div class="meta-bar"><a href="../index.html">← 返回目录</a></div>
 <h1>4.2 Tiling 设计</h1>
-<h3>4.2.1 什么是 Tiling</h3>
 <p>Tiling 的本质是"分而治之"。想象公司团建点了 1000 杯雪王奶茶，一家门店做不完，于是你把订单分给 20 家门店同时做——每家分 50 杯。但问题来了：1000 除 20 刚好整除，那如果是 1003 杯呢？最后 3 杯给谁做？而且每家门店的吧台（UB）就那么大，一次放不下 50 杯的原料，得分批从总仓库（GM）进货。Tiling 就是解决这些问题的"分单策略"——怎么分、每家分多少、分几批做。</p>
 <p>一个好的 Tiling 策略需要同时满足三个目标：</p>
 <ol>
@@ -110,7 +109,6 @@ Buffer[1]:        [搬运] [计算]        [搬运] [计算]</code></pre>
 <h3>4.2.4 Tiling 数据结构设计</h3>
 <p>Tiling 数据是 Host 侧和 Device 侧之间的"合同"。Host 侧根据输入规模和硬件参数计算出切分方案，打包成一个结构体写入 GM；Kernel 侧从 GM 读出这个结构体，就知道自己该处理哪段数据、每轮搬多少。</p>
 <p>这个结构体需要包含 Kernel 运行所需的全部切分信息，不多不少。字段太少，Kernel 无法正确工作；字段太多，增加 GM 读写开销和代码复杂度。</p>
-<p><strong>(1) swap 的 Tiling 结构</strong></p>
 <pre class=""><code>struct SswapTilingData {
     uint32_t totalN;     // 总元素个数
     uint32_t perCoreN;   // 每核处理量（已对齐到 ELEMENTS_PER_BLOCK）
@@ -141,7 +139,6 @@ if (tileTail &gt; 0) {
 uint32_t coreNum = ascendcPlatform.GetCoreNumAiv();
 uint64_t ubSize;
 ascendcPlatform.GetCoreMemSize(platform_ascendc::CoreMemType::UB, ubSize);</code></pre>
-<p><strong>(1) 反例：硬编码</strong></p>
 <pre class=""><code>// ❌ 错误：硬编码典型值
 constexpr uint32_t CORE_NUM = 32;
 constexpr uint32_t UB_SIZE = 248 * 1024;

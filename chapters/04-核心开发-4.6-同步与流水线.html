@@ -13,13 +13,11 @@
 <div class="content">
 <div class="meta-bar"><a href="../index.html">← 返回目录</a></div>
 <h1>4.6 同步与流水线</h1>
-<h3>4.6.1 为什么需要同步</h3>
 <p>AI Core 内部有多个执行单元并行工作：MTE2 负责从 GM 搬入数据，MTE3 负责把结果搬出 GM，Vector 做向量计算，Cube 做矩阵乘。这些单元各自有独立的硬件资源，可以同时执行不同的任务。</p>
 <p>但并行带来了依赖问题。想象你在蓝鹿咖啡当值班经理：前台接单（MTE2 搬入数据）、咖啡师做咖啡（Vector 计算）、出餐口叫号取餐（MTE3 搬出结果），三条线同时运转。问题来了：咖啡师还没做好，出餐口就喊"您的美式好了"——顾客拿到的是一杯空气。更离谱的是，上一杯拿铁的杯子没洗就接着做卡布奇诺——顾客喝到的是拿铁味的卡布奇诺，这在算子里就叫"读到上一轮的脏数据"。</p>
 <p>同步机制的作用就是在这些并行单元之间建立"先后顺序"的约束：告诉硬件"必须等 A 做完了，B 才能开始"。</p>
 <h3>4.6.2 Pipe 概念</h3>
 <p>每个执行单元有自己的指令流水线（Pipe）。你可以把 Pipe 理解为一条独立的"传送带"：传送带上的指令按顺序执行，但不同传送带之间是异步的。</p>
-<p><strong>(1) 各 Pipe 列表</strong></p>
 <table><thead><tr><th>Pipe</th><th>执行单元</th><th>功能</th></tr></thead><tbody><tr><td>PIPE_MTE2</td><td>MTE2</td><td>GM → UB/L1 搬运（输入搬入）</td></tr><tr><td>PIPE_MTE3</td><td>MTE3</td><td>UB → GM 搬运（输出搬出）</td></tr><tr><td>PIPE_MTE1</td><td>MTE1</td><td>核内搬运（L1↔L0、L1↔UB）</td></tr><tr><td>PIPE_V</td><td>Vector</td><td>向量计算</td></tr><tr><td>PIPE_C</td><td>Cube</td><td>矩阵乘计算</td></tr><tr><td>PIPE_SQU</td><td>Scalar</td><td>标量计算</td></tr></tbody></table>
 <p>同一 Pipe 内的指令是顺序执行的——PIPE_MTE2 上的第一条 DataCopy 一定在第二条之前完成。但不同 Pipe 之间没有天然的顺序保证——PIPE_MTE2 上的 DataCopy 和 PIPE_V 上的 Add 可能同时执行，也可能先后执行，取决于硬件调度。</p>
 <p>这就是为什么我们需要显式的同步机制：在 Pipe 之间建立依赖关系，确保数据在被使用之前已经准备好了。</p>
@@ -111,7 +109,6 @@ Buffer[1]:        [搬运] [计算] [搬出]          [搬运] [计算] [搬出]
 <p><strong>搬运和计算时间均衡</strong>：流水线的效率取决于最慢的那个阶段。如果搬运需要 100 个周期，计算只需要 10 个周期，那计算单元大部分时间都在等搬运，流水线形同虚设。理想的状况是搬运和计算时间接近，两者都能充分利用。</p>
 <p><strong>使用 TPipe 管理生命周期</strong>：<code>TPipe</code> 类封装了 Buffer 初始化、队列管理和流水线控制的全部逻辑。通过 <code>pipe.InitBuffer()</code> 初始化队列，框架会自动处理 Buffer 的分配和对齐。</p>
 <p><strong>使用 TQue 队列管理 Buffer</strong>：<code>TQue</code> 队列的 EnQue/DeQue 语义不仅管理 Buffer 的分配和释放，还隐含了同步语义（尤其在 A5 上）。正确使用队列可以让同步代码几乎为零。</p>
-<p><strong>(1) swap 为什么用单 Buffer</strong></p>
 <p>回到我们的贯穿示例 swap。swap 使用单 Buffer，而不是双 Buffer。这是为什么呢？</p>
 <p>原因在于 swap 没有 Vector 计算阶段。它的执行流程是：</p>
 <div style="margin:20px 0;text-align:center">

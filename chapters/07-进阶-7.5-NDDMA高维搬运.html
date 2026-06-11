@@ -78,7 +78,6 @@
 <li><strong>搬出</strong>：通过 Transpose + DataCopyPad 将结果转置回原始维度顺序并搬出到 GM</li>
 </ol>
 
-<p><strong>(1) 代码示例</strong></p>
 <p>以形状为 <code>[N, D]</code>（D=16，FP32）的张量归约为例，展示 NDDMA 的使用方式：</p>
 <pre><code class="language-cpp">__aicore__ inline void ReduceShortLastAxis(
     const LocalTensor&lt;float&gt;&amp; ubSrc,

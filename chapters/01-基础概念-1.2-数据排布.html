@@ -32,7 +32,6 @@
 <p><strong>Q：为什么 ND 格式最常用，而不是 NCHW 或 NHWC？</strong></p>
 <p>A：因为 Ascend C 开发的大部分算子（如 Add、Mul、Swap 等逐元素和搬运算子）并不关心数据的"语义"（哪个维度是 Channel、哪个是 Height）。它们只关心"总共有多少个元素、怎么连续搬运"。ND 格式不限定维度含义，对这些算子来说最灵活。只有涉及卷积、矩阵乘等需要匹配 Cube 计算粒度的算子时，才需要使用 5HD、FracZ 等专用格式。</p>
 </blockquote>
-<p><strong>(1) 格式转换路径</strong></p>
 <div style="margin:20px 0;text-align:center">
 <svg style="width:100%;max-width:510px" viewBox="0 0 510 210" xmlns="http://www.w3.org/2000/svg">
 <defs><marker id="ah4" markerWidth="6" markerHeight="4" refX="5" refY="2" orient="auto"><polygon points="0 0,6 2,0 4" fill="#6366f1"/></marker></defs>
